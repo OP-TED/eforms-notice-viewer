@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class NoticeViewer {
@@ -67,8 +68,9 @@ public class NoticeViewer {
             .generate(eformsSdkVersion, viewId, forceBuild);
 
     final Path htmlPath = HtmlGenerator.Builder
-        .create(eformsSdkVersion, sdkRoot)
+        .create()
         .withProfileXslt(profileXslt)
+        .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
         .build()
         .generateFile(language, viewId, noticeXmlPath, xslPath);
 
@@ -147,9 +149,10 @@ public class NoticeViewer {
 
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
           return HtmlGenerator.Builder
-              .create(eformsSdkVersion, sdkRoot)
+              .create()
               .withCharset(charset)
               .withProfileXslt(profileXslt)
+              .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
               .build()
               .generateString(language, viewId, new StreamSource(noticeXmlIsClone2),
                   new StreamSource(xslIs));

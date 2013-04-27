@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,34 +24,24 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
-import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
 public class HtmlGenerator {
   private static final Logger logger = LoggerFactory.getLogger(HtmlGenerator.class);
 
-  private final String sdkVersion;
-  private final Path sdkRoot;
   private final Charset charset;
   private final boolean profileXslt;
+  private final URIResolver uriResolver;
 
-  public HtmlGenerator(final String sdkVersion, final Path sdkRoot, Charset charset,
-      boolean profileXslt) {
-    Validate.notBlank(sdkVersion, "Undefined SDK version");
-
-    Validate.notNull(sdkRoot, "Undefined SDK root");
-    Validate.isTrue(Files.isDirectory(sdkRoot),
-        MessageFormat.format("SDK root directory not found: {0}", sdkRoot));
-
-    this.sdkVersion = sdkVersion;
-    this.sdkRoot = sdkRoot;
+  public HtmlGenerator(final Charset charset, final URIResolver uriResolver, boolean profileXslt) {
     this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
     this.profileXslt = profileXslt;
+    this.uriResolver = uriResolver;
   }
 
   private HtmlGenerator(Builder builder) {
-    this(builder.sdkVersion, builder.sdkRoot, builder.charset, builder.profileXslt);
+    this(builder.charset, builder.uriResolver, builder.profileXslt);
   }
 
   public Path generateFile(final String language, final String viewId, final Path noticeXmlPath,
@@ -111,7 +102,7 @@ public class HtmlGenerator {
   }
 
   private TransformerFactory getTransformerFactory() throws TransformerConfigurationException {
-    logger.debug("Creating XSL transformer factory for SDK version [{}]", sdkVersion);
+    logger.debug("Creating XSL transformer factory");
 
     // XSL for input transformation.
     final TransformerFactory factory = TransformerFactory.newInstance();
@@ -122,10 +113,12 @@ public class HtmlGenerator {
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
-    // Currently this is what allows to load the labels (i18n).
-    factory.setURIResolver(new TranslationUriResolver(sdkVersion, sdkRoot));
+    if (uriResolver != null) {
+      // Currently this is what allows to load the labels (i18n).
+      factory.setURIResolver(uriResolver);
+    }
 
-    logger.debug("Successfully created XSL transformer factory for SDK version [{}]", sdkVersion);
+    logger.debug("Successfully created XSL transformer factory");
 
     return factory;
   }
@@ -146,8 +139,7 @@ public class HtmlGenerator {
       factory.setAttribute(FeatureKeys.TRACE_LISTENER_OUTPUT_FILE, xsltProfilePath.toString());
     }
 
-    logger.debug("Creating XSL transformer for SDK version [{}], language [{}] and view ID [{}]",
-        sdkVersion, language, viewId);
+    logger.debug("Creating XSL transformer for language [{}] and view ID [{}]", language, viewId);
 
     final Transformer transformer = factory.newTransformer(xslSource);
     if (StringUtils.isNotBlank(language)) {
@@ -155,8 +147,8 @@ public class HtmlGenerator {
     }
 
     logger.debug(
-        "Successfully created XSL transformer for SDK version [{}], language [{}] and view ID [{}]",
-        sdkVersion, language, viewId);
+        "Successfully created XSL transformer for language [{}] and view ID [{}]", language,
+        viewId);
 
     return transformer;
   }
@@ -173,32 +165,26 @@ public class HtmlGenerator {
     final Transformer transformer = getTransformer(language, viewId, xslSource);
 
     logger.info(
-        "Applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}",
-        language, sdkVersion, xmlSource.getSystemId());
+        "Applying XSL transformation for language [{}] with: XML input={}", language,
+        xmlSource.getSystemId());
 
     transformer.transform(xmlSource, output);
 
     logger.debug(
-        "Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML source={}, XSL source={}",
-        language, sdkVersion, xmlSource.getSystemId(), xslSource.getSystemId());
+        "Finished applying XSL transformation for language [{}] with: XML source={}, XSL source={}",
+        language, xmlSource.getSystemId(), xslSource.getSystemId());
   }
 
   public static final class Builder {
     // required parameters
-    private final String sdkVersion;
-    private final Path sdkRoot;
 
     // optional parameters
     private Charset charset;
     private boolean profileXslt;
+    private URIResolver uriResolver;
 
-    public Builder(final String sdkVersion, final Path sdkRoot) {
-      this.sdkVersion = sdkVersion;
-      this.sdkRoot = sdkRoot;
-    }
-
-    public static Builder create(final String sdkVersion, final Path sdkRoot) {
-      return new Builder(sdkVersion, sdkRoot);
+    public static Builder create() {
+      return new Builder();
     }
 
     public Builder withCharset(final Charset charset) {
@@ -208,6 +194,11 @@ public class HtmlGenerator {
 
     public Builder withProfileXslt(final boolean profileXslt) {
       this.profileXslt = profileXslt;
+      return this;
+    }
+
+    public Builder withUriResolver(final URIResolver uriResolver) {
+      this.uriResolver = uriResolver;
       return this;
     }
 
