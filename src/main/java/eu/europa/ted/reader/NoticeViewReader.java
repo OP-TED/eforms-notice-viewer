@@ -51,11 +51,13 @@ public class NoticeViewReader {
     }
 
     // Build a custom Java representation of the tree.
-    final NoticeViewTemplate nvt = readChildNodeRecursive(viewTemplateRootJson);
+    final NoticeViewTemplate nvt = readChildNodeRecursive(viewTemplateRootJson, 1); // Level one.
+
+    // TODO pass SDK version and more.
     return new NoticeView(viewId, name, description, nvt);
   }
 
-  private static NoticeViewTemplate readChildNodeRecursive(final JsonNode node) {
+  private static NoticeViewTemplate readChildNodeRecursive(final JsonNode node, final int depth) {
     final String id = getTextMaybeNull(node, "id"); // Could be used as an ID in the HTML.
     final String parentId = getTextMaybeNoKey(node, "parentId");
     final String template = getTextMaybeNull(node, "template");
@@ -65,7 +67,7 @@ public class NoticeViewReader {
     // Build a custom Java representation.
     final NoticeViewTemplate nvt;
     if (childNodes == null) {
-      nvt = new NoticeViewTemplate(id, parentId, template); // Tree leaf.
+      nvt = new NoticeViewTemplate(id, parentId, depth, template); // Tree leaf.
     } else {
       if (!childNodes.isArray()) {
         throw new RuntimeException(
@@ -74,9 +76,9 @@ public class NoticeViewReader {
       final int size = childNodes.size();
       final List<NoticeViewTemplate> nvts = new ArrayList<>(size);
       for (int i = 0; i < size; i++) {
-        nvts.add(readChildNodeRecursive(childNodes.get(i)));
+        nvts.add(readChildNodeRecursive(childNodes.get(i), depth + 1));
       }
-      nvt = new NoticeViewTemplate(id, parentId, template, nvts);
+      nvt = new NoticeViewTemplate(id, parentId, template, depth, nvts);
     }
     return nvt;
   }

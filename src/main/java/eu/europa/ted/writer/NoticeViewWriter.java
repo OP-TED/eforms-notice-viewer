@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.europa.ted.reader.NoticeView;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -37,10 +38,9 @@ public class NoticeViewWriter {
     return viewTemplate; // TODO
   }
 
-  public static void toHtml5(final NoticeView noticeView, final Path pathToTemplate,
-      final Path outputFilepath, final Configuration freemarkerConfig)
+  public static void generateFileUsingFreeMarkerTemplate(final NoticeView noticeView,
+      final Path pathToTemplate, final Path outputFilepath, final Configuration freemarkerConfig)
       throws TemplateException, IOException {
-    System.out.println("Using template: " + pathToTemplate);
 
     // Template + data-model = output
 
@@ -56,5 +56,10 @@ public class NoticeViewWriter {
 
     final Writer fileWriter = new FileWriter(outputFilepath.toFile());
     freemarkerTemplate.process(templateModel, fileWriter);
+  }
+
+  public static void javaObjectToJson(final NoticeView noticeView, final Path outputFilepath,
+      final ObjectMapper mapper) throws IOException {
+    mapper.writeValue(outputFilepath.toFile(), noticeView);
   }
 }

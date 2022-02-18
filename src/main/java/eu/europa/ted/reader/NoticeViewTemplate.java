@@ -14,25 +14,30 @@ public class NoticeViewTemplate {
   private final String parentId;
   private final String template;
   private final List<NoticeViewTemplate> childNodes;
+  private final int depth;
 
   /**
    * Leaf constructor.
+   *
+   * @param depth
    */
-  public NoticeViewTemplate(final String id, final String parentId, final String template) {
-    this(id, parentId, template, Collections.emptyList());
+  public NoticeViewTemplate(final String id, final String parentId, final int depth,
+      final String template) {
+    this(id, parentId, template, depth, Collections.emptyList());
   }
 
   /**
    * Non-leaf constructor.
    */
   public NoticeViewTemplate(final String id, final String parentId, final String template,
-      final List<NoticeViewTemplate> childNodes) {
+      final int depth, final List<NoticeViewTemplate> childNodes) {
     assert id != null;
     assert template != null;
     assert childNodes != null;
     this.id = id;
     this.parentId = parentId;
     this.template = template;
+    this.depth = depth;
     this.childNodes = childNodes;
   }
 
@@ -57,6 +62,10 @@ public class NoticeViewTemplate {
 
   public String getId() {
     return id;
+  }
+
+  public int getDepth() {
+    return depth;
   }
 
   public String getParentId() {

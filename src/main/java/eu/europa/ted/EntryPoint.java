@@ -7,8 +7,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Locale;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.europa.ted.reader.NoticeViewReader;
 import eu.europa.ted.reader.NoticeView;
+import eu.europa.ted.reader.NoticeViewReader;
 import eu.europa.ted.writer.NoticeViewWriter;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
@@ -44,13 +44,10 @@ public class EntryPoint {
 
       final Configuration conf =
           NoticeViewWriter.buildFreeMarkerConfig(templateFolder, locale, charset);
-      NoticeViewWriter.toHtml5(noticeView,
+      NoticeViewWriter.generateFileUsingFreeMarkerTemplate(noticeView,
+          templateFolder.resolve(templateFileToUse), Path.of("target/output-html5.html"), conf);
 
-          templateFolder.resolve(templateFileToUse),
-
-          Path.of("target/output-html5.html"),
-
-          conf);
+      NoticeViewWriter.javaObjectToJson(noticeView, Path.of("target/output-data.json"), mapper);
 
     } catch (IOException e) {
       e.printStackTrace();

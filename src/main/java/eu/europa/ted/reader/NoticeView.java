@@ -3,6 +3,14 @@ package eu.europa.ted.reader;
 import java.util.Objects;
 
 public class NoticeView {
+
+  // TODO add SDK version stuff the way we do for fields.json
+  // "sdkVersion" : "eforms-sdk-0.5.0",
+  // "metadataDatabase" : {
+  // "version" : "0.3.0",
+  // "createdOn" : "2022-01-20T16:03:52"
+  // },
+
   private final String viewId;
   private final String name;
   private final String description;
