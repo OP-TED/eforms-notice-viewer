@@ -57,17 +57,24 @@ public class NoticeViewReader {
     return new NoticeView(viewId, name, description, nvt);
   }
 
+  public static String processViewTemplate(final String viewTemplate) {
+    return viewTemplate; // TODO call EFX.
+  }
+
   private static NoticeViewTemplate readChildNodeRecursive(final JsonNode node, final int depth) {
     final String id = getTextMaybeNull(node, "id"); // Could be used as an ID in the HTML.
     final String parentId = getTextMaybeNoKey(node, "parentId");
     final String template = getTextMaybeNull(node, "template");
+
     final String childrenKey = "children";
     final JsonNode childNodes = node.get(childrenKey);
+
+    final String efxTemplateOutput = processViewTemplate(template);
 
     // Build a custom Java representation.
     final NoticeViewTemplate nvt;
     if (childNodes == null) {
-      nvt = new NoticeViewTemplate(id, parentId, depth, template); // Tree leaf.
+      nvt = new NoticeViewTemplate(id, parentId, depth, efxTemplateOutput); // Tree leaf.
     } else {
       if (!childNodes.isArray()) {
         throw new RuntimeException(

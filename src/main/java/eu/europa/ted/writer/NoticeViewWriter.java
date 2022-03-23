@@ -34,10 +34,6 @@ public class NoticeViewWriter {
     return cfg;
   }
 
-  public static String processViewTemplate(final String viewTemplate) {
-    return viewTemplate; // TODO
-  }
-
   public static void generateFileUsingFreeMarkerTemplate(final NoticeView noticeView,
       final Path pathToTemplate, final Path outputFilepath, final Configuration freemarkerConfig)
       throws TemplateException, IOException {
