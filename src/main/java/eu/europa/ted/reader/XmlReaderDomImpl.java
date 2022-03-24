@@ -18,6 +18,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -68,12 +69,25 @@ public class XmlReaderDomImpl implements XmlReader {
   public List<String> valuesOf(final String xpathExpression) throws XPathExpressionException {
     final NodeList nodes =
         (NodeList) this.xpath.evaluate(xpathExpression, xmlDoc, XPathConstants.NODESET);
-    final int length = nodes.getLength();
-    final List<String> texts = new ArrayList<>(length);
-    for (int i = 0; i < length; i++) {
-      texts.add(nodes.item(i).getTextContent());
-    }
-    return texts;
+    return getNodesTexts(nodes);
+  }
+
+  /**
+   * @return One or more String values resulting of evaluating the expression. Implementation
+   *         specific.
+   */
+  private List<String> valuesOf(final String xpathExpression, final Node contextNode)
+      throws XPathExpressionException {
+    final NodeList nodes =
+        (NodeList) this.xpath.evaluate(xpathExpression, contextNode, XPathConstants.NODESET);
+    return getNodesTexts(nodes);
+  }
+
+  @Override
+  public List<String> valuesOf(final String relativeXpath, final String contextXpath)
+      throws XPathExpressionException {
+    final Node contextNode = (Node) this.xpath.evaluate(contextXpath, xmlDoc, XPathConstants.NODE);
+    return valuesOf(relativeXpath, contextNode);
   }
 
   /**
@@ -124,6 +138,15 @@ public class XmlReaderDomImpl implements XmlReader {
       }
     });
     return newXPath;
+  }
+
+  private static List<String> getNodesTexts(final NodeList nodes) {
+    final int length = nodes.getLength();
+    final List<String> texts = new ArrayList<>(length);
+    for (int i = 0; i < length; i++) {
+      texts.add(nodes.item(i).getTextContent());
+    }
+    return texts;
   }
 
 }
