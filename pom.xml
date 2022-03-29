@@ -2,11 +2,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>eforms-notice-viewer</groupId>
+  <groupId>eu.europa.ted.eforms</groupId>
   <artifactId>eforms-notice-viewer</artifactId>
   <version>0.0.1</version>
   <name>eForms Notice Viewer</name>
-  <description>eForms Notice Viewer Demo</description>
+  <description>eForms Notice Viewer sample application.</description>
   <packaging>jar</packaging>
 
   <properties>
@@ -16,6 +16,18 @@
   </properties>
 
   <dependencies>
+
+    <dependency>
+      <groupId>eu.europa.ted.eforms</groupId>
+      <artifactId>eforms-expression-language</artifactId>
+      <version>0.0.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>eu.europa.ted.eforms</groupId>
+      <artifactId>eforms-sdk-lib</artifactId>
+      <version>0.0.1</version>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
@@ -39,6 +51,20 @@
       <version>2.3.31</version>
     </dependency>
 
+
+      <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.12.0</version>
+      </dependency>
+  
+      <!-- Used for the codelists (gc files). -->
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-genericode</artifactId>
+        <version>6.2.0</version>
+      </dependency>
   </dependencies>
 
   <build>
@@ -48,7 +74,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>eu.europa.ted.EntryPoint</mainClass>
+              <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
             </manifest>
           </archive>
           <descriptorRefs>
