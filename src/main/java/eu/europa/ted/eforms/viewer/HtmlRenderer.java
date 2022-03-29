@@ -2,7 +2,7 @@ package eu.europa.ted.eforms.viewer;
 
 
 import java.io.StringWriter;
-import eu.europa.ted.efx.NoticeRenderer;
+import eu.europa.ted.efx.interfaces.NoticeRenderer;
 
 public class HtmlRenderer extends StringWriter implements NoticeRenderer {
 

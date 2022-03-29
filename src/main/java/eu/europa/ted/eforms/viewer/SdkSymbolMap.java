@@ -13,7 +13,7 @@ import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
 import eu.europa.ted.eforms.xpath.XPathContextualizer;
-import eu.europa.ted.efx.SymbolMap;
+import eu.europa.ted.efx.interfaces.SymbolMap;
 
 public class SdkSymbolMap implements SymbolMap {
 

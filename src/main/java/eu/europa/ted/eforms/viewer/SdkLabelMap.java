@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.JavaTools;
-import eu.europa.ted.efx.LabelMap;
+import eu.europa.ted.efx.interfaces.LabelMap;
 
 public class SdkLabelMap implements LabelMap {
 
