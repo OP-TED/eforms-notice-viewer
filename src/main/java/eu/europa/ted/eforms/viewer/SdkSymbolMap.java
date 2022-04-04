@@ -86,7 +86,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of the field who's parent node we are looking for.
    * @return The id of the parent node of the given field.
    */
-  String parentNodeOfField(final String fieldId) {
+  public String parentNodeOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField != null) {
       return sdkField.getParentNodeId();
@@ -98,7 +98,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of a field.
    * @return The xPath of the given field.
    */
-  String absoluteXpathOfField(final String fieldId) {
+  public String absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new InputMismatchException(String.format("Unknown field identifier '%s'.", fieldId));
@@ -110,7 +110,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param nodeId The id of a node or a field.
    * @return The xPath of the given node or field.
    */
-  String absoluteXpathOfNode(final String nodeId) {
+  public String absoluteXpathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
       throw new InputMismatchException(String.format("Unknown node identifier '%s'.", nodeId));
@@ -165,12 +165,10 @@ public class SdkSymbolMap implements SymbolMap {
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
-  @Override
   public String mapOperator(String operator) {
     return SdkSymbolMap.operators.get(operator);
   }
 
-  @Override
   public String typeOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
@@ -179,7 +177,6 @@ public class SdkSymbolMap implements SymbolMap {
     return sdkField.getType();
   }
 
-  @Override
   public String rootCodelistOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
