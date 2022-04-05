@@ -15,9 +15,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.JavaTools;
-import eu.europa.ted.efx.interfaces.LabelMap;
 
-public class SdkLabelMap implements LabelMap {
+public class SdkLabelMap {
 
   /**
    * Path relative to maven src/main/resources/
@@ -54,7 +53,6 @@ public class SdkLabelMap implements LabelMap {
     //
   }
 
-  @Override
   public String mapLabel(final String labelId, final String language) throws IOException {
 
     final Map<String, String> labelById =
@@ -105,12 +103,10 @@ public class SdkLabelMap implements LabelMap {
     return null;
   }
 
-  @Override
   public String mapLabel(final String labelId, final Locale locale) throws IOException {
     return mapLabel(labelId, locale.getLanguage());
   }
 
-  @Override
   public String mapLabel(String assetType, String labelType, String assetId, String language)
       throws IOException {
     return this.mapLabel(String.format("%s|%s|%s", assetType, labelType, assetId), language);
