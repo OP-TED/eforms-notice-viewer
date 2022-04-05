@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import eu.europa.ted.eforms.viewer.helpers.JavaTools;
-import eu.europa.ted.efx.EfxTemplateRenderer;
+import eu.europa.ted.efx.EfxTemplateTranslator;
 
 public class EfxToXslTranslatorTests {
     
@@ -16,7 +16,7 @@ public class EfxToXslTranslatorTests {
     @Test
     public void testTranslateFile() throws IOException {
         Path template = JavaTools.getResourceAsPath("eforms-sdk/notice-types/view-templates/X02.efx");
-        String translation = EfxTemplateRenderer.renderTemplateFile(template, SDK_VERSION, new DependencyFactory());
+        String translation = EfxTemplateTranslator.renderTemplateFile(template, SDK_VERSION, new DependencyFactory());
 
         String folderName = "target/output-xsl";
         File folder = new File(folderName); 
