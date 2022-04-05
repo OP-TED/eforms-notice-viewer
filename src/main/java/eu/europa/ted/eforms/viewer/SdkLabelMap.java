@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer;
 
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;

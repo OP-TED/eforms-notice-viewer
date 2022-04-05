@@ -10,22 +10,23 @@ import eu.europa.ted.eforms.viewer.helpers.JavaTools;
 import eu.europa.ted.efx.EfxTemplateTranslator;
 
 public class EfxToXslTranslatorTests {
-    
-    final String SDK_VERSION = "latest";
 
-    @Test
-    public void testTranslateFile() throws IOException {
-        Path template = JavaTools.getResourceAsPath("eforms-sdk/notice-types/view-templates/X02.efx");
-        String translation = EfxTemplateTranslator.renderTemplateFile(template, SDK_VERSION, new DependencyFactory());
+  final String SDK_VERSION = "latest";
 
-        String folderName = "target/output-xsl";
-        File folder = new File(folderName); 
-        if (!folder.exists()) {
-            folder.mkdirs();
-        }
-        File file = new File(folderName + "/X02.xsl");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
-        writer.write(translation);
-        writer.close();
+  @Test
+  public void testTranslateFile() throws IOException {
+    Path template = JavaTools.getResourceAsPath("eforms-sdk/notice-types/view-templates/X02.efx");
+    String translation =
+        EfxTemplateTranslator.renderTemplateFile(template, SDK_VERSION, new DependencyFactory());
+
+    String folderName = "target/output-xsl";
+    File folder = new File(folderName);
+    if (!folder.exists()) {
+      folder.mkdirs();
     }
+    File file = new File(folderName + "/X02.xsl");
+    BufferedWriter writer = new BufferedWriter(new FileWriter(file.getAbsoluteFile()));
+    writer.write(translation);
+    writer.close();
+  }
 }

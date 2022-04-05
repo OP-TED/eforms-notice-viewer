@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
+@SuppressWarnings("static-method")
 public class LabelMapTests {
 
   private static final String SDK_VERSION_DUMMY = "dummy";

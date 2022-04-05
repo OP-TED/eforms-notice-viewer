@@ -40,8 +40,7 @@ public class SdkSymbolMapTests {
     final String contextPathOfField = symbols.contextPathOfField(fieldId);
     assertEquals("/*/cac:TenderingTerms", contextPathOfField);
 
-    final String relativePathOfField =
-        symbols.relativeXpathOfField(fieldId, contextPathOfField);
+    final String relativePathOfField = symbols.relativeXpathOfField(fieldId, contextPathOfField);
     assertEquals("cac:ProcurementLegislationDocumentReference/cbc:ID[not(text()='CrossBorderLaw')]",
         relativePathOfField);
 
@@ -52,31 +51,31 @@ public class SdkSymbolMapTests {
 
   // @Test
   // public void testSymbolsFieldParentNode() {
-  //   final SdkSymbols symbols = getDummyInstance();
-  //   symbols.useNewContextualizer(testNewContextualizer);
-  //   final String fieldId = "BT-01(c)-Procedure";
-  //   final String parentNodeId = symbols.parentNodeOfField(fieldId);
-  //   assertEquals("ND-1", parentNodeId);
+  // final SdkSymbols symbols = getDummyInstance();
+  // symbols.useNewContextualizer(testNewContextualizer);
+  // final String fieldId = "BT-01(c)-Procedure";
+  // final String parentNodeId = symbols.parentNodeOfField(fieldId);
+  // assertEquals("ND-1", parentNodeId);
   // }
 
   // @Test
   // public void testSymbolsFieldXpath() {
-  //   final SdkSymbols symbols = getDummyInstance();
-  //   symbols.useNewContextualizer(testNewContextualizer);
-  //   final String fieldId = "BT-01(c)-Procedure";
-  //   final String xpath = symbols.absoluteXpathOfField(fieldId);
-  //   assertEquals(
-  //       "/*/cac:TenderingTerms/cac:ProcurementLegislationDocumentReference/cbc:ID[not(text()='CrossBorderLaw')]",
-  //       xpath);
+  // final SdkSymbols symbols = getDummyInstance();
+  // symbols.useNewContextualizer(testNewContextualizer);
+  // final String fieldId = "BT-01(c)-Procedure";
+  // final String xpath = symbols.absoluteXpathOfField(fieldId);
+  // assertEquals(
+  // "/*/cac:TenderingTerms/cac:ProcurementLegislationDocumentReference/cbc:ID[not(text()='CrossBorderLaw')]",
+  // xpath);
   // }
 
   // @Test
   // public void testSymbolsNodeXpath() {
-  //   final SdkSymbols symbols = getDummyInstance();
-  //   symbols.useNewContextualizer(testNewContextualizer);
-  //   final String nodeId = "ND-609";
-  //   final String xpath = symbols.absoluteXpathOfNode(nodeId);
-  //   assertEquals("/*/cac:AdditionalDocumentReference", xpath);
+  // final SdkSymbols symbols = getDummyInstance();
+  // symbols.useNewContextualizer(testNewContextualizer);
+  // final String nodeId = "ND-609";
+  // final String xpath = symbols.absoluteXpathOfNode(nodeId);
+  // assertEquals("/*/cac:AdditionalDocumentReference", xpath);
   // }
 
 }
