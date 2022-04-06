@@ -28,10 +28,10 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
     writer.openTag("html");
     writer.openTag("head");
     writer.openTag("style");
-    writer.writeLine("section { border: 1px solid black; padding: 5px; }");
-    writer.writeLine(".text { font-size: 12pt; color: blue;}");
+    writer.writeLine("section { padding: 6px 6px 6px 36px; }");
+    writer.writeLine(".text { font-size: 12pt; color: black;}");
     writer.writeLine(".label { font-size: 12pt; color: green; }");
-    writer.writeLine(".dynamic-label { font-size: 12pt; color: orange; }");
+    writer.writeLine(".dynamic-label { font-size: 12pt; color: blue; }");
     writer.writeLine(".value { font-size: 12pt; color: red; }");
     writer.closeTag("style");
     writer.closeTag("head");
