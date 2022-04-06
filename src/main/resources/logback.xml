@@ -10,6 +10,7 @@
   </appender>
 
   <!-- <logger name="eu.europa.ted.eforms.viewer" level="DEBUG" /> -->
+  <logger name="net.sf.saxon.lib" level="DEBUG" />
   <root level="INFO">
     <appender-ref ref="STDOUT" />
   </root>

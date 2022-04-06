@@ -12,10 +12,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.slf4j.Logger;
@@ -26,8 +26,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.JavaTools;
+import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.efx.EfxTemplateTranslator;
+import net.sf.saxon.Configuration;
+import net.sf.saxon.lib.FeatureKeys;
+import net.sf.saxon.lib.StandardURIResolver;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -36,8 +39,19 @@ public class NoticeViewer {
   private static final String EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
       "eforms-sdk/notice-types/view-templates/";
 
-  public static Path parseNotice(final Optional<String> viewIdOpt, final String noticeName)
-      throws IOException, SAXException, ParserConfigurationException, TransformerException {
+  /**
+   *
+   * @param language
+   * @param noticeName
+   * @param viewIdOpt
+   * @return
+   * @throws IOException If an error occurs during input or output
+   * @throws ParserConfigurationException Error related to XML reader configuration
+   * @throws SAXException XML parse related errors
+   */
+  public static Path generateHtml(final String language, final String noticeName,
+      final Optional<String> viewIdOpt)
+      throws IOException, SAXException, ParserConfigurationException {
 
     final Path noticeXmlPath = getNoticeXmlPath(noticeName);
     logger.info("noticeName={}, noticeXmlPath={}", noticeName, noticeXmlPath);
@@ -71,37 +85,63 @@ public class NoticeViewer {
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
     logger.info("noticeName={}, viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
+    // TODO use language
+
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
     logger.info("Created xsl file: {}", xslPath);
 
-    final Path htmlPath = applyXslTransform(noticeXmlPath, xslPath, viewId);
-    return htmlPath;
+    return applyXslTransform(language, noticeXmlPath, xslPath, viewId);
   }
 
-  private static Path applyXslTransform(final Path noticeXmlPath, final Path xslPath,
-      final String viewId) throws IOException, TransformerFactoryConfigurationError,
-      TransformerConfigurationException, TransformerException {
+  static Path applyXslTransform(final String language, final Path noticeXmlPath, final Path xslPath,
+      final String viewId) throws IOException {
 
     // XML as input.
     final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
 
-    // Use SaxonHE so that we can evaluate XSL 2.0:
+    // Use Saxon HE so that we can evaluate XSL 2.0:
     System.setProperty("javax.xml.transform.TransformerFactory",
-        "net.sf.saxon.TransformerFactoryImpl");
+        "net.sf.saxon.TransformerFactoryImpl"); // Use the "net.sf.saxon" we have in the pom.xml
 
-    // XSL for input transformation.
-    final TransformerFactory factory = TransformerFactory.newInstance();
-    final Source xslSource = new StreamSource(xslPath.toFile());
-    final Transformer transformer = factory.newTransformer(xslSource);
+    try {
+      // XSL for input transformation.
+      final TransformerFactory factory = TransformerFactory.newInstance();
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false); // Security.
+      factory.setFeature(FeatureKeys.DTD_VALIDATION, false);
 
-    // HTML as output of the transformation.
-    final Path outFolder = Path.of("target/output-html");
-    Files.createDirectories(outFolder);
-    final Path htmlPath = outFolder.resolve(viewId + ".html");
+      // factory.setFeature(FeatureKeys.SUPPRESS_XSLT_NAMESPACE_CHECK, true);
+      // factory.setFeature(FeatureKeys.DEFAULT_LANGUAGE, true);
 
-    transformer.transform(xmlInput, new StreamResult(htmlPath.toFile()));
+      final URIResolver uriResolver = new XsltUriResolver();
 
-    return htmlPath;
+      // Configuration config = new Configuration();
+      // final URIResolver uriResolver = new StandardURIResolver(config);
+      factory.setURIResolver(uriResolver);
+
+      final Source xslSource = new StreamSource(xslPath.toFile());
+      final Transformer transformer = factory.newTransformer(xslSource);
+      // transformer.setURIResolver(uriResolver); Already set by the factory!
+
+      // TODO use language in XsltUriResolver or pass it to transformer?
+      transformer.setParameter("language", language); // For en.xml or fr.xml, ...
+
+
+      // HTML as output of the transformation.
+      final Path outFolder = Path.of("target/output-html");
+      Files.createDirectories(outFolder);
+      final Path htmlPath = outFolder.resolve(viewId + ".html");
+
+      // en.xml this causes problems:
+      // <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+
+      transformer.transform(xmlInput, new StreamResult(htmlPath.toFile()));
+
+      return htmlPath;
+
+    } catch (TransformerFactoryConfigurationError | TransformerException e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+
   }
 
   /**
@@ -164,7 +204,7 @@ public class NoticeViewer {
   private static Path getNoticeXmlPath(final String cmdLnNoticeXml) {
     // TODO this kind of thing could be provided by the SDK lib
     final String resourcePath = EFORMS_SDK_EXAMPLES_NOTICES + cmdLnNoticeXml + ".xml";
-    return JavaTools.getResourceAsPath(resourcePath);
+    return ResourceLoader.getResourceAsPath(resourcePath);
   }
 
   /**
@@ -174,7 +214,7 @@ public class NoticeViewer {
   public static Path getPathToEfxAsStr(final String viewId) {
     // TODO this kind of thing could be provided by the SDK lib
     final String resourcePath = EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES + viewId + ".efx";
-    return JavaTools.getResourceAsPath(resourcePath);
+    return ResourceLoader.getResourceAsPath(resourcePath);
   }
 
 }

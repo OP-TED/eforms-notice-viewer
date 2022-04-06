@@ -1,10 +1,14 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -13,7 +17,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.JavaTools;
+import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 
 public class SdkLabelMap {
 
@@ -60,7 +64,7 @@ public class SdkLabelMap {
     if (labelById.isEmpty()) {
 
       // Lazily load all labels associated to given language.
-      JavaTools.listFilesUsingFileWalk(JavaTools.getResourceAsPath(SDK_TRANSLATIONS_FOLDER), 2,
+      listFilesUsingFileWalk(ResourceLoader.getResourceAsPath(SDK_TRANSLATIONS_FOLDER), 2,
           SDK_TRANSLATIONS_EXT).forEach(path -> {
             final String filenameStr = path.getFileName().toString();
 
@@ -142,4 +146,33 @@ public class SdkLabelMap {
       throw new RuntimeException(e);
     }
   }
+
+  /**
+   * @param pathFolder Folder to crawl
+   * @param maxDepth Maximum folder depth, minimum is 1 level
+   * @param dotExtension Something like .xlsx, or .xml, ... usually to exclude .md or other
+   *        irrelevant files. Ends with is performed using this string
+   *
+   * @return list of paths (files only) ending with the passed the extension.
+   */
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+      value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive.")
+  private static List<Path> listFilesUsingFileWalk(final Path pathFolder, final int maxDepth,
+      final String dotExtension) throws IOException {
+    assert maxDepth > 0 : "maxDepth should be > 0";
+
+    if (!pathFolder.toFile().isDirectory()) {
+      throw new RuntimeException(String.format("Expecting folder but got: %s", pathFolder));
+    }
+    // Works only if name is unique ...
+    // final Path rootPath = Paths.get(ClassLoader.getSystemResource(dir).toURI());
+    try (Stream<Path> stream = Files.walk(pathFolder, maxDepth)) {
+      return stream
+          .filter(pathFile -> !Files.isDirectory(pathFile)
+              && pathFile.toString().endsWith(dotExtension))
+          .sorted()// Alphanumeric sort.
+          .collect(Collectors.toList());
+    }
+  }
+
 }

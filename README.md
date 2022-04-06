@@ -25,5 +25,5 @@ mvn compile exec:java -Dspring.datasource.username=${EFORMS_DATABASE_USERNAME} -
 Example using notice sub type X02:
 
 ```
-mvn compile exec:java -Dspring.datasource.username=${EFORMS_DATABASE_USERNAME} -Dspring.datasource.password=${EFORMS_DATABASE_PASSWORD} -Dexec.mainClass="eu.europa.ted.eforms.viewer.Application" -Dexec.args="X02_registration"
+mvn compile exec:java -Dspring.datasource.username=${EFORMS_DATABASE_USERNAME} -Dspring.datasource.password=${EFORMS_DATABASE_PASSWORD} -Dexec.mainClass="eu.europa.ted.eforms.viewer.Application" -Dexec.args="en X02_registration"
 ```

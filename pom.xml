@@ -52,6 +52,7 @@
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+    <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>

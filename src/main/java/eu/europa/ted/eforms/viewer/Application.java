@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -20,52 +19,41 @@ public class Application {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
-   * @throws TransformerException XSL transformation related errors
    */
   public static void main(final String[] args)
-      throws IOException, SAXException, ParserConfigurationException, TransformerException {
+      throws IOException, SAXException, ParserConfigurationException {
     logger.info("eForms Notice Viewer");
-    logger.info("Usage: <xml file to view> [<view id to use>]");
+    logger.info("Usage: <xml file to view> <two letter language code> [<view id to use>]");
+    logger.info("Example: en X02_registrations");
     logger.info("args={}", Arrays.toString(args));
 
-    if (args.length < 1 || args.length > 2) {
+    if (args.length < 1 || args.length > 3) {
       throw new RuntimeException("Invalid number of arguments, see usage.");
     }
 
-    // We do not need the first arg anymore.
-    final String cmdLnNoticeXml = args[0];
-    final Optional<String> viewIdOpt = args.length > 1 ? Optional.of(args[1]) : Optional.empty();
+    final String language = args[0];
+    final String noticeXml = args[1];
+    final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
 
-    // TODO should we toleratate "X02_registration.xml" or without xml or both???
-    // TODO not sure if we should allow passing an entire path (any path or just ids)
-    generateView(cmdLnNoticeXml, viewIdOpt);
+    generateView(language, noticeXml, viewIdOpt);
   }
 
   /**
-   * @param noticeXml
-   * @param viewIdOpt
+   * @param language The language as a two letter code
+   * @param noticeXmlFilename The notice xml filename but without the xml extension
+   * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
+   *        notice summary. It could fail if this custom view is not compatible with the notice sub
+   *        type
    *
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
-   * @throws TransformerException XSL transformation related errors
    */
-  private static void generateView(final String noticeXml, final Optional<String> viewIdOpt)
-      throws IOException, SAXException, ParserConfigurationException, TransformerException {
-    try {
-      final Path xslPath = NoticeViewer.parseNotice(viewIdOpt, noticeXml);
-      logger.info("Created XSL file: {}", xslPath);
-
-    } catch (IOException e) {
-      logger.error(e.toString(), e);
-      throw e;
-    } catch (SAXException e) {
-      logger.error(e.toString(), e);
-      throw e;
-    } catch (ParserConfigurationException e) {
-      logger.error(e.toString(), e);
-      throw e;
-    }
+  private static void generateView(final String language, final String noticeXmlFilename,
+      final Optional<String> viewIdOpt)
+      throws IOException, SAXException, ParserConfigurationException {
+    final Path xslPath = NoticeViewer.generateHtml(language, noticeXmlFilename, viewIdOpt);
+    logger.info("Created XSL file: {}", xslPath);
   }
 
 }

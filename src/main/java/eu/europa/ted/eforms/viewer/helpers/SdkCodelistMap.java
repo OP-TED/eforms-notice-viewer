@@ -59,14 +59,14 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     final Map<String, String> codelistIdToFilename;
     try {
       codelistIdToFilename = buildMapCodelistIdToFilename(
-          JavaTools.getResourceAsPath(EFORMS_SDK_CODELISTS), marshaller);
+          ResourceLoader.getResourceAsPath(EFORMS_SDK_CODELISTS), marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
 
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = JavaTools.getResourceAsStream(EFORMS_SDK_CODELISTS + filename)) {
+    try (InputStream is = ResourceLoader.getResourceAsStream(EFORMS_SDK_CODELISTS + filename)) {
 
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
