@@ -3,6 +3,7 @@ package eu.europa.ted.eforms.viewer;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -15,7 +16,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.URIResolver;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.slf4j.Logger;
@@ -28,9 +28,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.efx.EfxTemplateTranslator;
-import net.sf.saxon.Configuration;
-import net.sf.saxon.lib.FeatureKeys;
-import net.sf.saxon.lib.StandardURIResolver;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -103,36 +100,24 @@ public class NoticeViewer {
     System.setProperty("javax.xml.transform.TransformerFactory",
         "net.sf.saxon.TransformerFactoryImpl"); // Use the "net.sf.saxon" we have in the pom.xml
 
-    try {
+    try (InputStream inputStream = Files.newInputStream(xslPath)) {
+
       // XSL for input transformation.
       final TransformerFactory factory = TransformerFactory.newInstance();
-      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, false); // Security.
-      factory.setFeature(FeatureKeys.DTD_VALIDATION, false);
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true); // Security.
+      factory.setURIResolver(new CustomUriResolver());
 
-      // factory.setFeature(FeatureKeys.SUPPRESS_XSLT_NAMESPACE_CHECK, true);
-      // factory.setFeature(FeatureKeys.DEFAULT_LANGUAGE, true);
-
-      final URIResolver uriResolver = new XsltUriResolver();
-
-      // Configuration config = new Configuration();
-      // final URIResolver uriResolver = new StandardURIResolver(config);
-      factory.setURIResolver(uriResolver);
-
-      final Source xslSource = new StreamSource(xslPath.toFile());
+      final Source xslSource = new StreamSource(inputStream);
       final Transformer transformer = factory.newTransformer(xslSource);
       // transformer.setURIResolver(uriResolver); Already set by the factory!
 
       // TODO use language in XsltUriResolver or pass it to transformer?
       transformer.setParameter("language", language); // For en.xml or fr.xml, ...
 
-
       // HTML as output of the transformation.
       final Path outFolder = Path.of("target/output-html");
       Files.createDirectories(outFolder);
       final Path htmlPath = outFolder.resolve(viewId + ".html");
-
-      // en.xml this causes problems:
-      // <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 
       transformer.transform(xmlInput, new StreamResult(htmlPath.toFile()));
 
@@ -141,7 +126,6 @@ public class NoticeViewer {
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
       throw new RuntimeException(e.toString(), e);
     }
-
   }
 
   /**
