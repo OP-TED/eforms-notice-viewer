@@ -12,6 +12,8 @@ import eu.europa.ted.eforms.viewer.SdkSymbolMap;
 
 public abstract class MapFromJson<T> extends HashMap<String, T> {
 
+  private static final long serialVersionUID = 1L;
+
   protected MapFromJson(final String sdkVersion, final String jsonPathname) throws IOException {
     this.populateMap(sdkVersion, jsonPathname);
   }
@@ -41,7 +43,7 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
 
   abstract protected void populateMap(final JsonNode json);
 
-  protected final String getTextNullOtherwise(final JsonNode node, final String key) {
+  protected final static String getTextNullOtherwise(final JsonNode node, final String key) {
     final JsonNode otherNode = node.get(key);
     if (otherNode == null) {
       return null;

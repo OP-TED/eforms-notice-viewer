@@ -7,6 +7,8 @@ import eu.europa.ted.eforms.sdk.SdkField;
 
 public class SdkFieldMap extends MapFromJson<SdkField> {
 
+  private static final long serialVersionUID = 1L;
+
   public SdkFieldMap(String sdkVersion) throws IOException {
     super(sdkVersion, "eforms-sdk/fields/fields.json");
   }

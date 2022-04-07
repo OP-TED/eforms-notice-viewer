@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 
-import static java.util.Map.entry;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -20,14 +19,6 @@ public class SdkSymbolMap implements SymbolMap {
   protected Map<String, SdkField> fieldById;
   protected Map<String, SdkNode> nodeById;
   protected Map<String, SdkCodelist> codelistById;
-
-  /**
-   * Maps efx operators to xPath operators.
-   */
-  static final Map<String, String> operators = Map.ofEntries(entry("+", "+"), entry("-", "-"),
-      entry("*", "*"), entry("/", "div"), entry("%", "mod"), entry("and", "and"), entry("or", "or"),
-      entry("not", "not"), entry("==", "="), entry("!=", "!="), entry("<", "<"), entry("<=", "<="),
-      entry(">", ">"), entry(">=", ">="));
 
   /**
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
@@ -52,8 +43,9 @@ public class SdkSymbolMap implements SymbolMap {
    * @param codelistId A reference to an SDK codelist.
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
+  @Override
   public final String expandCodelist(final String codelistId) {
-    SdkCodelist codelist = codelistById.get(codelistId);
+    final SdkCodelist codelist = codelistById.get(codelistId);
     if (codelist == null) {
       throw new InputMismatchException(String.format("Codelist '%s' not found.", codelistId));
     }
@@ -86,6 +78,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of the field who's parent node we are looking for.
    * @return The id of the parent node of the given field.
    */
+  @Override
   public String parentNodeOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField != null) {
@@ -98,6 +91,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of a field.
    * @return The xPath of the given field.
    */
+  @Override
   public String absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
@@ -110,6 +104,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param nodeId The id of a node or a field.
    * @return The xPath of the given node or field.
    */
+  @Override
   public String absoluteXpathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
@@ -125,6 +120,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of the field of which we want to find the context.
    * @return The absolute xPath of the parent node of the passed field
    */
+  @Override
   public String contextPathOfField(String fieldId) {
     return absoluteXpathOfNode(parentNodeOfField(fieldId));
   }
@@ -137,6 +133,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param broaderContextPath
    * @return
    */
+  @Override
   public String contextPathOfField(String fieldId, String broaderContextPath) {
     return relativeXpathOfNode(parentNodeOfField(fieldId), broaderContextPath);
   }
@@ -148,6 +145,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param contextPath xPath indicating the context.
    * @return The xPath of the given field relative to the given context.
    */
+  @Override
   public String relativeXpathOfField(String fieldId, String contextPath) {
     final String xpath = absoluteXpathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
@@ -160,15 +158,13 @@ public class SdkSymbolMap implements SymbolMap {
    * @param contextPath XPath indicating the context.
    * @return The XPath of the given node relative to the given context.
    */
+  @Override
   public String relativeXpathOfNode(String nodeId, String contextPath) {
     final String xpath = absoluteXpathOfNode(nodeId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
-  public String mapOperator(String operator) {
-    return SdkSymbolMap.operators.get(operator);
-  }
-
+  @Override
   public String typeOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
@@ -177,6 +173,7 @@ public class SdkSymbolMap implements SymbolMap {
     return sdkField.getType();
   }
 
+  @Override
   public String rootCodelistOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {

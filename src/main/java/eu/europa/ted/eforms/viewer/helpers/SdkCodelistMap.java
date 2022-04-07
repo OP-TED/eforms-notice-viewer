@@ -20,10 +20,14 @@ import eu.europa.ted.eforms.sdk.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
 
+  private static final long serialVersionUID = 1L;
+
   private static final String EFORMS_SDK_CODELISTS = "eforms-sdk/codelists/";
 
-  public SdkCodelistMap(final String sdkVersion) {
+  private final String sdkVersion;
 
+  public SdkCodelistMap(final String sdkVersion) {
+    this.sdkVersion = sdkVersion;
   }
 
   /**
@@ -35,29 +39,28 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
    */
   public final SdkCodelist get(final String codelistId) {
     if (StringUtils.isBlank(codelistId)) {
-      throw new RuntimeException("CodelistId is empty.");
+      throw new RuntimeException("CodelistId is blank.");
     }
-
-    return this.computeIfAbsent(codelistId, key -> this.loadSdkCodelist(key));
+    return this.computeIfAbsent(codelistId, key -> loadSdkCodelist(key));
   }
 
   @Override
   public SdkCodelist get(Object codelistId) {
-    return this.computeIfAbsent((String) codelistId, key -> this.loadSdkCodelist(key));
+    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
   }
 
   @Override
   public SdkCodelist getOrDefault(Object codelistId, SdkCodelist defaultValue) {
-    return this.computeIfAbsent((String) codelistId, key -> this.loadSdkCodelist(key));
+    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
   }
 
-  SdkCodelist loadSdkCodelist(String codeListId) {
+  private static SdkCodelist loadSdkCodelist(final String codeListId) {
     // Find the SDK codelist .gc file that corresponds to the passed reference.
     // Stream the data from that file.
-
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
     final Map<String, String> codelistIdToFilename;
     try {
+      // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
           ResourceLoader.getResourceAsPath(EFORMS_SDK_CODELISTS), marshaller);
     } catch (IOException e1) {
@@ -70,8 +73,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
 
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
-      final String codelistVersion = cl.getIdentification().getVersion(); // Version tag of
-                                                                          // .gc
+      final String codelistVersion = cl.getIdentification().getVersion(); // Version tag of .gc
 
       // Get all the code values in a list.
       // We assume there are no duplicate code values in the referenced codelists.
