@@ -8,21 +8,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.StringUtils;
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
-import org.apache.commons.lang3.StringUtils;
 import eu.europa.ted.eforms.sdk.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
 
   private static final long serialVersionUID = 1L;
-
-  private static final String EFORMS_SDK_CODELISTS = "eforms-sdk/codelists/";
 
   private final String sdkVersion;
 
@@ -62,14 +59,16 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     try {
       // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
-          ResourceLoader.getResourceAsPath(EFORMS_SDK_CODELISTS), marshaller);
+          ResourceLoader.getResourceAsPath(EformsSdkConstants.EFORMS_SDK_CODELISTS.toString()),
+          marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
 
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = ResourceLoader.getResourceAsStream(EFORMS_SDK_CODELISTS + filename)) {
+    try (InputStream is = ResourceLoader.getResourceAsStream(
+        EformsSdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
 
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
@@ -95,20 +94,12 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     }
   }
 
-  public static String buildEfxList(final List<String> codes) {
-    final StringJoiner joiner = new StringJoiner(", ", "(", ")"); // Separator, prefix, suffix
-    for (final String code : codes) {
-      joiner.add("'" + code + "'");
-    }
-    return joiner.toString();
-  }
-
   private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder,
       final Genericode10CodeListMarshaller marshaller) throws IOException {
     final int depth = 1; // Flat folder, not recursive for now.
     return getFilePathsAsSet(pathFolder, depth, GenericodeTools.EXTENSION_DOT_GC)//
         // .parallelStream() // Overkill and also messes with logs order.
-        .stream().map((Path path) -> {
+        .stream().map(path -> {
           final CodeListDocument cl = marshaller.read(path);
           final Identification identification = cl.getIdentification();
           // We use the longName as a ID, PK in the the DB.
@@ -128,9 +119,8 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
       throw new RuntimeException(String.format("Expecting folder but got: %s", pathFolder));
     }
     try (Stream<Path> stream = Files.walk(pathFolder, depth)) {
-      return stream
-          .filter(
-              pathFile -> !Files.isDirectory(pathFile) && pathFile.toString().endsWith(extension))
+      return stream.filter(pathFile -> !Files.isDirectory(pathFile)//
+          && pathFile.toString().endsWith(extension))//
           .collect(Collectors.toSet());
     }
   }

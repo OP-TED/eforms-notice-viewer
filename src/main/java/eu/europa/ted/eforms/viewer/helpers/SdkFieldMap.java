@@ -9,15 +9,15 @@ public class SdkFieldMap extends MapFromJson<SdkField> {
 
   private static final long serialVersionUID = 1L;
 
-  public SdkFieldMap(String sdkVersion) throws IOException {
-    super(sdkVersion, "eforms-sdk/fields/fields.json");
+  public SdkFieldMap(final String sdkVersion) throws IOException {
+    super(sdkVersion, EformsSdkConstants.EFORMS_SDK_FIELDS_FIELDS_JSON.toString());
   }
 
   @Override
-  protected void populateMap(JsonNode json) {
-    final ArrayNode fields = (ArrayNode) json.get("fields");
+  protected void populateMap(final JsonNode json) {
+    final ArrayNode fields = (ArrayNode) json.get(EformsSdkConstants.FIELDS_JSON_FIELDS_KEY);
     for (final JsonNode field : fields) {
-      SdkField sdkField = new SdkField(field);
+      final SdkField sdkField = new SdkField(field);
       this.put(sdkField.getId(), sdkField);
     }
   }

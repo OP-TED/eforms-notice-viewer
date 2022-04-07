@@ -7,9 +7,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import eu.europa.ted.eforms.viewer.helpers.EformsSdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 
 public class NoticeViewerTests {
+
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTests.class);
 
   private static final String SDK_VERSION = "latest";
@@ -24,7 +26,8 @@ public class NoticeViewerTests {
   }
 
   /**
-   * A minimal test covering an XSL transformation in isolation.
+   * A minimal test covering an XML to HTML transformation using XSL in isolation. This can be used
+   * to quickly try out things with XSL.
    */
   @Test
   @SuppressWarnings("static-method")
@@ -32,7 +35,7 @@ public class NoticeViewerTests {
     final String language = "en";
     final String viewId = "X02";
     final Path noticeXmlPath = ResourceLoader.getResourceAsPath(
-        NoticeViewer.EFORMS_SDK_EXAMPLES_NOTICES.resolve("X02_registration.xml").toString());
+        EformsSdkConstants.EFORMS_SDK_EXAMPLES_NOTICES.resolve("X02_registration.xml").toString());
     final Path xslPath = ResourceLoader.getResourceAsPath(Path.of("xsl", "X02.xsl").toString());
     final Path html = NoticeViewer.applyXslTransform(language, noticeXmlPath, xslPath, viewId);
     logger.info("Wrote file: {}", html);

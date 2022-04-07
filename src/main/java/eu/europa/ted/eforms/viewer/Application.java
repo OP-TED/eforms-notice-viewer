@@ -24,7 +24,8 @@ public class Application {
       throws IOException, SAXException, ParserConfigurationException {
 
     logger.info("eForms Notice Viewer");
-    logger.info("Usage: <xml file to view> <two letter language code> [<view id to use>]");
+    logger.info(
+        "Usage: <xml file to view (without .xml)> <two letter language code> [<view id to use>]");
     logger.info("Example: en X02_registrations");
     logger.info("args={}", Arrays.toString(args));
 
@@ -35,14 +36,14 @@ public class Application {
     final String language = args[0];
     if (language.length() != 2) {
       throw new RuntimeException(String.format(
-          "Language: expecting two letter codel like 'en', 'fr', but found '%s'", language));
+          "Language: expecting two letter code like 'en', 'fr', ..., but found '%s'", language));
     }
 
     final String noticeXml = args[1];
     final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
 
-    final Path xslPath = NoticeViewer.generateHtml(language, noticeXml, viewIdOpt);
-    logger.info("Created XSL file: {}", xslPath);
+    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXml, viewIdOpt);
+    logger.info("Created HTML file: {}", htmlPath);
   }
 
 }

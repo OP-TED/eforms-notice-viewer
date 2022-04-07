@@ -25,17 +25,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.viewer.helpers.EformsSdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.efx.EfxTemplateTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
-
-  static final Path EFORMS_SDK_EXAMPLES_NOTICES = Path.of("eforms-sdk", "examples", "notices");
-
-  static final Path EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
-      Path.of("eforms-sdk", "notice-types", "view-templates");
 
   public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
       final Optional<String> viewIdOpt) {
@@ -203,8 +199,8 @@ public class NoticeViewer {
   }
 
   private static Path getNoticeXmlPath(final String cmdLnNoticeXml) {
-    final String resourcePath =
-        EFORMS_SDK_EXAMPLES_NOTICES.resolve(Path.of(cmdLnNoticeXml + ".xml")).toString();
+    final String resourcePath = EformsSdkConstants.EFORMS_SDK_EXAMPLES_NOTICES
+        .resolve(Path.of(cmdLnNoticeXml + ".xml")).toString();
     return ResourceLoader.getResourceAsPath(resourcePath);
   }
 
@@ -213,8 +209,8 @@ public class NoticeViewer {
    *        something else for custom views
    */
   public static Path getPathToEfxAsStr(final String viewId) {
-    final String resourcePath =
-        EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES.resolve(Path.of(viewId + ".efx")).toString();
+    final String resourcePath = EformsSdkConstants.EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES
+        .resolve(Path.of(viewId + ".efx")).toString();
     return ResourceLoader.getResourceAsPath(resourcePath);
   }
 

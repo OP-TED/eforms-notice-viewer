@@ -9,15 +9,15 @@ public class SdkNodeMap extends MapFromJson<SdkNode> {
 
   private static final long serialVersionUID = 1L;
 
-  public SdkNodeMap(String sdkVersion) throws IOException {
-    super(sdkVersion, "eforms-sdk/fields/fields.json");
+  public SdkNodeMap(final String sdkVersion) throws IOException {
+    super(sdkVersion, EformsSdkConstants.EFORMS_SDK_FIELDS_FIELDS_JSON.toString());
   }
 
   @Override
-  protected void populateMap(JsonNode json) {
-    final ArrayNode nodes = (ArrayNode) json.get("xmlStructure");
+  protected void populateMap(final JsonNode json) {
+    final ArrayNode nodes = (ArrayNode) json.get(EformsSdkConstants.FIELDS_JSON_XML_STRUCTURE_KEY);
     for (final JsonNode node : nodes) {
-      SdkNode sdkNode = new SdkNode(node);
+      final SdkNode sdkNode = new SdkNode(node);
       this.put(sdkNode.getId(), sdkNode);
     }
   }
