@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -27,37 +26,48 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
+import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.efx.EfxTemplateTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
 
-  private static final String EFORMS_SDK_EXAMPLES_NOTICES = "eforms-sdk/examples/notices/";
-  private static final String EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
-      "eforms-sdk/notice-types/view-templates/";
+  static final Path EFORMS_SDK_EXAMPLES_NOTICES = Path.of("eforms-sdk", "examples", "notices");
+
+  static final Path EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
+      Path.of("eforms-sdk", "notice-types", "view-templates");
+
+  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
+      final Optional<String> viewIdOpt) {
+    try {
+      return generateHtml(language, noticeXmlFilename, viewIdOpt);
+    } catch (Exception e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+  }
 
   /**
+   * @param language The language as a two letter code
+   * @param noticeXmlFilename The notice xml filename but without the xml extension
+   * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
+   *        notice summary. It could fail if this custom view is not compatible with the notice sub
+   *        type
+   * @return The path of the generated HTML file
    *
-   * @param language
-   * @param noticeName
-   * @param viewIdOpt
-   * @return
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
    */
-  public static Path generateHtml(final String language, final String noticeName,
+  public static Path generateHtml(final String language, final String noticeXmlFilename,
       final Optional<String> viewIdOpt)
       throws IOException, SAXException, ParserConfigurationException {
 
-    final Path noticeXmlPath = getNoticeXmlPath(noticeName);
-    logger.info("noticeName={}, noticeXmlPath={}", noticeName, noticeXmlPath);
-    assert noticeXmlPath != null : "Invalid path to notice: " + noticeName;
+    final Path noticeXmlPath = getNoticeXmlPath(noticeXmlFilename);
+    logger.info("noticeName={}, noticeXmlPath={}", noticeXmlFilename, noticeXmlPath);
+    assert noticeXmlPath != null : "Invalid path to notice: " + noticeXmlFilename;
     assert noticeXmlPath.toFile().exists() : "No such file: " + noticeXmlPath;
 
-    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-    final DocumentBuilder db = dbf.newDocumentBuilder();
+    final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
     final Document doc = db.parse(noticeXmlPath.toFile());
     doc.getDocumentElement().normalize();
     Element root = doc.getDocumentElement();
@@ -78,11 +88,11 @@ public class NoticeViewer {
 
     // Build XSL from EFX.
     final String noticeSubType = noticeSubTypeFromXmlOpt.get();
-    final String eformsSdkVersion = eformsSdkVersionOpt.get();
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
-    logger.info("noticeName={}, viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
-    // TODO use language
+    final String eformsSdkVersion = eformsSdkVersionOpt.get();
+    logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
+        eformsSdkVersion);
 
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
     logger.info("Created xsl file: {}", xslPath);
@@ -93,9 +103,7 @@ public class NoticeViewer {
   static Path applyXslTransform(final String language, final Path noticeXmlPath, final Path xslPath,
       final String viewId) throws IOException {
 
-    // XML as input.
-    final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
-
+    // https://www.saxonica.com/documentation11/#!using-xsl/embedding
     // Use Saxon HE so that we can evaluate XSL 2.0:
     System.setProperty("javax.xml.transform.TransformerFactory",
         "net.sf.saxon.TransformerFactoryImpl"); // Use the "net.sf.saxon" we have in the pom.xml
@@ -104,21 +112,30 @@ public class NoticeViewer {
 
       // XSL for input transformation.
       final TransformerFactory factory = TransformerFactory.newInstance();
-      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true); // Security.
+
+      // SECURITY SETUP.
+      // https://stackoverflow.com/questions/40649152/how-to-prevent-xxe-attack
+      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
       factory.setURIResolver(new CustomUriResolver());
 
       final Source xslSource = new StreamSource(inputStream);
       final Transformer transformer = factory.newTransformer(xslSource);
       // transformer.setURIResolver(uriResolver); Already set by the factory!
 
+      // Parameters.
       // TODO use language in XsltUriResolver or pass it to transformer?
-      transformer.setParameter("language", language); // For en.xml or fr.xml, ...
+      transformer.setParameter("languageAsParam", language); // For en.xml or fr.xml, ...
 
       // HTML as output of the transformation.
-      final Path outFolder = Path.of("target/output-html");
+      final Path outFolder = Path.of("target", "output-html");
       Files.createDirectories(outFolder);
       final Path htmlPath = outFolder.resolve(viewId + ".html");
 
+      // XML as input.
+      final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
       transformer.transform(xmlInput, new StreamResult(htmlPath.toFile()));
 
       return htmlPath;
@@ -145,7 +162,7 @@ public class NoticeViewer {
     final String translation =
         EfxTemplateTranslator.renderTemplateFile(viewPath, sdkVersion, new DependencyFactory());
 
-    final Path outFolder = Path.of("target/output-xsl");
+    final Path outFolder = Path.of("target", "output-xsl");
     Files.createDirectories(outFolder);
     final Path filePath = outFolder.resolve(viewId + ".xsl");
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
@@ -186,8 +203,8 @@ public class NoticeViewer {
   }
 
   private static Path getNoticeXmlPath(final String cmdLnNoticeXml) {
-    // TODO this kind of thing could be provided by the SDK lib
-    final String resourcePath = EFORMS_SDK_EXAMPLES_NOTICES + cmdLnNoticeXml + ".xml";
+    final String resourcePath =
+        EFORMS_SDK_EXAMPLES_NOTICES.resolve(Path.of(cmdLnNoticeXml + ".xml")).toString();
     return ResourceLoader.getResourceAsPath(resourcePath);
   }
 
@@ -196,8 +213,8 @@ public class NoticeViewer {
    *        something else for custom views
    */
   public static Path getPathToEfxAsStr(final String viewId) {
-    // TODO this kind of thing could be provided by the SDK lib
-    final String resourcePath = EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES + viewId + ".efx";
+    final String resourcePath =
+        EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES.resolve(Path.of(viewId + ".efx")).toString();
     return ResourceLoader.getResourceAsPath(resourcePath);
   }
 

@@ -8,6 +8,10 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ResourceLoader {
 
+  private ResourceLoader() {
+    throw new AssertionError("Utility class.");
+  }
+
   /**
    * @param resourcePath Path relative to "src/main/resources/" if you are in a Maven project.
    *

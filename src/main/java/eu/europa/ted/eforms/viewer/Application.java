@@ -22,6 +22,7 @@ public class Application {
    */
   public static void main(final String[] args)
       throws IOException, SAXException, ParserConfigurationException {
+
     logger.info("eForms Notice Viewer");
     logger.info("Usage: <xml file to view> <two letter language code> [<view id to use>]");
     logger.info("Example: en X02_registrations");
@@ -32,27 +33,15 @@ public class Application {
     }
 
     final String language = args[0];
+    if (language.length() != 2) {
+      throw new RuntimeException(String.format(
+          "Language: expecting two letter codel like 'en', 'fr', but found '%s'", language));
+    }
+
     final String noticeXml = args[1];
     final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
 
-    generateView(language, noticeXml, viewIdOpt);
-  }
-
-  /**
-   * @param language The language as a two letter code
-   * @param noticeXmlFilename The notice xml filename but without the xml extension
-   * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
-   *        notice summary. It could fail if this custom view is not compatible with the notice sub
-   *        type
-   *
-   * @throws IOException If an error occurs during input or output
-   * @throws ParserConfigurationException Error related to XML reader configuration
-   * @throws SAXException XML parse related errors
-   */
-  private static void generateView(final String language, final String noticeXmlFilename,
-      final Optional<String> viewIdOpt)
-      throws IOException, SAXException, ParserConfigurationException {
-    final Path xslPath = NoticeViewer.generateHtml(language, noticeXmlFilename, viewIdOpt);
+    final Path xslPath = NoticeViewer.generateHtml(language, noticeXml, viewIdOpt);
     logger.info("Created XSL file: {}", xslPath);
   }
 

@@ -18,6 +18,7 @@
   <dependencies>
 
     <dependency>
+      <!-- EFX. -->
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>eforms-expression-language</artifactId>
       <version>0.0.1</version>
@@ -51,6 +52,7 @@
       <version>1.2.11</version>
     </dependency>
 
+    <!-- For XSL 2.0 -->
     <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
     <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
     <dependency>
@@ -63,6 +65,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -86,7 +89,9 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
+
 
 </project>
