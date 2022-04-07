@@ -87,6 +87,7 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
 
   @Override
   public String renderFreeText(String freeText) {
+    // TODO: This should be escaped for HTML:
     return String.format("<span class=\"text\"><xsl:text>%s</xsl:text></span>", freeText);
   }
 
