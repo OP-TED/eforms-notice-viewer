@@ -5,6 +5,7 @@ import static java.util.Map.entry;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 import eu.europa.ted.eforms.sdk.SdkCodelist;
 import eu.europa.ted.eforms.sdk.SdkField;
@@ -52,12 +53,12 @@ public class SdkSymbolMap implements SymbolMap {
    * @param codelistId A reference to an SDK codelist.
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
-  public final String expandCodelist(final String codelistId) {
+  public final List<String> expandCodelist(final String codelistId) {
     SdkCodelist codelist = codelistById.get(codelistId);
     if (codelist == null) {
       throw new InputMismatchException(String.format("Codelist '%s' not found.", codelistId));
     }
-    return codelist.toString(", ", "(", ")", '\'');
+    return codelist.getCodes();
   }
 
   /**

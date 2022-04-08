@@ -3,6 +3,7 @@ package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
+import eu.europa.ted.efx.XPathSyntaxMap;
 
 public class SdkSymbolMapTests {
 
@@ -15,20 +16,22 @@ public class SdkSymbolMapTests {
   @Test
   void testGetCodelistCodesNonTailored() {
     final SdkSymbolMap symbols = getDummyInstance();
+    final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String expected =
         "('all-rev-tic', 'cost-comp', 'exc-right', 'other', 'publ-ser-obl', 'soc-stand')";
     final String codelistReference = "contract-detail";
-    final String efxList = symbols.expandCodelist(codelistReference); // Has no parent.
+    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference)); // Has no parent.
     assertEquals(expected, efxList);
   }
 
   @Test
   void testGetCodelistCodesTailored() {
     final SdkSymbolMap symbols = getDummyInstance();
+    final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String codelistReference = "eu-official-language";
     final String expected =
         "('BUL', 'CES', 'DAN', 'DEU', 'ELL', 'ENG', 'EST', 'FIN', 'FRA', 'GLE', 'HRV', 'HUN', 'ITA', 'LAV', 'LIT', 'MLT', 'NLD', 'POL', 'POR', 'RON', 'SLK', 'SLV', 'SPA', 'SWE')";
-    final String efxList = symbols.expandCodelist(codelistReference);
+    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference));
     assertEquals(expected, efxList);
   }
 
