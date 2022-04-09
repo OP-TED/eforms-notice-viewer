@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.io.IOException;
 import java.util.Locale;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("static-method")
+@Disabled("The LabelMap was used in an earlier incarnation of the eForms Viewer. It will be removed before the next release.")
 public class LabelMapTests {
 
   private static final String SDK_VERSION_DUMMY = "dummy";

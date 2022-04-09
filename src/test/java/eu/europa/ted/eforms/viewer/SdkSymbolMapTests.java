@@ -3,7 +3,7 @@ package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
-import eu.europa.ted.efx.XPathSyntaxMap;
+import eu.europa.ted.efx.xpath.XPathSyntaxMap;
 
 public class SdkSymbolMapTests {
 
@@ -18,7 +18,7 @@ public class SdkSymbolMapTests {
     final SdkSymbolMap symbols = getDummyInstance();
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String expected =
-        "('all-rev-tic', 'cost-comp', 'exc-right', 'other', 'publ-ser-obl', 'soc-stand')";
+        "('all-rev-tic','cost-comp','exc-right','other','publ-ser-obl','soc-stand')";
     final String codelistReference = "contract-detail";
     final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference)); // Has no parent.
     assertEquals(expected, efxList);
@@ -30,7 +30,7 @@ public class SdkSymbolMapTests {
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String codelistReference = "eu-official-language";
     final String expected =
-        "('BUL', 'CES', 'DAN', 'DEU', 'ELL', 'ENG', 'EST', 'FIN', 'FRA', 'GLE', 'HRV', 'HUN', 'ITA', 'LAV', 'LIT', 'MLT', 'NLD', 'POL', 'POR', 'RON', 'SLK', 'SLV', 'SPA', 'SWE')";
+        "('BUL','CES','DAN','DEU','ELL','ENG','EST','FIN','FRA','GLE','HRV','HUN','ITA','LAV','LIT','MLT','NLD','POL','POR','RON','SLK','SLV','SPA','SWE')";
     final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference));
     assertEquals(expected, efxList);
   }

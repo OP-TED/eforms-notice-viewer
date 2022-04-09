@@ -23,12 +23,6 @@
       <version>0.0.1</version>
     </dependency>
 
-    <dependency>
-      <groupId>eu.europa.ted.eforms</groupId>
-      <artifactId>eforms-sdk-lib</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>

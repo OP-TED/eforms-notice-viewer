@@ -1,12 +1,12 @@
 package eu.europa.ted.eforms.viewer;
 
 import org.antlr.v4.runtime.BaseErrorListener;
-import eu.europa.ted.efx.XPathSyntaxMap;
 import eu.europa.ted.efx.exceptions.ThrowingErrorListener;
 import eu.europa.ted.efx.interfaces.Renderer;
 import eu.europa.ted.efx.interfaces.SymbolMap;
 import eu.europa.ted.efx.interfaces.SyntaxMap;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
+import eu.europa.ted.efx.xpath.XPathSyntaxMap;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
 

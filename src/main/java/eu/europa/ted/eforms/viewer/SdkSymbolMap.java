@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
-import eu.europa.ted.eforms.sdk.SdkCodelist;
-import eu.europa.ted.eforms.sdk.SdkField;
-import eu.europa.ted.eforms.sdk.SdkNode;
 import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
-import eu.europa.ted.eforms.xpath.XPathContextualizer;
 import eu.europa.ted.efx.interfaces.SymbolMap;
+import eu.europa.ted.efx.model.SdkCodelist;
+import eu.europa.ted.efx.model.SdkField;
+import eu.europa.ted.efx.model.SdkNode;
+import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolMap implements SymbolMap {
 
