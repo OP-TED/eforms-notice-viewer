@@ -76,10 +76,11 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
   }
 
   @Override
-  public String renderTemplate(String name, String content) {
+  public String renderTemplate(String name, String number, String content) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.openTag("xsl:template", String.format("name='%s'", name));
     writer.openTag("section", "title=\"" + name + "\"");
+    writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
     writer.writeBlock(content);
     writer.closeTag("section");
     writer.closeTag("xsl:template");

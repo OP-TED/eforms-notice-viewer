@@ -39,7 +39,7 @@
     {BT-503-Business}::#{business_term|name|BT-503}: ${BT-503-Business}
     {BT-739-Business}::#{business_term|name|BT-739}: ${BT-739-Business}
     {BT-505-Business}::#{business_term|name|BT-505}: ${BT-505-Business}
-  {OPP-105-Business}::#{[OPP-105-Business]}: #{[OPP-105-Business]}
+  {OPP-105-Business}::#{OPP-105-Business}: #{[OPP-105-Business]}
   {ND-0}::#{decoration|name|place-registration}
     {OPP-110-Business}::#{business_term|name|OPP-110}: ${OPP-110-Business}
     {OPP-111-Business}::#{business_term|name|OPP-111}: ${OPP-111-Business}
