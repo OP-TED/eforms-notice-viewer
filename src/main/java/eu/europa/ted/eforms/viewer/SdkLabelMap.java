@@ -19,6 +19,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 
+/**
+ * @deprecated The class was used in an earlier incarnation of the eForms Viewer. It will be removed before the next release.
+ */
+@Deprecated
 public class SdkLabelMap {
 
   /**

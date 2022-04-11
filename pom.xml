@@ -24,12 +24,6 @@
       <version>0.0.1</version>
     </dependency>
 
-    <dependency>
-      <groupId>eu.europa.ted.eforms</groupId>
-      <artifactId>eforms-sdk-lib</artifactId>
-      <version>0.0.1</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -59,6 +53,12 @@
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
       <version>11.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.helger</groupId>
+      <artifactId>ph-genericode</artifactId>
+      <version>6.2.0</version>
     </dependency>
 
   </dependencies>

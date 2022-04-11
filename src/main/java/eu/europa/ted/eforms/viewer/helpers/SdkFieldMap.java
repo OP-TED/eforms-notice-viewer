@@ -3,7 +3,7 @@ package eu.europa.ted.eforms.viewer.helpers;
 import java.io.IOException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import eu.europa.ted.eforms.sdk.SdkField;
+import eu.europa.ted.efx.model.SdkField;
 
 public class SdkFieldMap extends MapFromJson<SdkField> {
 

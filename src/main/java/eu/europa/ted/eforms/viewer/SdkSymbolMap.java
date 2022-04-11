@@ -4,15 +4,16 @@ package eu.europa.ted.eforms.viewer;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
-import eu.europa.ted.eforms.sdk.SdkCodelist;
-import eu.europa.ted.eforms.sdk.SdkField;
-import eu.europa.ted.eforms.sdk.SdkNode;
 import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
-import eu.europa.ted.eforms.xpath.XPathContextualizer;
 import eu.europa.ted.efx.interfaces.SymbolMap;
+import eu.europa.ted.efx.model.SdkCodelist;
+import eu.europa.ted.efx.model.SdkField;
+import eu.europa.ted.efx.model.SdkNode;
+import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolMap implements SymbolMap {
 
@@ -44,12 +45,12 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
   @Override
-  public final String expandCodelist(final String codelistId) {
+  public final List<String> expandCodelist(final String codelistId) {
     final SdkCodelist codelist = codelistById.get(codelistId);
     if (codelist == null) {
       throw new InputMismatchException(String.format("Codelist '%s' not found.", codelistId));
     }
-    return codelist.toString(", ", "(", ")", '\'');
+    return codelist.getCodes();
   }
 
   /**
