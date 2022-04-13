@@ -189,10 +189,10 @@ public class NoticeViewer {
       final Node item = subTypeCodes.item(i);
       final NamedNodeMap attributes = item.getAttributes();
       if (attributes != null) {
-        final Node listNameAttr = attributes.getNamedItem("listName");
-        if (listNameAttr != null && "notice-subtype".equals(listNameAttr.getNodeValue())) {
-          return Optional.of(item.getTextContent().strip());
-        }
+        // final Node listNameAttr = attributes.getNamedItem("listName");
+        // if (listNameAttr != null && "notice-subtype".equals(listNameAttr.getNodeValue())) {
+        return Optional.of(item.getTextContent().strip());
+        // }
       }
     }
     return Optional.empty();
