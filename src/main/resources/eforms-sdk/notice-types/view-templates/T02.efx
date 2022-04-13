@@ -11,12 +11,12 @@
     {ND-0}::#{decoration|name|purpose}
       {BT-23-Procedure}::#{business_term|name|BT-23}: #{[BT-23-Procedure]}
       {OPP-040-Procedure}::#{business_term|name|OPP-040}
-      {BT-262-Procedure}::#{business_term|name|BT-26}: ${BT-26(a)-Procedure}
-      {BT-263-Procedure}::#{business_term|name|BT-26}: ${BT-26(a)-Procedure}
+      {BT-262-Procedure}::#{business_term|name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} ${BT-262-Procedure/@unitCode}
+      {BT-263-Procedure}::#{business_term|name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} ${BT-263-Procedure/@unitCode}
     {ND-0}::#{decoration|name|general-information}
       {BT-300-Procedure}::#{business_term|name|BT-300}: ${BT-300-Procedure}
       {ND-0}::#{decoration|name|legal-basis}
-      {BT-01(c)-Procedure}::#{[BT-01(c)-Procedure]}
+      {BT-01-notice}::#{[BT-01-notice]} ${BT-01(c)-Procedure} ${BT-01(d)-Procedure}
       {BT-01(d)-Procedure}::#{business_term|name|BT-01}: ${BT-01(d)-Procedure}
       {ND-0}::#{decoration|name|cross-border-law}
       {BT-09(a)-Procedure}::#{field|name|BT-09(a)-Procedure}: ${BT-09(a)-Procedure}
@@ -28,12 +28,12 @@
     {BT-22-Lot}::#{business_term|name|BT-22}: ${BT-22-Lot}
     {BT-137-Lot}::#{decoration|name|purpose}
       {BT-23-Lot}::#{business_term|name|BT-23}: #{[BT-23-Lot]}
-      {BT-262-Lot}::#{business_term|name|BT-262}: #{[BT-262-Lot]}
-      {BT-263-Lot}::#{[BT-263-Lot]}: ${BT-26(a)-Procedure}
+      {BT-262-Lot}::#{business_term|name|BT-262} (${BT-26(m)-Lot}): ${BT-262-Lot} ${BT-262-Lot/@unitCode}
+      {BT-263-Lot}::#{business_term|name|BT-263} (${BT-26(a)-Lot}): ${BT-263-Lot} ${BT-263-Lot/@unitCode}
     {BT-137-Lot}::#{decoration|name|start-duration-contract}
       {BT-536-Lot}::#{business_term|name|BT-536}: ${BT-536-Lot}
       {BT-537-Lot}::#{business_term|name|BT-537}: ${BT-537-Lot}
-      {BT-36-Lot}::#{business_term|name|BT-538}: ${BT-538-Lot}
+      {BT-36-Lot}::#{business_term|name|BT-538}: ${BT-36-Lot} ${BT-36-Lot/@unitCode}, ${BT-538-Lot}
     {BT-137-Lot}::#{decoration|name|procurement-terms}
       {BT-137-Lot}::#{decoration|name|essential-assets}
         {OPP-020-Contract}::#{business_term|name|OPP-020}: ${OPP-020-Contract}

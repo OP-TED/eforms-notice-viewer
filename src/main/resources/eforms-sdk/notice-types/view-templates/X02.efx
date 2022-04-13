@@ -2,7 +2,7 @@
   {ND-0}::#{decoration|name|procedure}
     {ND-0}::#{decoration|name|general-information}
       {ND-0}::#{decoration|name|legal-basis}
-      {BT-01(c)-Procedure}::#{BT-01(c)-Procedure}
+      {BT-01-notice}::#{[BT-01-notice]} ${BT-01(c)-Procedure} ${BT-01(d)-Procedure}
       {BT-01(d)-Procedure}::#{business_term|name|BT-01}: ${BT-01(d)-Procedure}
 {ND-0}::#{decoration|name|organisations}
   {ND-0}::#{decoration|name|organisations}

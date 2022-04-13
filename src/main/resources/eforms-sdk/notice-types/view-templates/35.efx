@@ -15,14 +15,14 @@
     {ND-0}::#{decoration|name|purpose}
       {BT-23-Procedure}::#{business_term|name|BT-23}: #{[BT-23-Procedure]}
       {BT-531-Procedure}::#{business_term|name|BT-531}: #{[BT-531-Procedure]}
-      {BT-262-Procedure}::#{business_term|name|BT-26}: ${BT-26(a)-Procedure}
-      {BT-263-Procedure}::#{business_term|name|BT-26}: ${BT-26(a)-Procedure}
+      {BT-262-Procedure}::#{business_term|name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} ${BT-262-Procedure/@unitCode}
+      {BT-263-Procedure}::#{business_term|name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} ${BT-263-Procedure/@unitCode}
     {ND-0}::#{decoration|name|value}
-      {BT-27-Procedure}::#{business_term|name|BT-27}: ${BT-27-Procedure}
+      {BT-27-Procedure}::#{business_term|name|BT-27}: ${BT-27-Procedure} ${BT-27-Procedure/@currencyID}
     {ND-0}::#{decoration|name|general-information}
       {BT-300-Procedure}::#{business_term|name|BT-300}: ${BT-300-Procedure}
       {ND-0}::#{decoration|name|legal-basis}
-      {BT-01(c)-Procedure}::#{[BT-01(c)-Procedure]}
+      {BT-01-notice}::#{[BT-01-notice]} ${BT-01(c)-Procedure} ${BT-01(d)-Procedure}
       {BT-01(d)-Procedure}::#{business_term|name|BT-01}: ${BT-01(d)-Procedure}
       {ND-0}::#{decoration|name|cross-border-law}
       {BT-09(a)-Procedure}::#{field|name|BT-09(a)-Procedure}: ${BT-09(a)-Procedure}
@@ -34,7 +34,7 @@
     {BT-24-LotsGroup}::#{business_term|name|BT-24}: ${BT-24-LotsGroup}
     {BT-22-LotsGroup}::#{business_term|name|BT-22}: ${BT-22-LotsGroup}
     {BT-330-Procedure}::#{decoration|name|value}
-      {BT-27-LotsGroup}::#{business_term|name|BT-27}: ${BT-27-LotsGroup}
+      {BT-27-LotsGroup}::#{business_term|name|BT-27}: ${BT-27-LotsGroup} ${BT-27-LotsGroup/@currencyID}
     {BT-330-Procedure}::#{decoration|name|general-information}
       {BT-300-LotsGroup}::#{business_term|name|BT-300}: ${BT-300-LotsGroup}
     {BT-330-Procedure}::#{decoration|name|award-criteria}
@@ -55,15 +55,15 @@
     {BT-137-Lot}::#{decoration|name|purpose}
       {BT-23-Lot}::#{business_term|name|BT-23}: #{[BT-23-Lot]}
       {BT-531-Lot}::#{business_term|name|BT-531}: #{[BT-531-Lot]}
-      {BT-262-Lot}::#{business_term|name|BT-262}: #{[BT-262-Lot]}
-      {BT-263-Lot}::#{[BT-263-Lot]}: ${BT-26(a)-Procedure}
-      {BT-25-Lot}::#{business_term|name|BT-625}: ${BT-625-Lot}
+      {BT-262-Lot}::#{business_term|name|BT-262} (${BT-26(m)-Lot}): ${BT-262-Lot} ${BT-262-Lot/@unitCode}
+      {BT-263-Lot}::#{business_term|name|BT-263} (${BT-26(a)-Lot}): ${BT-263-Lot} ${BT-263-Lot/@unitCode}
+      {BT-25-Lot}::#{business_term|name|BT-25}: ${BT-25-Lot} ${BT-625-Lot}
       {BT-137-Lot}::#{decoration|name|options}
         {BT-54-Lot}::#{business_term|name|BT-54}: ${BT-54-Lot}
     {BT-137-Lot}::#{decoration|name|estimated-duration}
       {BT-536-Lot}::#{business_term|name|BT-536}: ${BT-536-Lot}
       {BT-537-Lot}::#{business_term|name|BT-537}: ${BT-537-Lot}
-      {BT-36-Lot}::#{business_term|name|BT-538}: ${BT-538-Lot}
+      {BT-36-Lot}::#{business_term|name|BT-538}: ${BT-36-Lot} ${BT-36-Lot/@unitCode}, ${BT-538-Lot}
     {BT-137-Lot}::#{decoration|name|renewal}
       {BT-58-Lot}::#{business_term|name|BT-58}: ${BT-58-Lot}
       {BT-57-Lot}::#{business_term|name|BT-57}: ${BT-57-Lot}
@@ -107,7 +107,7 @@
     {BT-137-Lot}::#{decoration|name|organisations}
 {ND-0}::#{decoration|name|results}
   {ND-0}::#{decoration|name|results-procurement-procedure}
-    {BT-161-NoticeResult}::#{business_term|name|BT-161}: ${BT-161-NoticeResult}
+    {BT-161-NoticeResult}::#{business_term|name|BT-161}: ${BT-161-NoticeResult} ${BT-161-NoticeResult/@currencyID}
       {BT-137-Lot}::#{business_term|name|BT-137}: ${BT-137-Lot}
         {BT-142-LotResult}::#{[BT-142-LotResult]}
         {BT-144-LotResult}::#{business_term|name|BT-144}: ${BT-144-LotResult}
@@ -115,14 +115,14 @@
           {BT-3201-Tender[BT-3202-Contract]}::#{decoration|name|tender}
             {BT-3201-Tender[BT-3202-Contract]}::#{business_term|name|BT-3201}: ${BT-3201-Tender[BT-3202-Contract]}
             {BT-13714-Tender}::#{business_term|name|BT-13714}: ${BT-13714-Tender}
-            {BT-720-Tender}::#{business_term|name|BT-720}: ${BT-720-Tender}
+            {BT-720-Tender}::#{business_term|name|BT-720}: ${BT-720-Tender} ${BT-720-Tender/@currencyID}
             {BT-3201-Tender[BT-3202-Contract]}::#{decoration|name|concession-value}
-              {BT-162-Tender}::#{business_term|name|BT-162}: ${BT-162-Tender}
-              {BT-160-Tender}::#{business_term|name|BT-160}: ${BT-160-Tender}
+              {BT-162-Tender}::#{business_term|name|BT-162}: ${BT-162-Tender} ${BT-162-Tender/@currencyID}
+              {BT-160-Tender}::#{business_term|name|BT-160}: ${BT-160-Tender} ${BT-160-Tender/@currencyID}
               {BT-163-Tender}::#{business_term|name|BT-163}: ${BT-163-Tender}
               {BT-193-Tender}::#{business_term|name|BT-193}: ${BT-193-Tender}
               {BT-773-Tender}::#{business_term|name|BT-773}: #{[BT-773-Tender]}
-              {BT-730-Tender}::#{business_term|name|BT-553}: ${BT-553-Tender}, #{[BT-730-Tender]}
+              {BT-730-Tender}::#{business_term|name|BT-553}: ${BT-553-Tender} ${BT-553-Tender/@currencyID}, #{[BT-730-Tender]}
               {BT-731-Tender}::#{business_term|name|BT-555}: ${BT-555-Tender}, #{[BT-731-Tender]}
               {BT-554-Tender}::#{business_term|name|BT-554}: ${BT-554-Tender}
             {BT-3201-Tender[BT-3202-Contract]}::#{decoration|name|contract-information}
@@ -165,7 +165,7 @@
   {ND-0}::#{decoration|name|organisations}
     {OPT-300-Procedure-Buyer}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -200,7 +200,7 @@
         {OPP-051-Organization}::TODO fix something in that row
     {OPT-300-Procedure-SProvider[OPT-030-Procedure-Sprovider=='serv-prov']}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -231,7 +231,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-AddInfo}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -262,7 +262,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-DocProvider}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -293,7 +293,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-TenderReceipt}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -324,7 +324,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-TenderEval}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -355,7 +355,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-300-Contract-Signatory}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -386,7 +386,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-LotResult-Financing}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -417,7 +417,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-LotResult-Paying}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -448,7 +448,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-ReviewOrg}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -479,7 +479,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-ReviewInfo}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -510,7 +510,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-Mediator}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -541,7 +541,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-FiscalLegis}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -572,7 +572,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-EnvironLegis}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -603,7 +603,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-301-Lot-EmployLegis}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
@@ -634,7 +634,7 @@
         {BT-509-Organization-TouchPoint}::#{business_term|name|BT-509}: ${BT-509-Organization-TouchPoint}
     {OPT-300-Procedure-SProvider[OPT-030-Procedure-Sprovider=='ted-esen']}::#{business_term|name|BT-500}
       {BT-500-Organization-Company}::#{business_term|name|BT-500}: ${BT-500-Organization-Company}
-      {BT-633-Organization}::#{[BT-633-Organization]}
+      {BT-633-Organization}::${BT-633-Organization}
       {BT-501-Organization-Company}::#{business_term|name|BT-501}: ${BT-501-Organization-Company}
       {BT-16-Organization-Company}::#{business_term|name|BT-16}: ${BT-16-Organization-Company}
       {BT-510(a)-Organization-Company}::#{business_term|name|BT-510}: ${BT-510(a)-Organization-Company} ${BT-510(b)-Organization-Company} ${BT-510(c)-Organization-Company}
