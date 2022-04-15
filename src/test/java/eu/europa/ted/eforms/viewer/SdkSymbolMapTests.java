@@ -40,7 +40,7 @@ public class SdkSymbolMapTests {
     final SdkSymbolMap symbols = getDummyInstance();
     final String fieldId = "BT-01(c)-Procedure";
 
-    final String contextPathOfField = symbols.contextPathOfField(fieldId);
+    final String contextPathOfField = symbols.absoluteXpathOfNode(symbols.parentNodeOfField(fieldId));
     assertEquals("/*/cac:TenderingTerms", contextPathOfField);
 
     final String relativePathOfField = symbols.relativeXpathOfField(fieldId, contextPathOfField);

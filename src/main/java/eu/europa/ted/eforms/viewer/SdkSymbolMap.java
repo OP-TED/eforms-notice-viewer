@@ -53,6 +53,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param codelistId A reference to an SDK codelist.
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
+  @Override
   public final List<String> expandCodelist(final String codelistId) {
     SdkCodelist codelist = codelistById.get(codelistId);
     if (codelist == null) {
@@ -87,6 +88,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of the field who's parent node we are looking for.
    * @return The id of the parent node of the given field.
    */
+  @Override
   public String parentNodeOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField != null) {
@@ -99,6 +101,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param fieldId The id of a field.
    * @return The xPath of the given field.
    */
+  @Override
   public String absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
@@ -111,6 +114,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param nodeId The id of a node or a field.
    * @return The xPath of the given node or field.
    */
+  @Override
   public String absoluteXpathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
@@ -119,28 +123,6 @@ public class SdkSymbolMap implements SymbolMap {
     return sdkNode.getXpathAbsolute();
   }
 
-  /**
-   * Find the context of a rule that applies to a given field. The context of the rule applied to a
-   * field, is typically the xPathAbsolute of that field's parent node.
-   *
-   * @param fieldId The id of the field of which we want to find the context.
-   * @return The absolute xPath of the parent node of the passed field
-   */
-  public String contextPathOfField(String fieldId) {
-    return absoluteXpathOfNode(parentNodeOfField(fieldId));
-  }
-
-  /**
-   * Find the context for nested predicate that applies to a given field taking into account the
-   * pre-existing context.
-   *
-   * @param fieldId
-   * @param broaderContextPath
-   * @return
-   */
-  public String contextPathOfField(String fieldId, String broaderContextPath) {
-    return relativeXpathOfNode(parentNodeOfField(fieldId), broaderContextPath);
-  }
 
   /**
    * Gets the xPath of the given field relative to the given context.
@@ -149,6 +131,7 @@ public class SdkSymbolMap implements SymbolMap {
    * @param contextPath xPath indicating the context.
    * @return The xPath of the given field relative to the given context.
    */
+  @Override
   public String relativeXpathOfField(String fieldId, String contextPath) {
     final String xpath = absoluteXpathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
@@ -161,15 +144,13 @@ public class SdkSymbolMap implements SymbolMap {
    * @param contextPath XPath indicating the context.
    * @return The XPath of the given node relative to the given context.
    */
+  @Override
   public String relativeXpathOfNode(String nodeId, String contextPath) {
     final String xpath = absoluteXpathOfNode(nodeId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
-  public String mapOperator(String operator) {
-    return SdkSymbolMap.operators.get(operator);
-  }
-
+  @Override
   public String typeOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
@@ -178,6 +159,7 @@ public class SdkSymbolMap implements SymbolMap {
     return sdkField.getType();
   }
 
+  @Override
   public String rootCodelistOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
