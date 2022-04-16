@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
+import java.util.List;
 import eu.europa.ted.efx.interfaces.Renderer;
 
 public class XsltRenderer extends IndentedStringWriter implements Renderer {
@@ -17,7 +18,7 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
   }
 
   @Override
-  public String renderFile(String body, String templates) {
+  public String renderFile(List<String> body, List<String> templates) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     writer.openTag("xsl:stylesheet",
@@ -36,11 +37,11 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
     writer.closeTag("style");
     writer.closeTag("head");
     writer.openTag("body");
-    writer.writeBlock(body);
+    writer.writeBlock(String.join("\n", body));
     writer.closeTag("body");
     writer.closeTag("html");
     writer.closeTag("xsl:template");
-    writer.writeBlock(templates);
+    writer.writeBlock(String.join("\n", templates));
     writer.closeTag("xsl:stylesheet");
     return writer.toString();
   }
