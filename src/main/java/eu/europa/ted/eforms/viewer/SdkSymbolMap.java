@@ -14,6 +14,7 @@ import eu.europa.ted.efx.interfaces.SymbolMap;
 import eu.europa.ted.efx.model.SdkCodelist;
 import eu.europa.ted.efx.model.SdkField;
 import eu.europa.ted.efx.model.SdkNode;
+import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolMap implements SymbolMap {
@@ -102,12 +103,12 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given field.
    */
   @Override
-  public String absoluteXpathOfField(final String fieldId) {
+  public PathExpression absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new InputMismatchException(String.format("Unknown field identifier '%s'.", fieldId));
     }
-    return sdkField.getXpathAbsolute();
+    return new PathExpression(sdkField.getXpathAbsolute());
   }
 
   /**
@@ -115,12 +116,12 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given node or field.
    */
   @Override
-  public String absoluteXpathOfNode(final String nodeId) {
+  public PathExpression absoluteXpathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
       throw new InputMismatchException(String.format("Unknown node identifier '%s'.", nodeId));
     }
-    return sdkNode.getXpathAbsolute();
+    return new PathExpression(sdkNode.getXpathAbsolute());
   }
 
 
@@ -132,8 +133,8 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given field relative to the given context.
    */
   @Override
-  public String relativeXpathOfField(String fieldId, String contextPath) {
-    final String xpath = absoluteXpathOfField(fieldId);
+  public PathExpression relativeXpathOfField(String fieldId, PathExpression contextPath) {
+    final PathExpression xpath = absoluteXpathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
@@ -145,8 +146,8 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The XPath of the given node relative to the given context.
    */
   @Override
-  public String relativeXpathOfNode(String nodeId, String contextPath) {
-    final String xpath = absoluteXpathOfNode(nodeId);
+  public PathExpression relativeXpathOfNode(String nodeId, PathExpression contextPath) {
+    final PathExpression xpath = absoluteXpathOfNode(nodeId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 

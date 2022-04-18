@@ -1,7 +1,12 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import eu.europa.ted.efx.interfaces.Renderer;
+import eu.europa.ted.efx.model.Expression;
+import eu.europa.ted.efx.model.Markup;
+import eu.europa.ted.efx.model.Expression.PathExpression;
+import eu.europa.ted.efx.model.Expression.StringExpression;
 
 public class XsltRenderer extends IndentedStringWriter implements Renderer {
 
@@ -18,7 +23,7 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
   }
 
   @Override
-  public String renderFile(List<String> body, List<String> templates) {
+  public Markup renderFile(List<Markup> body, List<Markup> templates) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     writer.openTag("xsl:stylesheet",
@@ -37,63 +42,63 @@ public class XsltRenderer extends IndentedStringWriter implements Renderer {
     writer.closeTag("style");
     writer.closeTag("head");
     writer.openTag("body");
-    writer.writeBlock(String.join("\n", body));
+    writer.writeBlock(body.stream().map(item -> item.script).collect(Collectors.joining("\n")));
     writer.closeTag("body");
     writer.closeTag("html");
     writer.closeTag("xsl:template");
-    writer.writeBlock(String.join("\n", templates));
+    writer.writeBlock(templates.stream().map(template -> template.script).collect(Collectors.joining("\n")));
     writer.closeTag("xsl:stylesheet");
-    return writer.toString();
+    return new Markup(writer.toString());
   }
 
   @Override
-  public String renderValueReference(String valueReference) {
-    return String.format("<span class=\"value\"><xsl:value-of select=\"%s\"/></span>",
-        valueReference);
+  public Markup renderValueReference(Expression valueReference) {
+    return new Markup(String.format("<span class=\"value\"><xsl:value-of select=\"%s\"/></span>",
+        valueReference.script));
   }
 
   @Override
-  public String renderLabelFromKey(final String key) {
-    return String.format(
+  public Markup renderLabelFromKey(final StringExpression key) {
+    return new Markup(String.format(
         "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key='%s']/text(), ' Label not found (%s)')[1]\"/></span>",
-        key, key);
+        key.script, key.script));
   }
 
   @Override
-  public String renderLabelFromExpression(final String expression) {
+  public Markup renderLabelFromExpression(final Expression expression) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     String variableName = String.format("label%d", ++variableCounter);
     writer.writeLine(
-        String.format("<xsl:variable name=\"%s\" select=\"%s\"/>", variableName, expression));
+        String.format("<xsl:variable name=\"%s\" select=\"%s\"/>", variableName, expression.script));
     writer.writeLine(String.format(
         "<span class=\"dynamic-label\"><xsl:value-of select=\"($labels/properties/entry[./@key=$%s]/text(), concat('Label not found (', $%s, ')'))[1]\"/></span>",
         variableName, variableName));
-    return writer.toString();
+    return new Markup(writer.toString());
   }
 
   @Override
-  public String renderFreeText(String freeText) {
-    return String.format("<span class=\"text\"><xsl:text>%s</xsl:text></span>", freeText);
+  public Markup renderFreeText(String freeText) {
+    return new Markup(String.format("<span class=\"text\"><xsl:text>%s</xsl:text></span>", freeText));
   }
 
   @Override
-  public String renderTemplate(String name, String number, String content) {
+  public Markup renderTemplate(String name, String number, Markup content) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.openTag("xsl:template", String.format("name='%s'", name));
     writer.openTag("section", "title=\"" + name + "\"");
     writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
-    writer.writeBlock(content);
+    writer.writeBlock(content.script);
     writer.closeTag("section");
     writer.closeTag("xsl:template");
-    return writer.toString();
+    return new Markup(writer.toString());
   }
 
   @Override
-  public String renderCallTemplate(String name, String context) {
+  public Markup renderCallTemplate(String name, PathExpression context) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
-    writer.openTag("xsl:for-each", String.format("select=\"%s\"", context));
+    writer.openTag("xsl:for-each", String.format("select=\"%s\"", context.script));
     writer.writeBlock(String.format("<xsl:call-template name=\"%s\"/>", name));
     writer.closeTag("xsl:for-each");
-    return writer.toString();
+    return new Markup(writer.toString());
   }
 }
