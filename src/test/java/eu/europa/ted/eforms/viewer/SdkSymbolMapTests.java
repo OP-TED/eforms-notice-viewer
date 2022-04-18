@@ -12,13 +12,13 @@ public class SdkSymbolMapTests {
 
   private final String testSdkVersion = "latest";
 
-  private SdkSymbolMap getDummyInstance() {
-    return SdkSymbolMap.getInstance(testSdkVersion);
+  private SdkSymbolResolver getDummyInstance() {
+    return SdkSymbolResolver.getInstance(testSdkVersion);
   }
 
   @Test
   void testGetCodelistCodesNonTailored() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String expected =
         "('all-rev-tic','cost-comp','exc-right','other','publ-ser-obl','soc-stand')";
@@ -29,7 +29,7 @@ public class SdkSymbolMapTests {
 
   @Test
   void testGetCodelistCodesTailored() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String codelistReference = "eu-official-language";
     final String expected =
@@ -40,7 +40,7 @@ public class SdkSymbolMapTests {
 
   @Test
   public void testSymbolsContext() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final String fieldId = "BT-01(c)-Procedure";
 
     final PathExpression contextPathOfField = symbols.absoluteXpathOfNode(symbols.parentNodeOfField(fieldId));

@@ -10,14 +10,14 @@ import java.util.Map;
 import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
-import eu.europa.ted.efx.interfaces.SymbolMap;
+import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.SdkCodelist;
 import eu.europa.ted.efx.model.SdkField;
 import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
-public class SdkSymbolMap implements SymbolMap {
+public class SdkSymbolResolver implements SymbolResolver {
 
   protected Map<String, SdkField> fieldById;
   protected Map<String, SdkNode> nodeById;
@@ -35,7 +35,7 @@ public class SdkSymbolMap implements SymbolMap {
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
    * eForms SDK.
    */
-  private static final Map<String, SdkSymbolMap> instances = new HashMap<>();
+  private static final Map<String, SdkSymbolResolver> instances = new HashMap<>();
 
   /**
    * Gets the single instance containing the sysmbls definned in the given version of the eForms
@@ -43,8 +43,8 @@ public class SdkSymbolMap implements SymbolMap {
    *
    * @param sdkVersion Version of the SDK
    */
-  public static SdkSymbolMap getInstance(final String sdkVersion) {
-    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolMap(sdkVersion));
+  public static SdkSymbolResolver getInstance(final String sdkVersion) {
+    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolResolver(sdkVersion));
   }
 
   /**
@@ -68,7 +68,7 @@ public class SdkSymbolMap implements SymbolMap {
    *
    * @param sdkVersion The version of the SDK.
    */
-  protected SdkSymbolMap(final String sdkVersion) {
+  protected SdkSymbolResolver(final String sdkVersion) {
     this.loadMapData(sdkVersion);
   }
 
