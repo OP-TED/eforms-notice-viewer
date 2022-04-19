@@ -5,8 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.Expression.StringExpression;
-import eu.europa.ted.efx.xpath.XPathSyntaxMap;
+import eu.europa.ted.efx.xpath.XPathScriptGenerator;
 
 public class SdkSymbolMapTests {
 
@@ -19,7 +18,7 @@ public class SdkSymbolMapTests {
   @Test
   void testGetCodelistCodesNonTailored() {
     final SdkSymbolResolver symbols = getDummyInstance();
-    final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
+    final XPathScriptGenerator syntaxMap = new XPathScriptGenerator();
     final String expected =
         "('all-rev-tic','cost-comp','exc-right','other','publ-ser-obl','soc-stand')";
     final String codelistReference = "contract-detail";
@@ -30,7 +29,7 @@ public class SdkSymbolMapTests {
   @Test
   void testGetCodelistCodesTailored() {
     final SdkSymbolResolver symbols = getDummyInstance();
-    final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
+    final XPathScriptGenerator syntaxMap = new XPathScriptGenerator();
     final String codelistReference = "eu-official-language";
     final String expected =
         "('BUL','CES','DAN','DEU','ELL','ENG','EST','FIN','FRA','GLE','HRV','HUN','ITA','LAV','LIT','MLT','NLD','POL','POR','RON','SLK','SLV','SPA','SWE')";
