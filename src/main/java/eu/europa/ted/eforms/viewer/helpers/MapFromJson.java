@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import eu.europa.ted.eforms.viewer.SdkSymbolMap;
+import eu.europa.ted.eforms.viewer.SdkSymbolResolver;
 
 public abstract class MapFromJson<T> extends HashMap<String, T> {
 
@@ -27,7 +27,7 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
     System.out.println("Populating maps for context, sdkVersion=" + sdkVersion);
     final ObjectMapper objectMapper = buildStandardJacksonObjectMapper();
     final InputStream fieldsJsonInputStream =
-        JavaTools.getResourceAsStream(SdkSymbolMap.class.getClassLoader(), jsonPathname);
+        JavaTools.getResourceAsStream(SdkSymbolResolver.class.getClassLoader(), jsonPathname);
     if (fieldsJsonInputStream == null) {
       throw new RuntimeException(String.format("File not found: %s", jsonPathname));
     }
