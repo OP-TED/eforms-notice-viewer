@@ -60,9 +60,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
   @Override
   public Markup renderLabelFromKey(final StringExpression key) {
     return new Markup(String.format(
-        "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key='%s']/text(), ' Label not found (%s)')[1]\"/></span>",
-        key.script, key.script));
-  }
+      "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key=%s]/text(), concat(' Label not found (', %s, ')'))[1]\"/></span>",
+      key.script, key.script));
+    }
 
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
