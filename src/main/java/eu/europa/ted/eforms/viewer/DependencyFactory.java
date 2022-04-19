@@ -6,7 +6,7 @@ import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.ScriptGenerator;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
-import eu.europa.ted.efx.xpath.XPathSyntaxMap;
+import eu.europa.ted.efx.xpath.XPathScriptGenerator;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
 
@@ -17,7 +17,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
 
   @Override
   public ScriptGenerator createScriptGenerator() {
-    return new XPathSyntaxMap();
+    return new XPathScriptGenerator();
   }
 
   @Override
