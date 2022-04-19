@@ -9,13 +9,14 @@ import java.util.Map;
 import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
-import eu.europa.ted.efx.interfaces.SymbolMap;
+import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.SdkCodelist;
 import eu.europa.ted.efx.model.SdkField;
 import eu.europa.ted.efx.model.SdkNode;
+import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
-public class SdkSymbolMap implements SymbolMap {
+public class SdkSymbolResolver implements SymbolResolver {
 
   protected Map<String, SdkField> fieldById;
   protected Map<String, SdkNode> nodeById;
@@ -25,7 +26,7 @@ public class SdkSymbolMap implements SymbolMap {
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
    * eForms SDK.
    */
-  private static final Map<String, SdkSymbolMap> instances = new HashMap<>();
+  private static final Map<String, SdkSymbolResolver> instances = new HashMap<>();
 
   /**
    * Gets the single instance containing the sysmbls definned in the given version of the eForms
@@ -33,8 +34,8 @@ public class SdkSymbolMap implements SymbolMap {
    *
    * @param sdkVersion Version of the SDK
    */
-  public static SdkSymbolMap getInstance(final String sdkVersion) {
-    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolMap(sdkVersion));
+  public static SdkSymbolResolver getInstance(final String sdkVersion) {
+    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolResolver(sdkVersion));
   }
 
   /**
@@ -58,7 +59,7 @@ public class SdkSymbolMap implements SymbolMap {
    *
    * @param sdkVersion The version of the SDK.
    */
-  protected SdkSymbolMap(final String sdkVersion) {
+  protected SdkSymbolResolver(final String sdkVersion) {
     this.loadMapData(sdkVersion);
   }
 
@@ -93,12 +94,12 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given field.
    */
   @Override
-  public String absoluteXpathOfField(final String fieldId) {
+  public PathExpression absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new InputMismatchException(String.format("Unknown field identifier '%s'.", fieldId));
     }
-    return sdkField.getXpathAbsolute();
+    return new PathExpression(sdkField.getXpathAbsolute());
   }
 
   /**
@@ -106,38 +107,14 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given node or field.
    */
   @Override
-  public String absoluteXpathOfNode(final String nodeId) {
+  public PathExpression absoluteXpathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
       throw new InputMismatchException(String.format("Unknown node identifier '%s'.", nodeId));
     }
-    return sdkNode.getXpathAbsolute();
+    return new PathExpression(sdkNode.getXpathAbsolute());
   }
 
-  /**
-   * Find the context of a rule that applies to a given field. The context of the rule applied to a
-   * field, is typically the xPathAbsolute of that field's parent node.
-   *
-   * @param fieldId The id of the field of which we want to find the context.
-   * @return The absolute xPath of the parent node of the passed field
-   */
-  @Override
-  public String contextPathOfField(String fieldId) {
-    return absoluteXpathOfNode(parentNodeOfField(fieldId));
-  }
-
-  /**
-   * Find the context for nested predicate that applies to a given field taking into account the
-   * pre-existing context.
-   *
-   * @param fieldId
-   * @param broaderContextPath
-   * @return
-   */
-  @Override
-  public String contextPathOfField(String fieldId, String broaderContextPath) {
-    return relativeXpathOfNode(parentNodeOfField(fieldId), broaderContextPath);
-  }
 
   /**
    * Gets the xPath of the given field relative to the given context.
@@ -147,8 +124,8 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The xPath of the given field relative to the given context.
    */
   @Override
-  public String relativeXpathOfField(String fieldId, String contextPath) {
-    final String xpath = absoluteXpathOfField(fieldId);
+  public PathExpression relativeXpathOfField(String fieldId, PathExpression contextPath) {
+    final PathExpression xpath = absoluteXpathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
@@ -160,8 +137,8 @@ public class SdkSymbolMap implements SymbolMap {
    * @return The XPath of the given node relative to the given context.
    */
   @Override
-  public String relativeXpathOfNode(String nodeId, String contextPath) {
-    final String xpath = absoluteXpathOfNode(nodeId);
+  public PathExpression relativeXpathOfNode(String nodeId, PathExpression contextPath) {
+    final PathExpression xpath = absoluteXpathOfNode(nodeId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 

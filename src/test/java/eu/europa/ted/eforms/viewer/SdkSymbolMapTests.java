@@ -2,50 +2,53 @@ package eu.europa.ted.eforms.viewer;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
+import eu.europa.ted.efx.model.Expression.PathExpression;
+import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.xpath.XPathSyntaxMap;
 
 public class SdkSymbolMapTests {
 
   private final String testSdkVersion = "latest";
 
-  private SdkSymbolMap getDummyInstance() {
-    return SdkSymbolMap.getInstance(testSdkVersion);
+  private SdkSymbolResolver getDummyInstance() {
+    return SdkSymbolResolver.getInstance(testSdkVersion);
   }
 
   @Test
   void testGetCodelistCodesNonTailored() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String expected =
         "('all-rev-tic','cost-comp','exc-right','other','publ-ser-obl','soc-stand')";
     final String codelistReference = "contract-detail";
-    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference)); // Has no parent.
+    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference).stream().map(i -> syntaxMap.mapString(i)).collect(Collectors.toList())).script; // Has no parent.
     assertEquals(expected, efxList);
   }
 
   @Test
   void testGetCodelistCodesTailored() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final XPathSyntaxMap syntaxMap = new XPathSyntaxMap();
     final String codelistReference = "eu-official-language";
     final String expected =
         "('BUL','CES','DAN','DEU','ELL','ENG','EST','FIN','FRA','GLE','HRV','HUN','ITA','LAV','LIT','MLT','NLD','POL','POR','RON','SLK','SLV','SPA','SWE')";
-    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference));
+    final String efxList = syntaxMap.mapList(symbols.expandCodelist(codelistReference).stream().map(i -> syntaxMap.mapString(i)).collect(Collectors.toList())).script; // Has no parent.
     assertEquals(expected, efxList);
   }
 
   @Test
   public void testSymbolsContext() {
-    final SdkSymbolMap symbols = getDummyInstance();
+    final SdkSymbolResolver symbols = getDummyInstance();
     final String fieldId = "BT-01(c)-Procedure";
 
-    final String contextPathOfField = symbols.contextPathOfField(fieldId);
-    assertEquals("/*/cac:TenderingTerms", contextPathOfField);
+    final PathExpression contextPathOfField = symbols.absoluteXpathOfNode(symbols.parentNodeOfField(fieldId));
+    assertEquals("/*/cac:TenderingTerms", contextPathOfField.script);
 
-    final String relativePathOfField = symbols.relativeXpathOfField(fieldId, contextPathOfField);
+    final PathExpression relativePathOfField = symbols.relativeXpathOfField(fieldId, contextPathOfField);
     assertEquals("cac:ProcurementLegislationDocumentReference/cbc:ID[not(text()='CrossBorderLaw')]",
-        relativePathOfField);
+        relativePathOfField.script);
 
     // TODO What about cases like this:
     // BT-71-Lot
