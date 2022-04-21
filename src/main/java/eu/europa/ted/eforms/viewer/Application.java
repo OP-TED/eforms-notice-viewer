@@ -44,6 +44,7 @@ public class Application {
 
     final Path htmlPath = NoticeViewer.generateHtml(language, noticeXml, viewIdOpt);
     logger.info("Created HTML file: {}", htmlPath);
+    System.exit(0);
   }
 
 }
