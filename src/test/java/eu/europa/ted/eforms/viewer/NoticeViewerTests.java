@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ted.eforms.viewer.helpers.EformsSdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 
 public class NoticeViewerTests {
@@ -35,7 +35,7 @@ public class NoticeViewerTests {
     final String language = "en";
     final String viewId = "X02";
     final Path noticeXmlPath = ResourceLoader.getResourceAsPath(
-        EformsSdkConstants.EFORMS_SDK_EXAMPLES_NOTICES.resolve("X02_registration.xml").toString());
+        SdkConstants.EFORMS_SDK_EXAMPLES_NOTICES.resolve("X02_registration.xml").toString());
     final Path xslPath = ResourceLoader.getResourceAsPath(Path.of("xsl", "X02.xsl").toString());
     final Path html = NoticeViewer.applyXslTransform(language, noticeXmlPath, xslPath, viewId);
     logger.info("Wrote file: {}", html);

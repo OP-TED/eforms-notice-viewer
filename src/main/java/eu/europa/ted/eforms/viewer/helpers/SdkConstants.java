@@ -2,7 +2,7 @@ package eu.europa.ted.eforms.viewer.helpers;
 
 import java.nio.file.Path;
 
-public class EformsSdkConstants {
+public class SdkConstants {
   public static final Path EFORMS_SDK_CODELISTS = Path.of("eforms-sdk", "codelists");
 
   public static final Path EFORMS_SDK_EXAMPLES_NOTICES =

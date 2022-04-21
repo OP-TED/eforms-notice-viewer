@@ -59,7 +59,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     try {
       // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
-          ResourceLoader.getResourceAsPath(EformsSdkConstants.EFORMS_SDK_CODELISTS.toString()),
+          ResourceLoader.getResourceAsPath(SdkConstants.EFORMS_SDK_CODELISTS.toString()),
           marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
@@ -68,7 +68,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
     try (InputStream is = ResourceLoader.getResourceAsStream(
-        EformsSdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
+        SdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
 
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
