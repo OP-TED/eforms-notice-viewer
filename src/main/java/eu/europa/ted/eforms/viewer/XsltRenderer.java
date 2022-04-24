@@ -2,6 +2,7 @@ package eu.europa.ted.eforms.viewer;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Markup;
@@ -60,9 +61,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
   @Override
   public Markup renderLabelFromKey(final StringExpression key) {
     return new Markup(String.format(
-      "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key=%s]/text(), concat(' Label not found (', %s, ')'))[1]\"/></span>",
-      key.script, key.script));
-    }
+        "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key=%s]/text(), concat(' Label not found (', %s, ')'))[1]\"/></span>",
+        key.script, key.script));
+  }
 
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
@@ -86,7 +87,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.openTag("xsl:template", String.format("name='%s'", name));
     writer.openTag("section", "title=\"" + name + "\"");
-    writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
+    if (StringUtils.isNotBlank(number)) {
+      writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
+    }
     writer.writeBlock(content.script);
     writer.closeTag("section");
     writer.closeTag("xsl:template");
