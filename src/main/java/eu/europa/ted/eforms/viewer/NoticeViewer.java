@@ -123,7 +123,7 @@ public class NoticeViewer {
 
       // Parameters.
       // TODO use language in XsltUriResolver or pass it to transformer?
-      transformer.setParameter("languageAsParam", language); // For en.xml or fr.xml, ...
+      transformer.setParameter("language", language); // For en.xml or fr.xml, ...
 
       // HTML as output of the transformation.
       final Path outFolder = Path.of("target", "output-html");

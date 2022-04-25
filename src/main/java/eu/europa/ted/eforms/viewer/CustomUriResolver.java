@@ -25,7 +25,7 @@ public final class CustomUriResolver implements URIResolver {
     // newHref = href;
     // }
 
-    try (InputStream is = ResourceLoader.getResourceAsStream("eforms-sdk/translations/en.xml")) {
+    try (InputStream is = ResourceLoader.getResourceAsStream("eforms-sdk/translations/" + href)) {
       if (is == null) {
         throw new RuntimeException(
             String.format("inputStream is null for href=%s, base=%s", href, base));
