@@ -13,6 +13,10 @@ public class GenericodeTools {
   public static final String KEY_CODE = "code";
   public static final String EXTENSION_DOT_GC = ".gc";
 
+  private GenericodeTools() {
+    throw new AssertionError("Utility class.");
+  }
+
   public static final Genericode10CodeListMarshaller getMarshaller() {
     // https://stackoverflow.com/questions/7400422/jaxb-creating-context-and-marshallers-cost
 

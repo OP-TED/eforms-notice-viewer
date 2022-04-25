@@ -11,11 +11,10 @@ import eu.europa.ted.efx.model.Expression.StringExpression;
 
 public class XsltRenderer extends IndentedStringWriter implements MarkupGenerator {
 
-  static int variableCounter = 0;
+  private static int variableCounter = 0;
 
   public XsltRenderer() {
-    super(0);
-    this.indent = 10;
+    super(10);
   }
 
   @Override
@@ -29,23 +28,31 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
     writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     writer.openTag("xsl:stylesheet",
         "version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:fn=\"http://www.w3.org/2005/xpath-functions\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\"");
+
     writer.writeLine("<xsl:output method=\"html\" encoding=\"UTF-8\" indent=\"yes\"/>");
     writer.writeLine("<xsl:variable name=\"labels\" select=\"fn:document('labels.xml')\"/>");
+
+    // Root template.
     writer.openTag("xsl:template", "match=\"/\"");
+
     writer.openTag("html");
+
     writer.openTag("head");
     writer.openTag("style");
     writer.writeLine("section { padding: 6px 6px 6px 36px; }");
-    writer.writeLine(".text { font-size: 12pt; color: black;}");
+    writer.writeLine(".text { font-size: 12pt; color: black; }");
     writer.writeLine(".label { font-size: 12pt; color: green; }");
     writer.writeLine(".dynamic-label { font-size: 12pt; color: blue; }");
     writer.writeLine(".value { font-size: 12pt; color: red; }");
     writer.closeTag("style");
     writer.closeTag("head");
+
     writer.openTag("body");
     writer.writeBlock(body.stream().map(item -> item.script).collect(Collectors.joining("\n")));
     writer.closeTag("body");
+
     writer.closeTag("html");
+
     writer.closeTag("xsl:template");
     writer.writeBlock(templates.stream().map(template -> template.script).collect(Collectors.joining("\n")));
     writer.closeTag("xsl:stylesheet");

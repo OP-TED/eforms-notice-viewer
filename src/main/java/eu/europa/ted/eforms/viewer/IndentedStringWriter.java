@@ -4,7 +4,7 @@ import java.io.StringWriter;
 
 public class IndentedStringWriter extends StringWriter {
 
-  int indent = 0;
+  private int indent;
 
   public IndentedStringWriter(int indent) {
     this.indent = indent;

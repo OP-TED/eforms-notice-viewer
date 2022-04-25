@@ -4,13 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import eu.europa.ted.eforms.viewer.SdkSymbolResolver;
 
 public abstract class MapFromJson<T> extends HashMap<String, T> {
+
+  private static final long serialVersionUID = 1L;
+  private static final Logger logger = LoggerFactory.getLogger(MapFromJson.class);
 
   protected MapFromJson(final String sdkVersion, final String jsonPathname) throws IOException {
     this.populateMap(sdkVersion, jsonPathname);
@@ -24,10 +28,12 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
    */
   private final void populateMap(final String sdkVersion, final String jsonPathname)
       throws IOException {
-    System.out.println("Populating maps for context, sdkVersion=" + sdkVersion);
+
+    logger.info("Populating maps for context, sdkVersion={}, jsonPathname={}", sdkVersion,
+        jsonPathname);
+
     final ObjectMapper objectMapper = buildStandardJacksonObjectMapper();
-    final InputStream fieldsJsonInputStream =
-        JavaTools.getResourceAsStream(SdkSymbolResolver.class.getClassLoader(), jsonPathname);
+    final InputStream fieldsJsonInputStream = ResourceLoader.getResourceAsStream(jsonPathname);
     if (fieldsJsonInputStream == null) {
       throw new RuntimeException(String.format("File not found: %s", jsonPathname));
     }
@@ -41,7 +47,7 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
 
   abstract protected void populateMap(final JsonNode json);
 
-  protected final String getTextNullOtherwise(final JsonNode node, final String key) {
+  protected final static String getTextNullOtherwise(final JsonNode node, final String key) {
     final JsonNode otherNode = node.get(key);
     if (otherNode == null) {
       return null;

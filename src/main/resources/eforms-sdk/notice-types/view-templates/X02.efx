@@ -1,10 +1,10 @@
-1 {ND-0} #{decoration|name|procedure}
+{ND-0} #{decoration|name|procedure}
   {ND-0} #{decoration|name|procedure}
     {ND-0} #{decoration|name|general-information}
       {ND-0} #{decoration|name|legal-basis}
-      {BT-01(c)-Procedure} #{name|BT-01(c)-Procedure}
+      {BT-01-notice} #{BT-01-notice} ${BT-01(c)-Procedure} ${BT-01(d)-Procedure}
       {BT-01(d)-Procedure} #{business_term|name|BT-01}: ${BT-01(d)-Procedure}
-5 {ND-0} #{decoration|name|organisations}
+{ND-0} #{decoration|name|organisations}
   {ND-0} #{decoration|name|organisations}
     {ND-0} #{business_term|name|BT-500}
       {BT-500-Business} #{business_term|name|BT-500}: ${BT-500-Business}
@@ -22,7 +22,7 @@
       {BT-505-Business} #{business_term|name|BT-505}: ${BT-505-Business}
   {ND-0} #{decoration|name|organisation-roles}
     {BT-500-Organization-Company[OPT-200-Organization-Company == OPT-300-Procedure-Buyer]} TODO fix something in that row
-7 {ND-0} #{decoration|name|object}
+{ND-0} #{decoration|name|object}
   {ND-0} #{decoration|name|legal-basis}
     {BT-01-notice} #{BT-01-notice}
     {OPP-100-Business} #{business_term|name|OPP-100}: #{OPP-100-Business}

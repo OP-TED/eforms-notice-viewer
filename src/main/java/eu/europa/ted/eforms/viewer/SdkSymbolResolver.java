@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 
-import static java.util.Map.entry;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -22,14 +21,6 @@ public class SdkSymbolResolver implements SymbolResolver {
   protected Map<String, SdkField> fieldById;
   protected Map<String, SdkNode> nodeById;
   protected Map<String, SdkCodelist> codelistById;
-
-  /**
-   * Maps efx operators to xPath operators.
-   */
-  static final Map<String, String> operators = Map.ofEntries(entry("+", "+"), entry("-", "-"),
-      entry("*", "*"), entry("/", "div"), entry("%", "mod"), entry("and", "and"), entry("or", "or"),
-      entry("not", "not"), entry("==", "="), entry("!=", "!="), entry("<", "<"), entry("<=", "<="),
-      entry(">", ">"), entry(">=", ">="));
 
   /**
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
@@ -56,7 +47,7 @@ public class SdkSymbolResolver implements SymbolResolver {
    */
   @Override
   public final List<String> expandCodelist(final String codelistId) {
-    SdkCodelist codelist = codelistById.get(codelistId);
+    final SdkCodelist codelist = codelistById.get(codelistId);
     if (codelist == null) {
       throw new ParseCancellationException(String.format("Codelist '%s' not found.", codelistId));
     }

@@ -18,6 +18,7 @@
   <dependencies>
 
     <dependency>
+      <!-- EFX. -->
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>eforms-expression-language</artifactId>
       <version>0.0.1</version>
@@ -31,13 +32,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.13.1</version>
-    </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -45,16 +39,33 @@
       <version>3.12.0</version>
     </dependency>
 
-    <!-- Used for the codelists (gc files). -->
+    <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.11</version>
+    </dependency>
+
+    <!-- For XSL 2.0 -->
+    <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+    <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>11.3</version>
+    </dependency>
+
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-genericode</artifactId>
       <version>6.2.0</version>
     </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
+
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
@@ -78,7 +89,9 @@
           </execution>
         </executions>
       </plugin>
+
     </plugins>
   </build>
+
 
 </project>
