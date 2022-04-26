@@ -1,7 +1,9 @@
 package eu.europa.ted.eforms.viewer;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Markup;
@@ -16,6 +18,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
     super(10);
   }
 
+  private final String[] assetTypes = {"business_term", "field", "code", "decoration"};
+  private final String translations = Arrays.stream(assetTypes).map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))").collect(Collectors.joining(", "));
+
   @Override
   public String toString() {
     return super.toString();
@@ -25,11 +30,12 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
   public Markup renderFile(List<Markup> body, List<Markup> templates) {
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    writer.openTag("xsl:stylesheet",
-        "version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:fn=\"http://www.w3.org/2005/xpath-functions\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\"");
+    writer.openTag("xsl:stylesheet", "version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:fn=\"http://www.w3.org/2005/xpath-functions\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\"");
 
     writer.writeLine("<xsl:output method=\"html\" encoding=\"UTF-8\" indent=\"yes\"/>");
-    writer.writeLine("<xsl:variable name=\"labels\" select=\"fn:document('labels.xml')\"/>");
+
+    writer.writeLine("<xsl:param name=\"language\" />");
+    writer.writeLine(String.format("<xsl:variable name=\"labels\" select=\"(%s)\"/>", this.translations));
 
     // Root template.
     writer.openTag("xsl:template", "match=\"/\"");
@@ -67,9 +73,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
   @Override
   public Markup renderLabelFromKey(final StringExpression key) {
     return new Markup(String.format(
-      "<span class=\"label\"><xsl:value-of select=\"($labels/properties/entry[./@key=%s]/text(), concat(' Label not found (', %s, ')'))[1]\"/></span>",
-      key.script, key.script));
-    }
+        "<span class=\"label\"><xsl:value-of select=\"($labels//entry[@key=%s]/text(), concat('{', %s, '}'))[1]\"/></span>",
+        key.script, key.script));
+  }
 
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
@@ -78,7 +84,7 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
     writer.writeLine(
         String.format("<xsl:variable name=\"%s\" select=\"%s\"/>", variableName, expression.script));
     writer.writeLine(String.format(
-        "<span class=\"dynamic-label\"><xsl:value-of select=\"($labels/properties/entry[./@key=$%s]/text(), concat('Label not found (', $%s, ')'))[1]\"/></span>",
+        "<span class=\"dynamic-label\"><xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/></span>",
         variableName, variableName));
     return new Markup(writer.toString());
   }
@@ -93,7 +99,9 @@ public class XsltRenderer extends IndentedStringWriter implements MarkupGenerato
     IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.openTag("xsl:template", String.format("name='%s'", name));
     writer.openTag("section", "title=\"" + name + "\"");
-    writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
+    if (StringUtils.isNotBlank(number)) {
+      writer.writeLine(String.format("<xsl:text>%s&#160;</xsl:text>", number));
+    }
     writer.writeBlock(content.script);
     writer.closeTag("section");
     writer.closeTag("xsl:template");
