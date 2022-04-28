@@ -29,7 +29,7 @@ public class SdkSymbolResolver implements SymbolResolver {
   private static final Map<String, SdkSymbolResolver> instances = new HashMap<>();
 
   /**
-   * Gets the single instance containing the sysmbls definned in the given version of the eForms
+   * Gets the single instance containing the symbols defined in the given version of the eForms
    * SDK.
    *
    * @param sdkVersion Version of the SDK
@@ -39,7 +39,7 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   /**
-   * Builds EFX list from the passed codelist refence. This will lazily compute and cache the result
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the result
    * for reuse as the operation can be costly on some large lists.
    *
    * @param codelistId A reference to an SDK codelist.
