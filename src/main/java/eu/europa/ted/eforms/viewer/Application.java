@@ -9,6 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+/**
+ * Entry point.
+ */
 public class Application {
 
   private static final Logger logger = LoggerFactory.getLogger(Application.class);
@@ -25,7 +28,7 @@ public class Application {
 
     logger.info("eForms Notice Viewer");
     logger.info(
-        "Usage: <xml file to view (without .xml)> <two letter language code> [<view id to use>]");
+        "Usage: <two letter language code> <xml file to view (without .xml)> [<view id to use>]");
     logger.info("Example: en X02_registrations");
     logger.info("args={}", Arrays.toString(args));
 
@@ -39,10 +42,10 @@ public class Application {
           "Language: expecting two letter code like 'en', 'fr', ..., but found '%s'", language));
     }
 
-    final String noticeXml = args[1];
+    final String noticeXmlName = args[1];
     final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
 
-    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXml, viewIdOpt);
+    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlName, viewIdOpt);
     logger.info("Created HTML file: {}", htmlPath);
     System.exit(0);
   }

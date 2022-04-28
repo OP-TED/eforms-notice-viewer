@@ -33,15 +33,6 @@ import eu.europa.ted.efx.EfxTemplateTranslator;
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
 
-  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
-      final Optional<String> viewIdOpt) {
-    try {
-      return generateHtml(language, noticeXmlFilename, viewIdOpt);
-    } catch (Exception e) {
-      throw new RuntimeException(e.toString(), e);
-    }
-  }
-
   /**
    * @param language The language as a two letter code
    * @param noticeXmlFilename The notice xml filename but without the xml extension
@@ -96,6 +87,15 @@ public class NoticeViewer {
     return applyXslTransform(language, noticeXmlPath, xslPath, viewId);
   }
 
+  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
+      final Optional<String> viewIdOpt) {
+    try {
+      return generateHtml(language, noticeXmlFilename, viewIdOpt);
+    } catch (Exception e) {
+      throw new RuntimeException(e.toString(), e);
+    }
+  }
+
   static Path applyXslTransform(final String language, final Path noticeXmlPath, final Path xslPath,
       final String viewId) throws IOException {
 
@@ -115,6 +115,7 @@ public class NoticeViewer {
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
+      // Currently this is what allows to load the labels (i18n).
       factory.setURIResolver(new CustomUriResolver());
 
       final Source xslSource = new StreamSource(inputStream);
@@ -122,7 +123,6 @@ public class NoticeViewer {
       // transformer.setURIResolver(uriResolver); Already set by the factory!
 
       // Parameters.
-      // TODO use language in XsltUriResolver or pass it to transformer?
       transformer.setParameter("language", language); // For en.xml or fr.xml, ...
 
       // HTML as output of the transformation.
@@ -160,10 +160,10 @@ public class NoticeViewer {
 
     final Path outFolder = Path.of("target", "output-xsl");
     Files.createDirectories(outFolder);
-    final Path filePath = outFolder.resolve(viewId + ".xsl");
+    final String nameByConvention = viewId + ".xsl";
+    final Path filePath = outFolder.resolve(nameByConvention);
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
       writer.write(translation);
-      writer.close();
     }
     return filePath;
   }

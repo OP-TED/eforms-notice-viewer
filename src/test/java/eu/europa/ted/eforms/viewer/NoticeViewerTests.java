@@ -1,15 +1,17 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 
+@SuppressWarnings("static-method")
 public class NoticeViewerTests {
 
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTests.class);
@@ -17,39 +19,26 @@ public class NoticeViewerTests {
   private static final String SDK_VERSION = "latest";
 
   @Test
-  @SuppressWarnings("static-method")
+  public void testEfxToHtmlFull() throws IOException {
+    final String language = "en"; // In english.
+    final String noticeXmlFilename = "X02_registration"; // "X02_registration.xml"
+    final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
+    final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlFilename, viewIdOpt);
+    logger.info("Wrote html file: {}", path);
+    final File htmlFile = path.toFile();
+    assertTrue(htmlFile.exists());
+
+    // The test would have failed if there were errors, this is what the check is really about.
+    // In addition to that we can also check that the produced HTML can be parsed.
+    Jsoup.parse(htmlFile, StandardCharsets.UTF_8.toString());
+  }
+
+  @Test
   public void testEfxToXsl() throws IOException {
     final String viewId = "X02";
     final Path xsl = NoticeViewer.buildXsl(viewId, SDK_VERSION);
     logger.info("Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
-  }
-
-  /**
-   * A minimal test covering an XML to HTML transformation using XSL in isolation. This can be used
-   * to quickly try out things with XSL.
-   */
-  @Test
-  @SuppressWarnings("static-method")
-  public void testXslToXml() throws IOException {
-    final String language = "en";
-    final String viewId = "X02";
-    final Path noticeXmlPath = ResourceLoader.getResourceAsPath(
-        SdkConstants.EFORMS_SDK_EXAMPLES_NOTICES.resolve("X02_registration.xml").toString());
-    final Path xslPath = ResourceLoader.getResourceAsPath(Path.of("xsl", "X02.xsl").toString());
-    final Path html = NoticeViewer.applyXslTransform(language, noticeXmlPath, xslPath, viewId);
-    logger.info("Wrote file: {}", html);
-    assertTrue(html.toFile().exists(), "Expecting HTML file to exist.");
-  }
-
-  @Test
-  @SuppressWarnings("static-method")
-  public void testEfxToHtmlFull() {
-    final String language = "en";
-    final String noticeXmlFilename = "X02_registration";
-    final Path xsl =
-        NoticeViewer.generateHtmlForUnitTest(language, noticeXmlFilename, Optional.empty());
-    logger.info("Wrote file: {}", xsl);
-    assertTrue(xsl.toFile().exists());
+    // The test would have failed if there were errors, this is what the check is really about.
   }
 }

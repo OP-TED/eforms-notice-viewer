@@ -70,7 +70,7 @@ public class SdkSymbolResolver implements SymbolResolver {
       this.codelistById = new SdkCodelistMap(sdkVersion);
     } catch (IOException e) {
       throw new RuntimeException(
-          String.format("Unable to load Symbols for eForms-SDK %s", sdkVersion), e);
+          String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
     }
   }
 
@@ -97,7 +97,8 @@ public class SdkSymbolResolver implements SymbolResolver {
   public PathExpression absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
-      throw new ParseCancellationException(String.format("Unknown field identifier '%s'.", fieldId));
+      throw new ParseCancellationException(
+          String.format("Unknown field identifier '%s'.", fieldId));
     }
     return new PathExpression(sdkField.getXpathAbsolute());
   }
