@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
-import eu.europa.ted.efx.model.Markup;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
+import eu.europa.ted.efx.model.Markup;
 
 public class XsltRenderer extends IndentedStringWriter implements MarkupGenerator {
 
