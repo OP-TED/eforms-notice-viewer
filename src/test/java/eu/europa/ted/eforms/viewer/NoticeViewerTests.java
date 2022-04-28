@@ -3,10 +3,8 @@ package eu.europa.ted.eforms.viewer;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Optional;
-import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +25,7 @@ public class NoticeViewerTests {
     logger.info("Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
-
     // The test would have failed if there were errors, this is what the check is really about.
-    // In addition to that we can also check that the produced HTML can be parsed.
-    Jsoup.parse(htmlFile, StandardCharsets.UTF_8.toString());
   }
 
   @Test

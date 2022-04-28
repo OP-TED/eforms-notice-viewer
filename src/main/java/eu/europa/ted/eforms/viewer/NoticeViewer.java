@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -84,7 +86,12 @@ public class NoticeViewer {
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
     logger.info("Created xsl file: {}", xslPath);
 
-    return applyXslTransform(language, noticeXmlPath, xslPath, viewId);
+    final Path htmlPath = applyXslTransform(language, noticeXmlPath, xslPath, viewId);
+
+    // Ensure the HTML can be parsed.
+    Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
+
+    return htmlPath;
   }
 
   public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
