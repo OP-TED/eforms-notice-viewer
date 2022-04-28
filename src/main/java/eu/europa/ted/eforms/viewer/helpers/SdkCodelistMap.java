@@ -31,7 +31,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   }
 
   /**
-   * Builds EFX list from the passed codelist refence. This will lazily compute and cache the result
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the result
    * for reuse as the operation can be costly on some large lists.
    *
    * @param codelistId A reference to an SDK codelist.
@@ -81,7 +81,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
       // We assume there are no duplicate code values in the referenced codelists.
       final List<String> codes = scl.getRow().stream().map(row -> {
         final String codeVal = row.getValue().stream()
-            .filter(valu -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(valu)))
+            .filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v)))
             .findFirst()//
             .orElseThrow(RuntimeException::new)//
             .getSimpleValue()//
