@@ -17,7 +17,7 @@ public class NoticeViewerTests {
   private static final String SDK_VERSION = "latest";
 
   @Test
-  public void testEfxToHtmlFull() throws IOException {
+  public void testEfxToHtmlFull() {
     final String language = "en"; // In english.
     final String noticeXmlFilename = "X02_registration"; // "X02_registration.xml"
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.

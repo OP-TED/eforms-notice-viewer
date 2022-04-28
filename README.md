@@ -2,8 +2,11 @@
 
 ## Introduction
 
+This is a sample command line application which demonstrates the usage of the SDK views and EFX.
 As input it takes an SDK view template EFX file and a notice XML file.
 The output is HTML showing labels, values and so on.
+
+Being a sample application, the HTML generation has been simplified for demonstration purposes.
 
 
 ## Building
