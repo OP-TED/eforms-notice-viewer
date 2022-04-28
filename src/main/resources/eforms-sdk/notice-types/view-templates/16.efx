@@ -16,8 +16,8 @@
 		{ND-0} #{decoration|name|purpose}
 			{BT-23-Procedure} #{business_term|name|BT-23}: #{BT-23-Procedure}
 			{BT-531-Procedure} #{business_term|name|BT-531}: #{BT-531-Procedure}
-			{BT-262-Procedure} #{name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} ${BT-262-Procedure/@unitCode}
-			{BT-263-Procedure} #{name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} ${BT-263-Procedure/@unitCode}
+			{BT-262-Procedure} #{name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} #{BT-262-Procedure}
+			{BT-263-Procedure} #{name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} #{BT-263-Procedure}
 		{ND-0} #{decoration|name|value}
 			{BT-27-Procedure} #{name|BT-27}: ${BT-27-Procedure} ${BT-27-Procedure/@currencyID}
 		{ND-0} #{decoration|name|general-information}

@@ -10,8 +10,8 @@
 		{ND-0} #{decoration|name|purpose}
 			{BT-23-Procedure} #{business_term|name|BT-23}: #{BT-23-Procedure}
 			{OPP-040-Procedure} #{business_term|name|OPP-040}
-			{BT-262-Procedure} #{name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} ${BT-262-Procedure/@unitCode}
-			{BT-263-Procedure} #{name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} ${BT-263-Procedure/@unitCode}
+			{BT-262-Procedure} #{name|BT-262} (${BT-26(m)-Procedure}): ${BT-262-Procedure} #{BT-262-Procedure}
+			{BT-263-Procedure} #{name|BT-263} (${BT-26(a)-Procedure}): ${BT-263-Procedure} #{BT-263-Procedure}
 		{ND-0} #{decoration|name|general-information}
 			{BT-300-Procedure} #{business_term|name|BT-300}: ${BT-300-Procedure}
 			{ND-0} #{decoration|name|legal-basis}
