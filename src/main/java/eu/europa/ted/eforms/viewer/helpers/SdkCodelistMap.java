@@ -21,6 +21,9 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
 
   private static final long serialVersionUID = 1L;
 
+  /**
+   * Currently unused, this will be supported in future versions.
+   */
   private final String sdkVersion;
 
   public SdkCodelistMap(final String sdkVersion) {
@@ -28,7 +31,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   }
 
   /**
-   * Builds EFX list from the passed codelist refence. This will lazily compute and cache the result
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the result
    * for reuse as the operation can be costly on some large lists.
    *
    * @param codelistId A reference to an SDK codelist.
@@ -42,12 +45,12 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   }
 
   @Override
-  public SdkCodelist get(Object codelistId) {
+  public SdkCodelist get(final Object codelistId) {
     return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
   }
 
   @Override
-  public SdkCodelist getOrDefault(Object codelistId, SdkCodelist defaultValue) {
+  public SdkCodelist getOrDefault(final Object codelistId, final SdkCodelist defaultValue) {
     return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
   }
 
@@ -67,8 +70,8 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
 
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = ResourceLoader.getResourceAsStream(
-        SdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
+    try (InputStream is = ResourceLoader
+        .getResourceAsStream(SdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
 
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
@@ -78,8 +81,7 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
       // We assume there are no duplicate code values in the referenced codelists.
       final List<String> codes = scl.getRow().stream().map(row -> {
         final String codeVal = row.getValue().stream()
-            .filter(
-                value -> (GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(value))))//
+            .filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v)))
             .findFirst()//
             .orElseThrow(RuntimeException::new)//
             .getSimpleValue()//

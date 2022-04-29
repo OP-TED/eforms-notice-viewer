@@ -16,7 +16,6 @@ public class ResourceLoader {
    * @param resourcePath Path relative to "src/main/resources/" if you are in a Maven project.
    *
    * @return The path of the specified resource
-   * @throws URISyntaxException
    */
   public static Path getResourceAsPath(final String resourcePath) {
     assert StringUtils.isNotBlank(resourcePath) : "resourcePath is blank";
@@ -33,7 +32,7 @@ public class ResourceLoader {
   /**
    * @param resourcePath Path relative to "src/main/resources/" if you are in a Maven project.
    *
-   * @return The inputstream to the specified resource
+   * @return The input stream to the specified resource
    */
   public static InputStream getResourceAsStream(final String resourcePath) {
     assert StringUtils.isNotBlank(resourcePath) : "resourcePath is blank";
@@ -46,7 +45,7 @@ public class ResourceLoader {
   /**
    * @param resourcePath Path relative to "src/main/resources/" if you are in a Maven project.
    *
-   * @return The inputstream to the specified resource
+   * @return The input stream to the specified resource
    */
   public static InputStream getResourceAsStream(final ClassLoader classLoader,
       final String resourcePath) {

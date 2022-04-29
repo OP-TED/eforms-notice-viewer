@@ -55,10 +55,18 @@
       <version>11.3</version>
     </dependency>
 
+    <!-- For genericode .gc files (SDK codelist related) -->
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-genericode</artifactId>
       <version>6.2.0</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.14.3</version>
     </dependency>
 
   </dependencies>
@@ -91,6 +99,44 @@
       </plugin>
 
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-checkstyle-plugin</artifactId>
+          <version>3.1.2</version>
+          <dependencies>
+            <dependency>
+              <groupId>com.puppycrawl.tools</groupId>
+              <artifactId>checkstyle</artifactId>
+              <!-- NOTE: versions before 8 something got confused by lambdas, luckily 9 solves this. -->
+              <version>9.0</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <configLocation>/src/main/resources/checkstyle-step2.xml
+            </configLocation>
+            <encoding>UTF-8</encoding>
+            <consoleOutput>true</consoleOutput>
+            <failsOnError>false</failsOnError>
+            <linkXRef>false</linkXRef>
+          </configuration>
+          <executions>
+            <execution>
+              <id>validate</id>
+              <phase>validate</phase>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+      </plugins>
+    </pluginManagement>
   </build>
 
 

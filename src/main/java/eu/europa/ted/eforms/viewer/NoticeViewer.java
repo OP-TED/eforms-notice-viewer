@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -25,22 +27,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.efx.EfxTemplateTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
-
-  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
-      final Optional<String> viewIdOpt) {
-    try {
-      return generateHtml(language, noticeXmlFilename, viewIdOpt);
-    } catch (Exception e) {
-      throw new RuntimeException(e.toString(), e);
-    }
-  }
 
   /**
    * @param language The language as a two letter code
@@ -93,7 +86,21 @@ public class NoticeViewer {
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
     logger.info("Created xsl file: {}", xslPath);
 
-    return applyXslTransform(language, noticeXmlPath, xslPath, viewId);
+    final Path htmlPath = applyXslTransform(language, noticeXmlPath, xslPath, viewId);
+
+    // Ensure the HTML can be parsed.
+    Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
+
+    return htmlPath;
+  }
+
+  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename,
+      final Optional<String> viewIdOpt) {
+    try {
+      return generateHtml(language, noticeXmlFilename, viewIdOpt);
+    } catch (Exception e) {
+      throw new RuntimeException(e.toString(), e);
+    }
   }
 
   static Path applyXslTransform(final String language, final Path noticeXmlPath, final Path xslPath,
@@ -115,6 +122,7 @@ public class NoticeViewer {
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
+      // Currently this is what allows to load the labels (i18n).
       factory.setURIResolver(new CustomUriResolver());
 
       final Source xslSource = new StreamSource(inputStream);
@@ -122,7 +130,6 @@ public class NoticeViewer {
       // transformer.setURIResolver(uriResolver); Already set by the factory!
 
       // Parameters.
-      // TODO use language in XsltUriResolver or pass it to transformer?
       transformer.setParameter("language", language); // For en.xml or fr.xml, ...
 
       // HTML as output of the transformation.
@@ -160,10 +167,10 @@ public class NoticeViewer {
 
     final Path outFolder = Path.of("target", "output-xsl");
     Files.createDirectories(outFolder);
-    final Path filePath = outFolder.resolve(viewId + ".xsl");
+    final String nameByConvention = viewId + ".xsl";
+    final Path filePath = outFolder.resolve(nameByConvention);
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
       writer.write(translation);
-      writer.close();
     }
     return filePath;
   }

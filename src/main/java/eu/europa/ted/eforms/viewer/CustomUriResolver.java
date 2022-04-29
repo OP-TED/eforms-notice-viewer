@@ -13,18 +13,12 @@ import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 
 public final class CustomUriResolver implements URIResolver {
+
+  /**
+   * Currently this allows to load the labels.
+   */
   @Override
   public Source resolve(final String href, final String base) {
-    // TODO lookup in SDK ?
-    // IDEALLY WE PASS THE LANGUAGE TO THE XSD AS A PARAMETER.
-
-    // final String newHref;
-    // if ("labels.xml".equals(href)) {
-    // newHref = "eforms-sdk/translations/en.xml";
-    // } else {
-    // newHref = href;
-    // }
-
     try (InputStream is = ResourceLoader.getResourceAsStream("eforms-sdk/translations/" + href)) {
       if (is == null) {
         throw new RuntimeException(
@@ -33,15 +27,12 @@ public final class CustomUriResolver implements URIResolver {
       // DOM parser based.
       final DocumentBuilder builder = SafeDocumentBuilder.buildSafeDocumentBuilderAllowDoctype();
       final Document document = builder.parse(is);
-
       return new DOMSource(document);
-
     } catch (SAXException | IOException | ParserConfigurationException e) {
       throw new RuntimeException(e.toString(), e);
     }
-
     // An alternative is to use a StreamSource, this uses less memory.
-    // This can fail when it tries to load a dtd (proxy ...).
+    // This can fail when it tries to load a dtd (proxy issues ...).
     // return new StreamSource(is);
   }
 

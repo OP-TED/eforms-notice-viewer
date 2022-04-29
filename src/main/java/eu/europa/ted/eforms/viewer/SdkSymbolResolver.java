@@ -10,10 +10,10 @@ import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
+import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.SdkCodelist;
 import eu.europa.ted.efx.model.SdkField;
 import eu.europa.ted.efx.model.SdkNode;
-import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
@@ -29,7 +29,7 @@ public class SdkSymbolResolver implements SymbolResolver {
   private static final Map<String, SdkSymbolResolver> instances = new HashMap<>();
 
   /**
-   * Gets the single instance containing the sysmbls definned in the given version of the eForms
+   * Gets the single instance containing the symbols defined in the given version of the eForms
    * SDK.
    *
    * @param sdkVersion Version of the SDK
@@ -39,7 +39,7 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   /**
-   * Builds EFX list from the passed codelist refence. This will lazily compute and cache the result
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the result
    * for reuse as the operation can be costly on some large lists.
    *
    * @param codelistId A reference to an SDK codelist.
@@ -70,7 +70,7 @@ public class SdkSymbolResolver implements SymbolResolver {
       this.codelistById = new SdkCodelistMap(sdkVersion);
     } catch (IOException e) {
       throw new RuntimeException(
-          String.format("Unable to load Symbols for eForms-SDK %s", sdkVersion), e);
+          String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
     }
   }
 
@@ -97,7 +97,8 @@ public class SdkSymbolResolver implements SymbolResolver {
   public PathExpression absoluteXpathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
-      throw new ParseCancellationException(String.format("Unknown field identifier '%s'.", fieldId));
+      throw new ParseCancellationException(
+          String.format("Unknown field identifier '%s'.", fieldId));
     }
     return new PathExpression(sdkField.getXpathAbsolute());
   }
