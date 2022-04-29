@@ -125,7 +125,7 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @return The xPath of the given field relative to the given context.
    */
   @Override
-  public PathExpression relativeXpathOfField(String fieldId, PathExpression contextPath) {
+  public PathExpression relativePathOfField(String fieldId, PathExpression contextPath) {
     final PathExpression xpath = absolutePathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
