@@ -130,7 +130,7 @@ public class NoticeViewer {
       // transformer.setURIResolver(uriResolver); Already set by the factory!
 
       // Parameters.
-      transformer.setParameter("language", language); // For en.xml or fr.xml, ...
+      transformer.setParameter("language", language);
 
       // HTML as output of the transformation.
       final Path outFolder = Path.of("target", "output-html");
