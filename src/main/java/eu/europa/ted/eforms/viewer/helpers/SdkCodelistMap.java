@@ -31,8 +31,8 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   }
 
   /**
-   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the result
-   * for reuse as the operation can be costly on some large lists.
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the
+   * result for reuse as the operation can be costly on some large lists.
    *
    * @param codelistId A reference to an SDK codelist.
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
