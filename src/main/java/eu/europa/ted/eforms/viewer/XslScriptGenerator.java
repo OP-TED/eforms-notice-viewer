@@ -10,11 +10,11 @@ import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
-public class XsltRenderer extends IndentedStringWriter implements MarkupGenerator {
+public class XslScriptGenerator extends IndentedStringWriter implements MarkupGenerator {
 
   private static int variableCounter = 0;
 
-  public XsltRenderer() {
+  public XslScriptGenerator() {
     super(10);
   }
 

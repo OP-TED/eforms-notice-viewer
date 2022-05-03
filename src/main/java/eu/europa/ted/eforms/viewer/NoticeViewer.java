@@ -163,7 +163,7 @@ public class NoticeViewer {
     assert viewPath.toFile().exists() : "No such file: " + viewId;
 
     final String translation =
-        EfxTemplateTranslator.renderTemplateFile(viewPath, sdkVersion, new DependencyFactory());
+        EfxTemplateTranslator.renderTemplate(viewPath, new DependencyFactory(), sdkVersion);
 
     final Path outFolder = Path.of("target", "output-xsl");
     Files.createDirectories(outFolder);

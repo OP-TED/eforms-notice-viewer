@@ -93,7 +93,7 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @return The xPath of the given field.
    */
   @Override
-  public PathExpression absoluteXpathOfField(final String fieldId) {
+  public PathExpression absolutePathOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new ParseCancellationException(
@@ -107,7 +107,7 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @return The xPath of the given node or field.
    */
   @Override
-  public PathExpression absoluteXpathOfNode(final String nodeId) {
+  public PathExpression absolutePathOfNode(final String nodeId) {
     final SdkNode sdkNode = nodeById.get(nodeId);
     if (sdkNode == null) {
       throw new ParseCancellationException(String.format("Unknown node identifier '%s'.", nodeId));
@@ -124,8 +124,8 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @return The xPath of the given field relative to the given context.
    */
   @Override
-  public PathExpression relativeXpathOfField(String fieldId, PathExpression contextPath) {
-    final PathExpression xpath = absoluteXpathOfField(fieldId);
+  public PathExpression relativePathOfField(String fieldId, PathExpression contextPath) {
+    final PathExpression xpath = absolutePathOfField(fieldId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
@@ -137,8 +137,8 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @return The XPath of the given node relative to the given context.
    */
   @Override
-  public PathExpression relativeXpathOfNode(String nodeId, PathExpression contextPath) {
-    final PathExpression xpath = absoluteXpathOfNode(nodeId);
+  public PathExpression relativePathOfNode(String nodeId, PathExpression contextPath) {
+    final PathExpression xpath = absolutePathOfNode(nodeId);
     return XPathContextualizer.contextualize(contextPath, xpath);
   }
 
