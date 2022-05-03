@@ -9,7 +9,7 @@ public class SdkConstants {
       Path.of("eforms-sdk", "examples", "notices");
 
   public static final Path EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
-      Path.of("eforms-sdk", "notice-types", "view-templates");
+      Path.of("eforms-sdk", "view-templates");
 
   public static final Path EFORMS_SDK_FIELDS_FIELDS_JSON =
       Path.of("eforms-sdk", "fields", "fields.json");
