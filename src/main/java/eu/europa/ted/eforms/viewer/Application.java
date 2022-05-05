@@ -29,7 +29,7 @@ public class Application {
     logger.info("eForms Notice Viewer");
     logger.info(
         "Usage: <two letter language code> <xml file to view (without .xml)> [<view id to use>]");
-    logger.info("Example: en X02_registrations");
+    logger.info("Example: en X02_registration");
     logger.info("args={}", Arrays.toString(args));
 
     if (args.length < 1 || args.length > 3) {
