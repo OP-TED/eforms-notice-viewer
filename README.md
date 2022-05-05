@@ -18,7 +18,7 @@ Being a sample application, the HTML generation has been simplified for demonstr
 
 ### Required projects
 
-You will need https://citnet.tech.ec.europa.eu/CITnet/stash/projects/TEDEFO/repos/eforms-expression-language/browse (git clone, see README of that project)
+You will need https://github.com/OP-TED/efx-toolkit-java (git clone, see README of that project)
 After the setup, run `mvn clean install` in this project from the same folder as the `pom.xml`
 
 
@@ -31,7 +31,7 @@ Usage: `<two letter language code> <xml file to view (without .xml)> [<view id t
 I want to generate an HTML to view the file `X02_registration.xml` in `en` (english). Running it using Maven:
 
 ```
-mvn compile exec:java -Dspring.datasource.username=${EFORMS_DATABASE_USERNAME} -Dspring.datasource.password=${EFORMS_DATABASE_PASSWORD} -Dexec.mainClass="eu.europa.ted.eforms.viewer.Application" -Dexec.args="en X02_registration"
+mvn compile exec:java -Dexec.mainClass="eu.europa.ted.eforms.viewer.Application" -Dexec.args="en X02_registration"
 ```
 
 After running it read the logs in the console for details about the location of the generated XSL, HTML, ...
