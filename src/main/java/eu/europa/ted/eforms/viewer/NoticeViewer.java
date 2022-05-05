@@ -30,7 +30,7 @@ import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.ResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.efx.EfxTemplateTranslator;
+import eu.europa.ted.efx.EfxTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -163,7 +163,7 @@ public class NoticeViewer {
     assert viewPath.toFile().exists() : "No such file: " + viewId;
 
     final String translation =
-        EfxTemplateTranslator.renderTemplate(viewPath, new DependencyFactory(), sdkVersion);
+        EfxTranslator.translateTemplate(viewPath, new DependencyFactory(), sdkVersion);
 
     final Path outFolder = Path.of("target", "output-xsl");
     Files.createDirectories(outFolder);

@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.commons.lang3.StringUtils;
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
+import org.apache.commons.lang3.StringUtils;
 import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {

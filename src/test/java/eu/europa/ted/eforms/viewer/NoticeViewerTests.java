@@ -14,7 +14,7 @@ public class NoticeViewerTests {
 
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTests.class);
 
-  private static final String SDK_VERSION = "latest";
+  private static final String SDK_VERSION = "eforms-sdk-0.6";
 
   @Test
   public void testEfxToHtmlX01English() {
