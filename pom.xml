@@ -17,8 +17,16 @@
 
   <dependencies>
 
+    <!--  eForms SDK -->
     <dependency>
-      <!-- EFX. -->
+      <groupId>eu.europa.ted.eforms</groupId>
+      <artifactId>eforms-sdk</artifactId>
+      <version>0.6.0</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- EFX. -->
+    <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
       <version>0.0.1</version>
