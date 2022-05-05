@@ -20,7 +20,7 @@
     <dependency>
       <!-- EFX. -->
       <groupId>eu.europa.ted.eforms</groupId>
-      <artifactId>eforms-expression-language</artifactId>
+      <artifactId>efx-toolkit-java</artifactId>
       <version>0.0.1</version>
     </dependency>
 
