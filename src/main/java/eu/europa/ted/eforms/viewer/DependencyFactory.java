@@ -22,7 +22,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
 
   @Override
   public MarkupGenerator createMarkupGenerator() {
-    return new XslScriptGenerator();
+    return new XslMarkupGenerator();
   }
 
   @Override

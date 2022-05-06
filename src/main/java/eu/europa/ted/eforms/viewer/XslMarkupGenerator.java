@@ -10,11 +10,11 @@ import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
-public class XslScriptGenerator extends IndentedStringWriter implements MarkupGenerator {
+public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
 
   private static int variableCounter = 0;
 
-  public XslScriptGenerator() {
+  public XslMarkupGenerator() {
     super(10);
   }
 
@@ -29,7 +29,7 @@ public class XslScriptGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   @Override
-  public Markup renderFile(final List<Markup> body, final List<Markup> templates) {
+  public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
 
     // NOTE: you should use a library to build HTML and handle escaping, here we just use String
     // format for demonstration purposes.
@@ -75,7 +75,7 @@ public class XslScriptGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   @Override
-  public Markup renderValueReference(final Expression valueReference) {
+  public Markup renderVariableExpression(final Expression valueReference) {
     return new Markup(String.format("<span class=\"value\"><xsl:value-of select=\"%s\"/></span>",
         valueReference.script));
   }
@@ -108,7 +108,7 @@ public class XslScriptGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   @Override
-  public Markup renderTemplate(final String name, final String number, final Markup content) {
+  public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     final String tagTemplate = "xsl:template";
     writer.openTag(tagTemplate, String.format("name='%s'", name));
@@ -126,7 +126,7 @@ public class XslScriptGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   @Override
-  public Markup renderCallTemplate(final String name, final PathExpression context) {
+  public Markup renderFragmentInvocation(final String name, final PathExpression context) {
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     final String tag = "xsl:for-each";
     writer.openTag(tag, String.format("select=\"%s\"", context.script));
