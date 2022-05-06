@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>eu.europa.ted.eforms</groupId>
   <artifactId>eforms-notice-viewer</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0-SNAPSHOT</version>
   <name>eForms Notice Viewer</name>
   <description>eForms Notice Viewer sample application.</description>
   <packaging>jar</packaging>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
-      <version>0.0.1</version>
+      <version>0.1.0-SNAPSHOT</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
