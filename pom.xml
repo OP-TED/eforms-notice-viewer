@@ -79,6 +79,14 @@
 
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>github-public</id>
+      <name>Github Packages</name>
+      <url>https://public:&#103;hp_fkKwOmLCctdXETIEqjul8vX7EFw6HE12kl4t@maven.pkg.github.com/OP-TED/*</url>
+    </repository>
+  </repositories>
+
   <build>
     <plugins>
 
