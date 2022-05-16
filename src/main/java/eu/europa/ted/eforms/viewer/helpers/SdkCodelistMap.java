@@ -10,11 +10,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
-import org.apache.commons.lang3.StringUtils;
+
 import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
@@ -62,17 +65,14 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     try {
       // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
-          ResourceLoader.getResourceAsPath(SdkConstants.EFORMS_SDK_CODELISTS.toString()),
-          marshaller);
+          SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS), marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
 
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = ResourceLoader
-        .getResourceAsStream(SdkConstants.EFORMS_SDK_CODELISTS.resolve(filename).toString())) {
-
+    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, filename)) {
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
       final String codelistVersion = cl.getIdentification().getVersion(); // Version tag of .gc

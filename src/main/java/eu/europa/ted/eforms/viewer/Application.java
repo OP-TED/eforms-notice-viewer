@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Optional;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
 /**
  * Entry point.
@@ -28,11 +32,11 @@ public class Application {
 
     logger.info("eForms Notice Viewer");
     logger.info(
-        "Usage: <two letter language code> <xml file to view (without .xml)> [<view id to use>]");
+        "Usage: <two letter language code> <xml file to view (without .xml)> <SDK resources version> [<view id to use>] [SDK resources root folder]");
     logger.info("Example: en X02_registration");
     logger.info("args={}", Arrays.toString(args));
 
-    if (args.length < 1 || args.length > 3) {
+    if (args.length < 1 || args.length > 5) {
       throw new RuntimeException("Invalid number of arguments, see usage.");
     }
 
@@ -43,11 +47,15 @@ public class Application {
     }
 
     final String noticeXmlName = args[1];
-    final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
+    final String sdkResourcesVersion = args[2];
+
+    final Optional<String> viewIdOpt = args.length > 3 ? Optional.of(args[3]) : Optional.empty();
+    final Optional<String> sdkResourcesRoot = args.length > 4 ? Optional.of(args[4]) : Optional.empty();
+
+    SdkResourcesLoader.getInstance().setVersion(sdkResourcesVersion).setRoot(sdkResourcesRoot);
 
     final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlName, viewIdOpt);
     logger.info("Created HTML file: {}", htmlPath);
     System.exit(0);
   }
-
 }

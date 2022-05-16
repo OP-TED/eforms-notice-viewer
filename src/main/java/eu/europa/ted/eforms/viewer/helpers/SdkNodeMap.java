@@ -1,8 +1,10 @@
 package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.IOException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import eu.europa.ted.efx.model.SdkNode;
 
 public class SdkNodeMap extends MapFromJson<SdkNode> {
@@ -10,7 +12,8 @@ public class SdkNodeMap extends MapFromJson<SdkNode> {
   private static final long serialVersionUID = 1L;
 
   public SdkNodeMap(final String sdkVersion) throws IOException {
-    super(sdkVersion, SdkConstants.EFORMS_SDK_FIELDS_FIELDS_JSON.toString());
+    super(sdkVersion, SdkResourcesLoader.getInstance()
+        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON).toString());
   }
 
   @Override

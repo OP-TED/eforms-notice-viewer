@@ -9,13 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("static-method")
-public class NoticeViewerTests {
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
-  private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTests.class);
+public class NoticeViewerTest {
+  private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
   private static final String SDK_VERSION = "eforms-sdk-0.6";
+  private static final String SDK_RESOURCES_VERSION="0.6.0";
+  private static final Optional<String> SDK_RESOURCES_ROOT=Optional.of(Path.of("target", "eforms-sdk").toString());
 
+ 
   @Test
   public void testEfxToHtmlX01English() {
     final String language = "en"; // In english.
@@ -45,6 +48,8 @@ public class NoticeViewerTests {
   }
 
   private void testGenerateHtml(final String language, final String noticeXmlFilename) {
+    SdkResourcesLoader.getInstance().setVersion(SDK_RESOURCES_VERSION).setRoot(SDK_RESOURCES_ROOT);
+
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
     final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlFilename, viewIdOpt);
     logger.info("TEST: Wrote html file: {}", path);
