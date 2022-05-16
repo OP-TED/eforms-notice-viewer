@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -53,13 +54,12 @@ public class NoticeViewer {
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
    */
-  public static Path generateHtml(final String language, final String noticeXmlFilename, final Optional<String> viewIdOpt)
+  public static Path generateHtml(final String language, final Path noticeXmlPath, final Optional<String> viewIdOpt)
       throws IOException, SAXException, ParserConfigurationException {
 
-    final Path noticeXmlPath = SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.NOTICE_EXAMPLE, noticeXmlFilename + ".xml");
-    logger.info("noticeName={}, noticeXmlPath={}", noticeXmlFilename, noticeXmlPath);
-    Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlFilename);
-    Validate.isTrue(noticeXmlPath.toFile().exists(), "No such file: " + noticeXmlPath);
+    logger.info("noticeXmlPath={}", noticeXmlPath);
+    Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
+    Validate.isTrue(Files.isRegularFile(noticeXmlPath, new LinkOption[0]), "No such file: " + noticeXmlPath);
 
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
     final Document doc = db.parse(noticeXmlPath.toFile());
@@ -91,7 +91,7 @@ public class NoticeViewer {
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
     logger.info("Created xsl file: {}", xslPath);
 
-    final Path htmlPath = applyXslTransform(language, noticeXmlPath, xslPath, viewId);
+    final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath, viewId);
 
     // Ensure the HTML can be parsed.
     Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
@@ -99,15 +99,15 @@ public class NoticeViewer {
     return htmlPath;
   }
 
-  public static Path generateHtmlForUnitTest(final String language, final String noticeXmlFilename, final Optional<String> viewIdOpt) {
+  public static Path generateHtmlForUnitTest(final String language, final Path noticeXmlPath, final Optional<String> viewIdOpt) {
     try {
-      return generateHtml(language, noticeXmlFilename, viewIdOpt);
+      return generateHtml(language, noticeXmlPath, viewIdOpt);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
   }
 
-  static Path applyXslTransform(final String language, final Path noticeXmlPath, final Path xslPath,
+  static Path applyXslTransform(final String language, String sdkVersion, final Path noticeXmlPath, final Path xslPath,
       final String viewId) throws IOException {
 
     // https://www.saxonica.com/documentation11/#!using-xsl/embedding
@@ -127,7 +127,7 @@ public class NoticeViewer {
       factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
       // Currently this is what allows to load the labels (i18n).
-      factory.setURIResolver(new CustomUriResolver());
+      factory.setURIResolver(new CustomUriResolver(sdkVersion));
 
       final Source xslSource = new StreamSource(inputStream);
       final Transformer transformer = factory.newTransformer(xslSource);
@@ -165,7 +165,7 @@ public class NoticeViewer {
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
       throws IOException {
-    final Path viewPath = getPathToEfxAsStr(viewId);
+    final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
     Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);
 
     final String translation =
@@ -214,9 +214,10 @@ public class NoticeViewer {
   /**
    * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
    *        something else for custom views
+   * @param sdkVersion The SDK version to load the path from
    */
-  public static Path getPathToEfxAsStr(final String viewId) {
-    return SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, viewId + ".efx");
+  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion) {
+    return SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, sdkVersion, viewId + ".efx");
   }
 
 }

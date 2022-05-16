@@ -13,7 +13,7 @@ public class SdkNodeMap extends MapFromJson<SdkNode> {
 
   public SdkNodeMap(final String sdkVersion) throws IOException {
     super(sdkVersion, SdkResourcesLoader.getInstance()
-        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON).toString());
+        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion).toString());
   }
 
   @Override

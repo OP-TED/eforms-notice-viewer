@@ -1,24 +1,25 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
 public class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
   private static final String SDK_VERSION = "eforms-sdk-0.6";
-  private static final String SDK_RESOURCES_VERSION="0.6.0";
-  private static final Optional<String> SDK_RESOURCES_ROOT=Optional.of(Path.of("target", "eforms-sdk").toString());
+  private static final Optional<String> SDK_RESOURCES_ROOT = Optional.of(Path.of("target", "eforms-sdk").toString());
 
- 
   @Test
   public void testEfxToHtmlX01English() {
     final String language = "en"; // In english.
@@ -47,11 +48,13 @@ public class NoticeViewerTest {
     testGenerateHtml(language, noticeXmlFilename);
   }
 
-  private void testGenerateHtml(final String language, final String noticeXmlFilename) {
-    SdkResourcesLoader.getInstance().setVersion(SDK_RESOURCES_VERSION).setRoot(SDK_RESOURCES_ROOT);
+  private void testGenerateHtml(final String language, final String noticeXmlName) {
+    SdkResourcesLoader.getInstance().setRoot(SDK_RESOURCES_ROOT);
+    Path noticeXmlPath = Path.of("src", "test", "/resources", "eforms-sdk",
+        SdkConstants.ResourceType.NOTICE_EXAMPLE.getPath().toString(), noticeXmlName + ".xml");
 
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
-    final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlFilename, viewIdOpt);
+    final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlPath, viewIdOpt);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());

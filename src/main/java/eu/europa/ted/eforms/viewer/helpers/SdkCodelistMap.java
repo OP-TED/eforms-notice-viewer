@@ -44,20 +44,20 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     if (StringUtils.isBlank(codelistId)) {
       throw new RuntimeException("CodelistId is blank.");
     }
-    return this.computeIfAbsent(codelistId, key -> loadSdkCodelist(key));
+    return this.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, sdkVersion));
   }
 
   @Override
   public SdkCodelist get(final Object codelistId) {
-    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
+    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, sdkVersion));
   }
 
   @Override
   public SdkCodelist getOrDefault(final Object codelistId, final SdkCodelist defaultValue) {
-    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key));
+    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, sdkVersion));
   }
 
-  private static SdkCodelist loadSdkCodelist(final String codeListId) {
+  private static SdkCodelist loadSdkCodelist(final String codeListId, String sdkVersion) {
     // Find the SDK codelist .gc file that corresponds to the passed reference.
     // Stream the data from that file.
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
@@ -65,14 +65,14 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     try {
       // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
-          SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS), marshaller);
+          SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion), marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
 
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, filename)) {
+    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, sdkVersion, filename)) {
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
       final String codelistVersion = cl.getIdentification().getVersion(); // Version tag of .gc

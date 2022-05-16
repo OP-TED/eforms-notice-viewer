@@ -18,12 +18,18 @@ import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
 public final class CustomUriResolver implements URIResolver {
 
+  private String sdkVersion;
+
+  public CustomUriResolver(String sdkVersion) {
+  this.sdkVersion=sdkVersion;  
+  }
+
   /**
    * Currently this allows to load the labels.
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, href)) {
+    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
       if (is == null) {
         throw new RuntimeException(
             String.format("inputStream is null for href=%s, base=%s", href, base));

@@ -1,12 +1,16 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -32,7 +36,7 @@ public class Application {
 
     logger.info("eForms Notice Viewer");
     logger.info(
-        "Usage: <two letter language code> <xml file to view (without .xml)> <SDK resources version> [<view id to use>] [SDK resources root folder]");
+        "Usage: <two letter language code> <path of XML file to view> [<view id to use>] [SDK resources root folder]");
     logger.info("Example: en X02_registration");
     logger.info("args={}", Arrays.toString(args));
 
@@ -42,19 +46,18 @@ public class Application {
 
     final String language = args[0];
     if (language.length() != 2) {
-      throw new RuntimeException(String.format(
-          "Language: expecting two letter code like 'en', 'fr', ..., but found '%s'", language));
+      throw new RuntimeException(MessageFormat.format(
+          "Language: expecting two letter code like 'en', 'fr', ..., but found '{0}'", language));
     }
 
-    final String noticeXmlName = args[1];
-    final String sdkResourcesVersion = args[2];
+    final Path noticeXmlPath = Path.of(args[1]);
 
-    final Optional<String> viewIdOpt = args.length > 3 ? Optional.of(args[3]) : Optional.empty();
-    final Optional<String> sdkResourcesRoot = args.length > 4 ? Optional.of(args[4]) : Optional.empty();
+    final Optional<String> viewIdOpt = args.length > 2 ? Optional.of(args[2]) : Optional.empty();
+    final Optional<String> sdkResourcesRoot = args.length > 3 ? Optional.of(args[4]) : Optional.empty();
 
-    SdkResourcesLoader.getInstance().setVersion(sdkResourcesVersion).setRoot(sdkResourcesRoot);
+    SdkResourcesLoader.getInstance().setRoot(sdkResourcesRoot);
 
-    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlName, viewIdOpt);
+    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt);
     logger.info("Created HTML file: {}", htmlPath);
     System.exit(0);
   }
