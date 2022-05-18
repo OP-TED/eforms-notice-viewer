@@ -8,30 +8,49 @@ The output is HTML showing labels, values and so on.
 
 Being a sample application, the HTML generation has been simplified for demonstration purposes.
 
-
 ## Building
 
-### Required technologies
+### Requirements
 
-* Java 11, higher may work for example Java 15 works
-* Maven 3.8.2 as a reference but lower or higher may work
+* Java 11 or higher
+* Maven 3.8.2 as a reference, but lower or higher may work
 
 ### Required projects
 
-You will need https://github.com/OP-TED/efx-toolkit-java (git clone, see README of that project)
-After the setup, run `mvn clean install` in this project from the same folder as the `pom.xml`
+Execute the following on the root folder of this project:
 
+```
+mvn clean install
+```
 
-## Command line
+## Execution
 
-Usage: `<two letter language code> <xml file to view (without .xml)> [<view id to use>]`
+### Requirements
+
+* Java 11 or higher
+
+### Command line
+
+1. Unzip the binary distribution (a .zip file), e.g. to `/path/to/eforms-notice-viewer`.
+
+   The unpacked folder will contain the following:
+     - A JAR file named eforms-notice-viewer-<version>.jar
+     - A `eforms-sdk` containing all of the supported eForms SDKs
+
+2. Go to `/path/to/eforms-notice-viewer` and execute the following:
+
+   ```
+   java -jar eforms-notice-viewer-<version>.jar <options>
+   ```
+
+   where `<options>` is: `<two letter language code> <path of XML file to view> [<view id to use>] [SDK resources root folder]`
 
 ### Example
 
-I want to generate an HTML to view the file `X02_registration.xml` in `en` (english). Running it using Maven:
+To generate an HTML to view the file `X02_registration.xml` in `en` (english), execute::
 
 ```
-mvn compile exec:java -Dexec.mainClass="eu.europa.ted.eforms.viewer.Application" -Dexec.args="en X02_registration"
+java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/X02_registration.xml
 ```
 
 After running it read the logs in the console for details about the location of the generated XSL, HTML, ...
