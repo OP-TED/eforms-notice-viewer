@@ -50,7 +50,7 @@ public class NoticeViewerTest {
 
   private void testGenerateHtml(final String language, final String noticeXmlName) {
     SdkResourcesLoader.getInstance().setRoot(SDK_RESOURCES_ROOT);
-    Path noticeXmlPath = Path.of("src", "test", "/resources", "eforms-sdk",
+    Path noticeXmlPath = Path.of("src", "test", "resources", "eforms-sdk",
         SdkConstants.ResourceType.NOTICE_EXAMPLE.getPath().toString(), noticeXmlName + ".xml");
 
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
