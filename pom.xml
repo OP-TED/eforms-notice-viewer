@@ -13,23 +13,17 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+
+    <efx.toolkit.version>0.1.0</efx.toolkit.version>
+    <dependency.plugin.version>3.3.0</dependency.plugin.version>
   </properties>
 
   <dependencies>
-
-    <!--  eForms SDK -->
-    <dependency>
-      <groupId>eu.europa.ted.eforms</groupId>
-      <artifactId>eforms-sdk</artifactId>
-      <version>0.6.0</version>
-      <scope>runtime</scope>
-    </dependency>
-
     <!-- EFX. -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>${efx.toolkit.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
@@ -76,7 +70,6 @@
       <artifactId>jsoup</artifactId>
       <version>1.14.3</version>
     </dependency>
-
   </dependencies>
 
   <repositories>
@@ -88,37 +81,8 @@
   </repositories>
 
   <build>
-    <plugins>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
-            </manifest>
-          </archive>
-          <descriptorRefs>
-            <descriptorRef>jar-with-dependencies</descriptorRef>
-          </descriptorRefs>
-          <appendAssemblyId>false</appendAssemblyId>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-    </plugins>
-
     <pluginManagement>
       <plugins>
-
         <plugin>
           <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
           <groupId>org.apache.maven.plugins</groupId>
@@ -150,10 +114,80 @@
             </execution>
           </executions>
         </plugin>
-
       </plugins>
     </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>${dependency.plugin.version}</version>
+        <executions>
+          <execution>
+            <id>unpack-sdk</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>eu.europa.ted.eforms</groupId>
+              <artifactId>eforms-sdk</artifactId>
+              <version>0.6.0</version>
+              <type>jar</type>
+              <includes>eforms-sdk/**/*</includes>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+              <fileMappers>
+                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+                  <pattern>^(eforms-sdk)/(.*)$</pattern>
+                  <replacement>$1/0.6/$2</replacement>
+                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
+              </fileMappers>
+            </artifactItem>
+          </artifactItems>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <archive>
+                <manifest>
+                  <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
+                </manifest>
+              </archive>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+            </configuration>
+          </execution>
+          <execution>
+            <id>create-bundle</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>src/main/assembly/bundle.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
-
-
 </project>

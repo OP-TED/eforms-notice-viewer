@@ -1,20 +1,24 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("static-method")
-public class NoticeViewerTests {
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
-  private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTests.class);
+public class NoticeViewerTest {
+  private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
   private static final String SDK_VERSION = "eforms-sdk-0.6";
+  private static final Optional<String> SDK_RESOURCES_ROOT = Optional.of(Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString());
 
   @Test
   public void testEfxToHtmlX01English() {
@@ -44,9 +48,13 @@ public class NoticeViewerTests {
     testGenerateHtml(language, noticeXmlFilename);
   }
 
-  private void testGenerateHtml(final String language, final String noticeXmlFilename) {
+  private void testGenerateHtml(final String language, final String noticeXmlName) {
+    SdkResourcesLoader.getInstance().setRoot(SDK_RESOURCES_ROOT);
+
+    Path noticeXmlPath = Path.of("src", "test", "resources", "xml", noticeXmlName + ".xml");
+
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
-    final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlFilename, viewIdOpt);
+    final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlPath, viewIdOpt);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());

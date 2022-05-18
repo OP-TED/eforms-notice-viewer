@@ -3,17 +3,29 @@ package eu.europa.ted.eforms.viewer.helpers;
 import java.nio.file.Path;
 
 public class SdkConstants {
-  public static final Path EFORMS_SDK_CODELISTS = Path.of("eforms-sdk", "codelists");
-
-  public static final Path EFORMS_SDK_EXAMPLES_NOTICES =
-      Path.of("eforms-sdk", "examples", "notices");
-
-  public static final Path EFORMS_SDK_NOTICE_TYPES_VIEW_TEMPLATES =
-      Path.of("eforms-sdk", "view-templates");
-
-  public static final Path EFORMS_SDK_FIELDS_FIELDS_JSON =
-      Path.of("eforms-sdk", "fields", "fields.json");
-
   public static final String FIELDS_JSON_XML_STRUCTURE_KEY = "xmlStructure";
   public static final String FIELDS_JSON_FIELDS_KEY = "fields";
+
+  public static final String DEFAULT_SDK_ROOT = "eforms-sdk";
+
+  public static enum ResourceType {
+    CODELISTS(Path.of("codelists")),
+    NOTICE_TYPES_VIEW_TEMPLATE(Path.of("view-templates")),
+    SDK_FIELD(Path.of("fields")),
+    TRANSLATION(Path.of("translations")),
+    SDK_FIELDS_FIELDS_JSON(Path.of("fields", "fields.json"));
+
+    public static final String FIELDS_JSON_XML_STRUCTURE_KEY = "xmlStructure";
+    public static final String FIELDS_JSON_FIELDS_KEY = "fields";
+
+    private Path path;
+
+    private ResourceType(Path path) {
+      this.path = path;
+    }
+
+    public Path getPath() {
+      return path;
+    }
+  }
 }
