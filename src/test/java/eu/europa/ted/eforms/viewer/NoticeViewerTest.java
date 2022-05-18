@@ -18,7 +18,7 @@ public class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
   private static final String SDK_VERSION = "eforms-sdk-0.6";
-  private static final Optional<String> SDK_RESOURCES_ROOT = Optional.of(Path.of("target", "eforms-sdk").toString());
+  private static final Optional<String> SDK_RESOURCES_ROOT = Optional.of(Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString());
 
   @Test
   public void testEfxToHtmlX01English() {
@@ -50,8 +50,8 @@ public class NoticeViewerTest {
 
   private void testGenerateHtml(final String language, final String noticeXmlName) {
     SdkResourcesLoader.getInstance().setRoot(SDK_RESOURCES_ROOT);
-    Path noticeXmlPath = Path.of("src", "test", "resources", "eforms-sdk",
-        SdkConstants.ResourceType.NOTICE_EXAMPLE.getPath().toString(), noticeXmlName + ".xml");
+
+    Path noticeXmlPath = Path.of("src", "test", "resources", "xml", noticeXmlName + ".xml");
 
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not passing any in cli.
     final Path path = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlPath, viewIdOpt);
