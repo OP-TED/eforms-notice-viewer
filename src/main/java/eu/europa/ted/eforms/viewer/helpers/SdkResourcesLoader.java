@@ -9,14 +9,12 @@ import java.text.MessageFormat;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang3.Validate;
 
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants.ResourceType;
 
 public class SdkResourcesLoader {
-  public static final String DEFAULT_SDK_ROOT = "eforms-sdk";
-
-  private String root = DEFAULT_SDK_ROOT;
+  private String root = SdkConstants.DEFAULT_SDK_ROOT;
 
   private static final SdkResourcesLoader INSTANCE = new SdkResourcesLoader();
 
@@ -24,7 +22,7 @@ public class SdkResourcesLoader {
   }
 
   public SdkResourcesLoader setRoot(Optional<String> root) {
-    this.root = root.orElse(DEFAULT_SDK_ROOT);
+    this.root = root.orElse(SdkConstants.DEFAULT_SDK_ROOT);
     return this;
   }
 
@@ -32,15 +30,24 @@ public class SdkResourcesLoader {
     return getResourceAsPath(resourceType, sdkVersion, null);
   }
 
-  public Path getResourceAsPath(final ResourceType resourceType, String sdkVersion, final String filename) {
+  public Path getResourceAsPath(final ResourceType resourceType, String sdkVersion, String filename) {
     Validate.notEmpty(sdkVersion, "Undefined SDK resources version");
 
-    sdkVersion = StringUtils.removeStart(sdkVersion, "eforms-sdk-");
+    sdkVersion = Optional
+        .ofNullable(sdkVersion)
+        .map((String sv) -> StringUtils.removeStart(sv, "eforms-sdk-"))
+        .orElse(StringUtils.EMPTY);
 
-    Path result = Path.of(
-        root, Optional.ofNullable(sdkVersion).orElse(StringUtils.EMPTY), Optional.ofNullable(resourceType)
-            .map(SdkConstants.ResourceType::getPath).orElse(Path.of(StringUtils.EMPTY)).toString(),
-        Optional.ofNullable(filename).orElse(StringUtils.EMPTY)).toAbsolutePath();
+    final String resourcePath = Optional
+        .ofNullable(resourceType)
+        .map(SdkConstants.ResourceType::getPath)
+        .orElse(Path.of(StringUtils.EMPTY))
+        .toString();
+
+
+    filename = Optional.ofNullable(filename).orElse(StringUtils.EMPTY);
+
+    Path result = Path.of(root, sdkVersion, resourcePath, filename).toAbsolutePath();
 
     Validate.isTrue(Files.exists(result, new LinkOption[0]),
         MessageFormat.format("Resource [{0}] does not exist", result));

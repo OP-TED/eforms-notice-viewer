@@ -12,7 +12,7 @@ public class SdkFieldMap extends MapFromJson<SdkField> {
   private static final long serialVersionUID = 1L;
 
   public SdkFieldMap(final String sdkVersion) throws IOException {
-    super(sdkVersion, SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS, sdkVersion, "fields.json").toString());
+    super(sdkVersion, SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion).toString());
   }
 
   @Override

@@ -63,7 +63,6 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
     final Map<String, String> codelistIdToFilename;
     try {
-      // TODO use the SDK version.
       codelistIdToFilename = buildMapCodelistIdToFilename(
           SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion), marshaller);
     } catch (IOException e1) {
