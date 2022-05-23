@@ -39,7 +39,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <efx.toolkit.version>0.1.0</efx.toolkit.version>
+    <efx.toolkit.version>0.1.1</efx.toolkit.version>
     <dependency.plugin.version>3.3.0</dependency.plugin.version>
   </properties>
 
@@ -160,7 +160,7 @@
             <artifactItem>
               <groupId>eu.europa.ted.eforms</groupId>
               <artifactId>eforms-sdk</artifactId>
-              <version>0.6.0</version>
+              <version>0.6.2</version>
               <type>jar</type>
               <includes>eforms-sdk/**/*</includes>
               <outputDirectory>${project.build.directory}</outputDirectory>
