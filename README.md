@@ -2,20 +2,23 @@
 
 ## Introduction
 
-This is a sample command line application which demonstrates the usage of the SDK views and EFX.
-As input it takes an SDK view template EFX file and a notice XML file.
-The output is HTML showing labels, values and so on.
+This is a sample command line application which demonstrates how you can use the eForms SDK in a metadata driven application that visualises eForms notices.
 
-Being a sample application, the HTML generation has been simplified for demonstration purposes.
+As input it takes a notice XML file, a language code, and optionally an EFX template..
+The output is an HTML page showing the content of the notice, with labels in the desired language, values and so on.
+
+The notice viewer is not a production ready application. It is intended to demonstrate the use of concepts and resources available in the eForms SDK. You can use it as an inspiration or a starting point for your own apps.
+
+The documentation is available at: https://docs.ted.europa.eu/eforms/latest/notice-viewer
 
 ## Building
 
-### Requirements
+Requirements:
 
 * Java 11 or higher
-* Maven 3.8.2 as a reference, but lower or higher may work
+* Maven 3.8, other versions probably also work
 
-### Required projects
+This project depends on both the eForms SDK and the EFX toolkit for Java, and uses their respective Maven packages.
 
 Execute the following on the root folder of this project:
 
@@ -23,7 +26,7 @@ Execute the following on the root folder of this project:
 mvn clean install
 ```
 
-## Execution
+## Usage
 
 ### Requirements
 
@@ -40,18 +43,26 @@ mvn clean install
 2. Go to `/path/to/eforms-notice-viewer` and execute the following:
 
    ```
-   java -jar eforms-notice-viewer-<version>.jar <options>
+   java -jar eforms-notice-viewer-<version>.jar <language> <xml file> [<view id>] [<SDK resources>]
    ```
 
-   where `<options>` is: `<two letter language code> <path of XML file to view> [<view id to use>] [SDK resources root folder]`
+   - `<language>`: two letter code for the desired language of the output (en, fr, etc.)
+   - `<xml file>`: path to the XML notice to view
+   - `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
+   - `<SDK resources>`: path to the folder containing the SDK resources, organized by version. If omitted, the folder `eforms-sdk` is used.
 
 ### Example
 
-To generate an HTML to view the file `X02_registration.xml` in `en` (english), execute::
+To generate an HTML to view the file `X02_registration.xml` in `en` (English):
 
 ```
 java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/X02_registration.xml
 ```
 
-After running it read the logs in the console for details about the location of the generated XSL, HTML, ...
-For technical details see `Application.java` for the entry point, also see unit tests for usage.
+To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
+
+```
+java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/cn_24_minimal.xml summary
+```
+
+While running, log output is generated in the console, giving information on the location of the generated XSL, HTML, and any problem encountered.
