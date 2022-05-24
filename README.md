@@ -53,10 +53,16 @@ mvn clean install
 
 ### Example
 
-To generate an HTML to view the file `X02_registration.xml` in `en` (english), execute::
+To generate an HTML to view the file `X02_registration.xml` in `en` (English):
 
 ```
 java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/X02_registration.xml
+```
+
+To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
+
+```
+java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/cn_24_minimal.xml summary
 ```
 
 While running, log output is generated in the console, giving information on the location of the generated XSL, HTML, and any problem encountered.
