@@ -68,7 +68,7 @@ public class NoticeViewer {
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
     final Document doc = db.parse(noticeXmlPath.toFile());
     doc.getDocumentElement().normalize();
-    Element root = doc.getDocumentElement();
+    final Element root = doc.getDocumentElement();
 
     // Find the corresponding notice sub type inside the XML.
     final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
@@ -108,7 +108,8 @@ public class NoticeViewer {
    * @param language The language as a two letter code
    * @param noticeXmlContent The notice xml content
    * @param xsl structure of the notice
-   * @param charset of the input string content (xml notice and xsl structure) and output html string
+   * @param charset of the input string content (xml notice and xsl structure) and output html
+   *        string
    * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
@@ -147,8 +148,7 @@ public class NoticeViewer {
    * @throws SAXException XML parse related errors
    */
   public static String generateHtml(final String language,
-      final ByteArrayInputStream noticeXmlContent,
-      final ByteArrayInputStream xslIs,
+      final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
       final Charset charset, final Optional<String> viewIdOpt)
       throws IOException, ParserConfigurationException, SAXException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -160,7 +160,7 @@ public class NoticeViewer {
 
     final Document doc = db.parse(noticeXmlIsClone1);
     doc.getDocumentElement().normalize();
-    Element root = doc.getDocumentElement();
+    final Element root = doc.getDocumentElement();
 
     // Find the corresponding notice sub type inside the XML.
     final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
