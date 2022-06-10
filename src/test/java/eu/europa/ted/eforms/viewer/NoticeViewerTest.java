@@ -50,6 +50,13 @@ public class NoticeViewerTest {
     final String noticeXmlFilename = "pin-buyer_24_minimal";
     testGenerateHtmlFromFile(language, noticeXmlFilename);
   }
+  
+  @Test
+  public void testEfxToHtmlX01GreekFromString() throws IOException {
+    final String language = "el"; // In greek.
+    final String noticeXmlFilename = "X01_EEIG"; // "X01_EEIG.xml"
+    testGenerateHtmlFromString(language, noticeXmlFilename, "X01", SDK_VERSION);
+  }
 
   @Test
   public void testEfxToHtmlX02FromString() throws IOException {

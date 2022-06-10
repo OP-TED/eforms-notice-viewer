@@ -2,6 +2,7 @@ package eu.europa.ted.eforms.viewer;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,9 +108,9 @@ public class NoticeViewer {
 
   /**
    * @param language The language as a two letter code
-   * @param noticeXmlContent The notice xml content.
+   * @param noticeXmlContent The notice xml content
    * @param xsl structure of the notice
-   * @param charset of the input string content (xml notice and xsl structure)
+   * @param charset of the input string content (xml notice and xsl structure) and output html string
    * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
@@ -126,23 +127,53 @@ public class NoticeViewer {
     logger.info("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
+    final ByteArrayInputStream noticeXmlInputStream =
+        new ByteArrayInputStream(noticeXmlContent.getBytes(charset));
+    final ByteArrayInputStream xslInputStream = new ByteArrayInputStream(xsl.getBytes(charset));
+
+    return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt);
+  }
+
+  /**
+   * @param language The language as a two letter code
+   * @param noticeXmlContent The notice xml content as InputStream
+   * @param xslIs structure of the notice as InputStream
+   * @param charset of the output html string
+   * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
+   *        notice summary. It could fail if this custom view is not compatible with the notice sub
+   *        type
+   * @return The generated HTML string using the input charset
+   *
+   * @throws IOException If an error occurs during input or output
+   * @throws ParserConfigurationException Error related to XML reader configuration
+   * @throws SAXException XML parse related errors
+   */
+  public static String generateHtml(final String language,
+      final ByteArrayInputStream noticeXmlContent,
+      final ByteArrayInputStream xslIs,
+      final Charset charset, final Optional<String> viewIdOpt)
+      throws IOException, ParserConfigurationException, SAXException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    noticeXmlContent.transferTo(baos);
+    final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(baos.toByteArray());
+    final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(baos.toByteArray());
+
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
-    final Document doc = db.parse(new ByteArrayInputStream(noticeXmlContent.getBytes(charset)));
+
+    final Document doc = db.parse(noticeXmlIsClone1);
     doc.getDocumentElement().normalize();
     Element root = doc.getDocumentElement();
 
     // Find the corresponding notice sub type inside the XML.
     final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
     if (noticeSubTypeFromXmlOpt.isEmpty()) {
-      throw new RuntimeException(
-          String.format("SubTypeCode not found in notice xml: %s", noticeXmlContent));
+      throw new RuntimeException("SubTypeCode not found in notice xml");
     }
 
     // Find the eForms SDK version inside the XML.
     final Optional<String> eformsSdkVersionOpt = getEformsSdkVersion(root);
     if (eformsSdkVersionOpt.isEmpty()) {
-      throw new RuntimeException(
-          String.format("eForms SDK version not found in notice xml: %s", noticeXmlContent));
+      throw new RuntimeException("eForms SDK version not found in notice xml");
     }
 
     // Build XSL from EFX.
@@ -153,17 +184,15 @@ public class NoticeViewer {
     logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
 
-    final StringWriter writer = new StringWriter();
-    final StreamResult htmlResult = new StreamResult(writer);
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    final StreamResult htmlResult = new StreamResult(outputStream);
 
-    applyXslTransform(language, eformsSdkVersion,
-        new StreamSource(new StringReader(noticeXmlContent)),
-        new StreamSource(new StringReader(xsl)), htmlResult);
-
-    final String htmlText = writer.toString();
+    applyXslTransform(language, eformsSdkVersion, new StreamSource(noticeXmlIsClone2),
+        new StreamSource(xslIs), htmlResult);
 
     // Ensure the HTML can be parsed.
-    Jsoup.parse(htmlText, charset.toString());
+    final String htmlText = outputStream.toString(charset);
+    Jsoup.parse(htmlText);
 
     return htmlText;
   }
