@@ -13,19 +13,17 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Optional;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -36,7 +34,6 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
@@ -110,28 +107,27 @@ public class NoticeViewer {
 
   /**
    * @param language The language as a two letter code
-   * @param noticeXmlFilename The notice xml filename but without the xml extension
+   * @param noticeXmlContent The notice xml content.
+   * @param xsl structure of the notice
+   * @param charset of the input string content (xml notice and xsl structure)
    * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
-   * @param sdkResourcesVersion The version to use when loading SDK resources
-   * @param sdkResourcesRoot (Optional) The root folder of the SDK resources. If not specified, the
-   *        default will be used.
-   * @return The path of the generated HTML file
+   * @return The generated HTML string
    *
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
    */
   public static String generateHtml(final String language, final String noticeXmlContent,
-      final String xsl, final Charset charsets, final Optional<String> viewIdOpt)
+      final String xsl, final Charset charset, final Optional<String> viewIdOpt)
       throws IOException, SAXException, ParserConfigurationException {
 
-    logger.info("noticeXmlContent={}", noticeXmlContent);
+    logger.info("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
-    final Document doc = db.parse(new ByteArrayInputStream(noticeXmlContent.getBytes(charsets)));
+    final Document doc = db.parse(new ByteArrayInputStream(noticeXmlContent.getBytes(charset)));
     doc.getDocumentElement().normalize();
     Element root = doc.getDocumentElement();
 
@@ -157,9 +153,6 @@ public class NoticeViewer {
     logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
 
-    final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
-    logger.info("Created xsl file: {}", xslPath);
-
     final StringWriter writer = new StringWriter();
     final StreamResult htmlResult = new StreamResult(writer);
 
@@ -170,9 +163,18 @@ public class NoticeViewer {
     final String htmlText = writer.toString();
 
     // Ensure the HTML can be parsed.
-    Jsoup.parse(htmlText, charsets.toString());
+    Jsoup.parse(htmlText, charset.toString());
 
     return htmlText;
+  }
+
+  public static String generateHtmlForUnitTest(final String language, final String noticeXmlContent,
+      final String xsl, final Charset charset, final Optional<String> viewIdOpt) {
+    try {
+      return generateHtml(language, noticeXmlContent, xsl, charset, viewIdOpt);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   public static Path generateHtmlForUnitTest(final String language, final Path noticeXmlPath,
