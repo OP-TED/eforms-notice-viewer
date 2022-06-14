@@ -39,7 +39,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <efx.toolkit.version>0.1.1</efx.toolkit.version>
+    <efx.toolkit.version>0.1.2-SNAPSHOT</efx.toolkit.version>
     <dependency.plugin.version>3.3.0</dependency.plugin.version>
   </properties>
 

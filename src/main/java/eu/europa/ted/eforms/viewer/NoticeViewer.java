@@ -127,7 +127,7 @@ public class NoticeViewer {
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
     final ByteArrayInputStream noticeXmlInputStream =
-        new ByteArrayInputStream(noticeXmlContent.getBytes(charset));
+        new ByteArrayInputStream(noticeXmlContent.trim().getBytes(charset));
     final ByteArrayInputStream xslInputStream = new ByteArrayInputStream(xsl.getBytes(charset));
 
     return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt);
