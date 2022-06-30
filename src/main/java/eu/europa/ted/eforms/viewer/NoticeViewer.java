@@ -126,11 +126,14 @@ public class NoticeViewer {
     logger.info("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
-    final ByteArrayInputStream noticeXmlInputStream =
-        new ByteArrayInputStream(noticeXmlContent.trim().getBytes(charset));
-    final ByteArrayInputStream xslInputStream = new ByteArrayInputStream(xsl.getBytes(charset));
+    try (
+        final ByteArrayInputStream noticeXmlInputStream =
+            new ByteArrayInputStream(noticeXmlContent.trim().getBytes(charset));
+        final ByteArrayInputStream xslInputStream =
+            new ByteArrayInputStream(xsl.getBytes(charset));) {
 
-    return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt);
+      return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt);
+    }
   }
 
   /**
@@ -151,48 +154,50 @@ public class NoticeViewer {
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
       final Charset charset, final Optional<String> viewIdOpt)
       throws IOException, ParserConfigurationException, SAXException {
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    noticeXmlContent.transferTo(baos);
-    final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(baos.toByteArray());
-    final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(baos.toByteArray());
+    try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(baos.toByteArray());
+        final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(baos.toByteArray());) {
+      noticeXmlContent.transferTo(baos);
 
-    final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
+      final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
 
-    final Document doc = db.parse(noticeXmlIsClone1);
-    doc.getDocumentElement().normalize();
-    final Element root = doc.getDocumentElement();
+      final Document doc = db.parse(noticeXmlIsClone1);
+      doc.getDocumentElement().normalize();
+      final Element root = doc.getDocumentElement();
 
-    // Find the corresponding notice sub type inside the XML.
-    final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
-    if (noticeSubTypeFromXmlOpt.isEmpty()) {
-      throw new RuntimeException("SubTypeCode not found in notice xml");
+      // Find the corresponding notice sub type inside the XML.
+      final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
+      if (noticeSubTypeFromXmlOpt.isEmpty()) {
+        throw new RuntimeException("SubTypeCode not found in notice xml");
+      }
+
+      // Find the eForms SDK version inside the XML.
+      final Optional<String> eformsSdkVersionOpt = getEformsSdkVersion(root);
+      if (eformsSdkVersionOpt.isEmpty()) {
+        throw new RuntimeException("eForms SDK version not found in notice xml");
+      }
+
+      // Build XSL from EFX.
+      final String noticeSubType = noticeSubTypeFromXmlOpt.get();
+      final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
+
+      final String eformsSdkVersion = eformsSdkVersionOpt.get();
+      logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
+          eformsSdkVersion);
+
+      try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+        final StreamResult htmlResult = new StreamResult(outputStream);
+
+        applyXslTransform(language, eformsSdkVersion, new StreamSource(noticeXmlIsClone2),
+            new StreamSource(xslIs), htmlResult);
+
+        // Ensure the HTML can be parsed.
+        final String htmlText = outputStream.toString(charset);
+        Jsoup.parse(htmlText);
+
+        return htmlText;
+      }
     }
-
-    // Find the eForms SDK version inside the XML.
-    final Optional<String> eformsSdkVersionOpt = getEformsSdkVersion(root);
-    if (eformsSdkVersionOpt.isEmpty()) {
-      throw new RuntimeException("eForms SDK version not found in notice xml");
-    }
-
-    // Build XSL from EFX.
-    final String noticeSubType = noticeSubTypeFromXmlOpt.get();
-    final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
-
-    final String eformsSdkVersion = eformsSdkVersionOpt.get();
-    logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
-        eformsSdkVersion);
-
-    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    final StreamResult htmlResult = new StreamResult(outputStream);
-
-    applyXslTransform(language, eformsSdkVersion, new StreamSource(noticeXmlIsClone2),
-        new StreamSource(xslIs), htmlResult);
-
-    // Ensure the HTML can be parsed.
-    final String htmlText = outputStream.toString(charset);
-    Jsoup.parse(htmlText);
-
-    return htmlText;
   }
 
   public static String generateHtmlForUnitTest(final String language, final String noticeXmlContent,
@@ -225,13 +230,9 @@ public class NoticeViewer {
     final StreamResult outputTarget = new StreamResult(htmlPath.toFile());
 
     try (InputStream inputStream = Files.newInputStream(xslPath)) {
-
       final Source xslSource = new StreamSource(inputStream);
-
       applyXslTransform(language, sdkVersion, xmlInput, xslSource, outputTarget);
-
       return htmlPath;
-
     }
   }
 
@@ -285,18 +286,21 @@ public class NoticeViewer {
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
     Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);
 
-    InputStream viewInputStream = Files.newInputStream(viewPath);
-    final String translation =
-        EfxTranslator.translateTemplate(viewInputStream, new DependencyFactory(), sdkVersion);
+    try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
 
-    final Path outFolder = Path.of("target", "output-xsl");
-    Files.createDirectories(outFolder);
-    final String nameByConvention = viewId + ".xsl";
-    final Path filePath = outFolder.resolve(nameByConvention);
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-      writer.write(translation);
+      final String translation =
+          EfxTranslator.translateTemplate(viewInputStream, new DependencyFactory(), sdkVersion);
+      final Path outFolder = Path.of("target", "output-xsl");
+      Files.createDirectories(outFolder);
+      final String nameByConvention = viewId + ".xsl";
+      final Path filePath = outFolder.resolve(nameByConvention);
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+        writer.write(translation);
+      }
+
+      return filePath;
     }
-    return filePath;
+
   }
 
   /**
