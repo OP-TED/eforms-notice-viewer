@@ -19,7 +19,7 @@ import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 public class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
-  private static final String SDK_VERSION = "eforms-sdk-0.6";
+  private static final String SDK_VERSION = "eforms-sdk-0.7";
   private static final Optional<String> SDK_RESOURCES_ROOT =
       Optional.of(Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString());
 
