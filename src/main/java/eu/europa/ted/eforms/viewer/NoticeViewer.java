@@ -294,7 +294,11 @@ public class NoticeViewer {
     final NodeList nodeList = root.getElementsByTagName("cbc:CustomizationID");
     // We assume that length equals 1 exactly. Anything else is considered
     // empty.
-    return nodeList.getLength() == 1 ? Optional.of(nodeList.item(0).getTextContent().strip()) : Optional.empty();
+    return nodeList.getLength() == 1 ? Optional.of(normalizeVersion(nodeList.item(0).getTextContent().strip())) : Optional.empty();
+  }
+
+  private static String normalizeVersion(final String sdkVersion) {
+    return StringUtils.removeStart(sdkVersion, "eforms-sdk-");
   }
 
   /**

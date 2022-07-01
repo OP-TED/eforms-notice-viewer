@@ -32,7 +32,7 @@ public class SdkResourcesLoader {
 
   public Path getResourceAsPath(final ResourceType resourceType, String sdkVersion, String filename) {
     Validate.notEmpty(sdkVersion, "Undefined SDK resources version");
-    sdkVersion = Optional.ofNullable(sdkVersion).map((String sv) -> StringUtils.removeStart(sv, "eforms-sdk-")).orElse(StringUtils.EMPTY);
+    sdkVersion = Optional.ofNullable(sdkVersion).orElse(StringUtils.EMPTY);
     final String resourcePath = Optional.ofNullable(resourceType).map(SdkConstants.ResourceType::getPath).orElse(Path.of(StringUtils.EMPTY)).toString();
     filename = Optional.ofNullable(filename).orElse(StringUtils.EMPTY);
     Path result = Path.of(root, sdkVersion, resourcePath, filename).toAbsolutePath();
