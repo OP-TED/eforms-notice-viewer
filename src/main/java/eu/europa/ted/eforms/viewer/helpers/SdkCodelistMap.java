@@ -21,7 +21,6 @@ import com.helger.genericode.v10.SimpleCodeList;
 import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
-
   private static final long serialVersionUID = 1L;
 
   /**
@@ -34,11 +33,14 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   }
 
   /**
-   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the
-   * result for reuse as the operation can be costly on some large lists.
+   * Builds EFX list from the passed codelist reference. This will lazily
+   * compute and cache the result for reuse as the operation can be costly on
+   * some large lists.
    *
-   * @param codelistId A reference to an SDK codelist.
-   * @return The EFX string representation of the list of all the codes of the referenced codelist.
+   * @param codelistId
+   *          A reference to an SDK codelist.
+   * @return The EFX string representation of the list of all the codes of the
+   *         referenced codelist.
    */
   public final SdkCodelist get(final String codelistId) {
     if (StringUtils.isBlank(codelistId)) {
@@ -63,40 +65,37 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
     final Map<String, String> codelistIdToFilename;
     try {
-      codelistIdToFilename = buildMapCodelistIdToFilename(
-          SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion), marshaller);
+      codelistIdToFilename = buildMapCodelistIdToFilename(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion), marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
-
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, sdkVersion, filename)) {
+    try (
+        InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, sdkVersion, filename)) {
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
-      final String codelistVersion = cl.getIdentification().getVersion(); // Version tag of .gc
-
+      final String codelistVersion = cl.getIdentification().getVersion(); // Version
+                                                                          // tag
+                                                                          // of
+                                                                          // .gc
       // Get all the code values in a list.
-      // We assume there are no duplicate code values in the referenced codelists.
+      // We assume there are no duplicate code values in the referenced
+      // codelists.
       final List<String> codes = scl.getRow().stream().map(row -> {
-        final String codeVal = row.getValue().stream()
-            .filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v)))
-            .findFirst()//
+        final String codeVal = row.getValue().stream().filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v))).findFirst()//
             .orElseThrow(RuntimeException::new)//
             .getSimpleValue()//
             .getValue().strip();
         return codeVal;
       }).collect(Collectors.toList());
-
       return new SdkCodelist(codeListId, codelistVersion, codes);
-
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder,
-      final Genericode10CodeListMarshaller marshaller) throws IOException {
+  private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder, final Genericode10CodeListMarshaller marshaller) throws IOException {
     final int depth = 1; // Flat folder, not recursive for now.
     return getFilePathsAsSet(pathFolder, depth, GenericodeTools.EXTENSION_DOT_GC)//
         // .parallelStream() // Overkill and also messes with logs order.
@@ -112,10 +111,8 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
         }).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
-      value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive.")
-  private static Set<Path> getFilePathsAsSet(final Path pathFolder, final int depth,
-      final String extension) throws IOException {
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive.")
+  private static Set<Path> getFilePathsAsSet(final Path pathFolder, final int depth, final String extension) throws IOException {
     if (!pathFolder.toFile().isDirectory()) {
       throw new RuntimeException(String.format("Expecting folder but got: %s", pathFolder));
     }

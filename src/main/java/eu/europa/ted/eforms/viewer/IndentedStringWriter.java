@@ -3,7 +3,6 @@ package eu.europa.ted.eforms.viewer;
 import java.io.StringWriter;
 
 public class IndentedStringWriter extends StringWriter {
-
   private int indent;
 
   public IndentedStringWriter(int indent) {

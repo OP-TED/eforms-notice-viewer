@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import eu.europa.ted.efx.model.SdkField;
 
 public class SdkFieldMap extends MapFromJson<SdkField> {
-
   private static final long serialVersionUID = 1L;
 
   public SdkFieldMap(final String sdkVersion) throws IOException {
