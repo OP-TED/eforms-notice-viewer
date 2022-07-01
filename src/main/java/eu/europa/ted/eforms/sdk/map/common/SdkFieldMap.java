@@ -1,10 +1,13 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.map.common;
 
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import eu.europa.ted.eforms.viewer.helpers.MapFromJson;
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.model.SdkField;
 
 public class SdkFieldMap extends MapFromJson<SdkField> {

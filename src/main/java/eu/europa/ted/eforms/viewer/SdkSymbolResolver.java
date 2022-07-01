@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
-import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
+import eu.europa.ted.eforms.sdk.map.common.SdkCodelistMap;
+import eu.europa.ted.eforms.sdk.map.common.SdkFieldMap;
+import eu.europa.ted.eforms.sdk.map.common.SdkNodeMap;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.SdkCodelist;

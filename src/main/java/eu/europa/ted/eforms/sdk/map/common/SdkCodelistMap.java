@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.map.common;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +18,9 @@ import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 
+import eu.europa.ted.eforms.viewer.helpers.GenericodeTools;
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {

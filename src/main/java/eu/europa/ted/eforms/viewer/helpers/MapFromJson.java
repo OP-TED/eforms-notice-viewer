@@ -43,7 +43,7 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
     }
   }
 
-  abstract void populateMap(final JsonNode json);
+  protected abstract void populateMap(final JsonNode json);
 
   /**
    * @return A reusable Jackson object mapper instance.
