@@ -278,7 +278,7 @@ public class NoticeViewer {
       final String nameByConvention = viewId + ".xsl";
       final Path filePath = outFolder.resolve(nameByConvention);
       try (
-          BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
         writer.write(translation);
       }
       return filePath;
