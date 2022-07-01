@@ -1,20 +1,20 @@
 package eu.europa.ted.eforms.sdk.map.common;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import eu.europa.ted.eforms.viewer.helpers.MapFromJson;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.model.SdkField;
 
 public class SdkFieldMap extends MapFromJson<SdkField> {
   private static final long serialVersionUID = 1L;
 
-  public SdkFieldMap(final String sdkVersion) throws IOException {
-    super(sdkVersion, SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion).toString());
+  public SdkFieldMap(final Path jsonPath) throws IOException {
+    super(jsonPath);
   }
 
   @Override
@@ -22,7 +22,7 @@ public class SdkFieldMap extends MapFromJson<SdkField> {
     final ArrayNode fields = (ArrayNode) json.get(SdkConstants.FIELDS_JSON_FIELDS_KEY);
     for (final JsonNode field : fields) {
       final SdkField sdkField = new SdkField(field);
-      this.put(sdkField.getId(), sdkField);
+      put(sdkField.getId(), sdkField);
     }
   }
 }

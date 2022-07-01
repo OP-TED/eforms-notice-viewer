@@ -10,6 +10,8 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import eu.europa.ted.eforms.sdk.map.common.SdkCodelistMap;
 import eu.europa.ted.eforms.sdk.map.common.SdkFieldMap;
 import eu.europa.ted.eforms.sdk.map.common.SdkNodeMap;
+import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.SdkCodelist;
@@ -72,9 +74,9 @@ public class SdkSymbolResolver implements SymbolResolver {
 
   protected void loadMapData(final String sdkVersion) {
     try {
-      this.fieldById = new SdkFieldMap(sdkVersion);
-      this.nodeById = new SdkNodeMap(sdkVersion);
-      this.codelistById = new SdkCodelistMap(sdkVersion);
+      this.fieldById = new SdkFieldMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion));
+      this.nodeById = new SdkNodeMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion));
+      this.codelistById = new SdkCodelistMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion));
     } catch (IOException e) {
       throw new RuntimeException(String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
     }

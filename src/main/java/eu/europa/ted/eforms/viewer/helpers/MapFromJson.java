@@ -19,24 +19,24 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
 
   private static final Logger logger = LoggerFactory.getLogger(MapFromJson.class);
 
-  protected MapFromJson(final String sdkVersion, final String jsonPathname) throws IOException {
-    this.populateMap(sdkVersion, jsonPathname);
+  protected MapFromJson(final Path jsonPath) throws IOException {
+    this.populateMap(jsonPath);
   }
 
   /**
    * @param sdkVersion
    *          Currently ignored. It will be effective in a later implementation
    */
-  private final void populateMap(final String sdkVersion, final String jsonPathname) throws IOException {
-    logger.info("Populating maps for context, sdkVersion={}, jsonPathname={}", sdkVersion, jsonPathname);
+  private final void populateMap(final Path jsonPath) throws IOException {
+    logger.info("Populating maps for context, jsonPath={}", jsonPath);
     final ObjectMapper mapper = buildStandardJacksonObjectMapper();
     try (
-        InputStream fieldsJsonInputStream = Files.newInputStream(Path.of(jsonPathname))) {
+        InputStream fieldsJsonInputStream = Files.newInputStream(jsonPath)) {
       if (fieldsJsonInputStream == null) {
-        throw new RuntimeException(String.format("File not found: %s", jsonPathname));
+        throw new RuntimeException(String.format("File not found: %s", jsonPath));
       }
       if (fieldsJsonInputStream.available() == 0) {
-        throw new RuntimeException(String.format("File is empty: %s", jsonPathname));
+        throw new RuntimeException(String.format("File is empty: %s", jsonPath));
       }
       final JsonNode json = mapper.readTree(fieldsJsonInputStream);
       this.populateMap(json);

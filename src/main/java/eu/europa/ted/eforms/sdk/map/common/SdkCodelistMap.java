@@ -19,20 +19,15 @@ import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 
 import eu.europa.ted.eforms.viewer.helpers.GenericodeTools;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   private static final long serialVersionUID = 1L;
 
-  /**
-   * Currently unused, this will be supported in future versions.
-   */
-  private final String sdkVersion;
+  private transient Path codelistsPath;
 
-  public SdkCodelistMap(final String sdkVersion) {
-    this.sdkVersion = sdkVersion;
+  public SdkCodelistMap(Path codelistsPath) {
+    this.codelistsPath = codelistsPath;
   }
 
   /**
@@ -49,33 +44,32 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
     if (StringUtils.isBlank(codelistId)) {
       throw new RuntimeException("CodelistId is blank.");
     }
-    return this.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, sdkVersion));
+    return computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
   }
 
   @Override
   public SdkCodelist get(final Object codelistId) {
-    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, sdkVersion));
+    return computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, codelistsPath));
   }
 
   @Override
   public SdkCodelist getOrDefault(final Object codelistId, final SdkCodelist defaultValue) {
-    return this.computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, sdkVersion));
+    return computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, codelistsPath));
   }
 
-  private static SdkCodelist loadSdkCodelist(final String codeListId, String sdkVersion) {
+  private static SdkCodelist loadSdkCodelist(final String codeListId, Path codelistsPath) {
     // Find the SDK codelist .gc file that corresponds to the passed reference.
     // Stream the data from that file.
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
     final Map<String, String> codelistIdToFilename;
     try {
-      codelistIdToFilename = buildMapCodelistIdToFilename(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion), marshaller);
+      codelistIdToFilename = buildMapCodelistIdToFilename(codelistsPath, marshaller);
     } catch (IOException e1) {
       throw new RuntimeException(e1);
     }
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (
-        InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.CODELISTS, sdkVersion, filename)) {
+    try (InputStream is = Files.newInputStream(codelistsPath)) {
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
       final String codelistVersion = cl.getIdentification().getVersion(); // Version
@@ -86,11 +80,10 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
       // We assume there are no duplicate code values in the referenced
       // codelists.
       final List<String> codes = scl.getRow().stream().map(row -> {
-        final String codeVal = row.getValue().stream().filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v))).findFirst()//
+        return row.getValue().stream().filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v))).findFirst()//
             .orElseThrow(RuntimeException::new)//
             .getSimpleValue()//
             .getValue().strip();
-        return codeVal;
       }).collect(Collectors.toList());
       return new SdkCodelist(codeListId, codelistVersion, codes);
     } catch (final IOException e) {
