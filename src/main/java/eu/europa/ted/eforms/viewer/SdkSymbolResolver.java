@@ -2,6 +2,7 @@ package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,10 +10,8 @@ import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
 import eu.europa.ted.eforms.sdk.map.SdkMap;
-import eu.europa.ted.eforms.sdk.map.common.SdkCodelistMap;
-import eu.europa.ted.eforms.sdk.map.common.SdkFieldMap;
-import eu.europa.ted.eforms.sdk.map.common.SdkNodeMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkObjectFactory;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
@@ -42,7 +41,13 @@ public class SdkSymbolResolver implements SymbolResolver {
    *          Version of the SDK
    */
   public static SdkSymbolResolver getInstance(final String sdkVersion) {
-    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolResolver(sdkVersion));
+    return instances.computeIfAbsent(sdkVersion, k -> {
+      try {
+        return new SdkSymbolResolver(sdkVersion);
+      } catch (InstantiationException e) {
+        throw new RuntimeException(MessageFormat.format("Failed to instantiate SDK Symbol Resolver for SDK version [{0}]", sdkVersion), e);
+      }
+    });
   }
 
   /**
@@ -69,18 +74,19 @@ public class SdkSymbolResolver implements SymbolResolver {
    *
    * @param sdkVersion
    *          The version of the SDK.
+   * @throws InstantiationException
    */
-  protected SdkSymbolResolver(final String sdkVersion) {
+  protected SdkSymbolResolver(final String sdkVersion) throws InstantiationException {
     this.loadMapData(sdkVersion);
   }
 
-  protected void loadMapData(final String sdkVersion) {
+  protected void loadMapData(final String sdkVersion) throws InstantiationException {
     try {
       Path jsonPath = SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
       Path codelistsPath = SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
-      this.fieldById = new SdkFieldMap().setResourceFilepath(jsonPath);
-      this.nodeById = new SdkNodeMap().setResourceFilepath(jsonPath);
-      this.codelistById = new SdkCodelistMap().setResourceFilepath(codelistsPath);
+      this.fieldById = SdkObjectFactory.getFieldsMap(sdkVersion, jsonPath);
+      this.nodeById = SdkObjectFactory.getNodesMap(sdkVersion, jsonPath);
+      this.codelistById = SdkObjectFactory.getCodelistsMap(sdkVersion, codelistsPath);
     } catch (IOException e) {
       throw new RuntimeException(String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
     }
