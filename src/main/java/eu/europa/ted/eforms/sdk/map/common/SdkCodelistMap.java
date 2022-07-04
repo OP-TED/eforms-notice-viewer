@@ -18,16 +18,25 @@ import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 
+import eu.europa.ted.eforms.sdk.map.SdkMap;
 import eu.europa.ted.eforms.viewer.helpers.GenericodeTools;
 import eu.europa.ted.efx.model.SdkCodelist;
 
-public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
+public class SdkCodelistMap implements SdkMap<SdkCodelist> {
   private static final long serialVersionUID = 1L;
+
+  private transient Map<String, SdkCodelist> _map;
 
   private transient Path codelistsPath;
 
-  public SdkCodelistMap(Path codelistsPath) {
+  public SdkCodelistMap() {
+    _map = new HashMap<>();
+  }
+
+  @Override
+  public SdkCodelistMap setResourceFilepath(Path codelistsPath) {
     this.codelistsPath = codelistsPath;
+    return this;
   }
 
   /**
@@ -40,21 +49,17 @@ public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
    * @return The EFX string representation of the list of all the codes of the
    *         referenced codelist.
    */
+  @Override
   public final SdkCodelist get(final String codelistId) {
     if (StringUtils.isBlank(codelistId)) {
       throw new RuntimeException("CodelistId is blank.");
     }
-    return computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
+    return _map.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
   }
 
   @Override
-  public SdkCodelist get(final Object codelistId) {
-    return computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, codelistsPath));
-  }
-
-  @Override
-  public SdkCodelist getOrDefault(final Object codelistId, final SdkCodelist defaultValue) {
-    return computeIfAbsent((String) codelistId, key -> loadSdkCodelist(key, codelistsPath));
+  public SdkCodelist getOrDefault(final String codelistId, final SdkCodelist defaultValue) {
+    return _map.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
   }
 
   private static SdkCodelist loadSdkCodelist(final String codeListId, Path codelistsPath) {

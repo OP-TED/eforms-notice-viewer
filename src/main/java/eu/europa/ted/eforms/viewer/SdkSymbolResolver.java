@@ -1,12 +1,14 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 
+import eu.europa.ted.eforms.sdk.map.SdkMap;
 import eu.europa.ted.eforms.sdk.map.common.SdkCodelistMap;
 import eu.europa.ted.eforms.sdk.map.common.SdkFieldMap;
 import eu.europa.ted.eforms.sdk.map.common.SdkNodeMap;
@@ -20,11 +22,11 @@ import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
-  protected Map<String, SdkField> fieldById;
+  protected SdkMap<SdkField> fieldById;
 
-  protected Map<String, SdkNode> nodeById;
+  protected SdkMap<SdkNode> nodeById;
 
-  protected Map<String, SdkCodelist> codelistById;
+  protected SdkMap<SdkCodelist> codelistById;
 
   /**
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per
@@ -74,9 +76,11 @@ public class SdkSymbolResolver implements SymbolResolver {
 
   protected void loadMapData(final String sdkVersion) {
     try {
-      this.fieldById = new SdkFieldMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion));
-      this.nodeById = new SdkNodeMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion));
-      this.codelistById = new SdkCodelistMap(SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion));
+      Path jsonPath = SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
+      Path codelistsPath = SdkResourcesLoader.getInstance().getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
+      this.fieldById = new SdkFieldMap().setResourceFilepath(jsonPath);
+      this.nodeById = new SdkNodeMap().setResourceFilepath(jsonPath);
+      this.codelistById = new SdkCodelistMap().setResourceFilepath(codelistsPath);
     } catch (IOException e) {
       throw new RuntimeException(String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
     }
