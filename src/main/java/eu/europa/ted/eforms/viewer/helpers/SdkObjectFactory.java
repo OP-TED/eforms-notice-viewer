@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer.helpers;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -79,7 +78,7 @@ public class SdkObjectFactory {
 
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkCodelist> getCodelistsMap(String sdkVersion, Path codelistsPath)
-      throws InstantiationException, IOException {
+      throws InstantiationException {
     return SdkObjectFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.CODELIST_MAP, SdkMap.class)
         .setResourceFilepath(codelistsPath);
@@ -87,7 +86,7 @@ public class SdkObjectFactory {
 
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkField> getFieldsMap(String sdkVersion, Path jsonPath)
-      throws InstantiationException, IOException {
+      throws InstantiationException {
     return SdkObjectFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.FIELD_MAP, SdkMap.class)
         .setResourceFilepath(jsonPath);
@@ -95,7 +94,7 @@ public class SdkObjectFactory {
 
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkNode> getNodesMap(String sdkVersion, Path jsonPath)
-      throws InstantiationException, IOException {
+      throws InstantiationException {
     return SdkObjectFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.NODE_MAP, SdkMap.class)
         .setResourceFilepath(jsonPath);

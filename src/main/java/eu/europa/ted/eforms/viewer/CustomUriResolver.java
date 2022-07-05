@@ -38,8 +38,5 @@ public final class CustomUriResolver implements URIResolver {
     } catch (SAXException | IOException | ParserConfigurationException e) {
       throw new RuntimeException(e.toString(), e);
     }
-    // An alternative is to use a StreamSource, this uses less memory.
-    // This can fail when it tries to load a dtd (proxy issues ...).
-    // return new StreamSource(is);
   }
 }

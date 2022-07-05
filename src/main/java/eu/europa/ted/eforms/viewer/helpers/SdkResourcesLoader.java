@@ -3,7 +3,6 @@ package eu.europa.ted.eforms.viewer.helpers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Optional;
@@ -31,13 +30,18 @@ public class SdkResourcesLoader {
   public Path getResourceAsPath(final ResourceType resourceType, String sdkVersion,
       String filename) {
     Validate.notEmpty(sdkVersion, "Undefined SDK resources version");
+
     sdkVersion = Optional.ofNullable(sdkVersion).orElse(StringUtils.EMPTY);
+
     final String resourcePath = Optional.ofNullable(resourceType)
         .map(SdkConstants.ResourceType::getPath).orElse(Path.of(StringUtils.EMPTY)).toString();
     filename = Optional.ofNullable(filename).orElse(StringUtils.EMPTY);
+
     Path result = Path.of(root, sdkVersion, resourcePath, filename).toAbsolutePath();
-    Validate.isTrue(Files.exists(result, new LinkOption[0]),
+
+    Validate.isTrue(Files.exists(result),
         MessageFormat.format("Resource [{0}] does not exist", result));
+
     return result;
   }
 

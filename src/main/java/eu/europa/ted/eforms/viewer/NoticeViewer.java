@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.Optional;
 import javax.xml.XMLConstants;
@@ -41,15 +40,14 @@ import eu.europa.ted.efx.EfxTranslator;
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
 
+  private NoticeViewer() {}
+
   /**
    * @param language The language as a two letter code
    * @param noticeXmlFilename The notice xml filename but without the xml extension
    * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
-   * @param sdkResourcesVersion The version to use when loading SDK resources
-   * @param sdkResourcesRoot (Optional) The root folder of the SDK resources. If not specified, the
-   *        default will be used.
    * @return The path of the generated HTML file
    *
    * @throws IOException If an error occurs during input or output
@@ -61,8 +59,7 @@ public class NoticeViewer {
       throws IOException, SAXException, ParserConfigurationException {
     logger.info("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
-    Validate.isTrue(Files.isRegularFile(noticeXmlPath, new LinkOption[0]),
-        "No such file: " + noticeXmlPath);
+    Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
     final Document doc = db.parse(noticeXmlPath.toFile());
     doc.getDocumentElement().normalize();
@@ -221,9 +218,6 @@ public class NoticeViewer {
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
    * @param sdkVersion The version of the desired SDK
-   * @param sdkResourcesVersion The version to use when loading SDK resources
-   * @param sdkResourcesRoot (Optional) The root folder of the SDK resources. If not specified, the
-   *        default will be used.
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
    */
@@ -272,11 +266,7 @@ public class NoticeViewer {
       final Node item = subTypeCodes.item(i);
       final NamedNodeMap attributes = item.getAttributes();
       if (attributes != null) {
-        // final Node listNameAttr = attributes.getNamedItem("listName");
-        // if (listNameAttr != null &&
-        // "notice-subtype".equals(listNameAttr.getNodeValue())) {
         return Optional.of(item.getTextContent().strip());
-        // }
       }
     }
     return Optional.empty();

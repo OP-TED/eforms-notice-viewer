@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -74,18 +73,14 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   protected void loadMapData(final String sdkVersion) throws InstantiationException {
-    try {
-      Path jsonPath = SdkResourcesLoader.INSTANCE
-          .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
-      Path codelistsPath = SdkResourcesLoader.INSTANCE
-          .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
-      this.fieldById = SdkObjectFactory.getFieldsMap(sdkVersion, jsonPath);
-      this.nodeById = SdkObjectFactory.getNodesMap(sdkVersion, jsonPath);
-      this.codelistById = SdkObjectFactory.getCodelistsMap(sdkVersion, codelistsPath);
-    } catch (IOException e) {
-      throw new RuntimeException(
-          String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
-    }
+    Path jsonPath = SdkResourcesLoader.INSTANCE
+        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
+    Path codelistsPath = SdkResourcesLoader.INSTANCE
+        .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
+
+    this.fieldById = SdkObjectFactory.getFieldsMap(sdkVersion, jsonPath);
+    this.nodeById = SdkObjectFactory.getNodesMap(sdkVersion, jsonPath);
+    this.codelistById = SdkObjectFactory.getCodelistsMap(sdkVersion, codelistsPath);
   }
 
   /**
