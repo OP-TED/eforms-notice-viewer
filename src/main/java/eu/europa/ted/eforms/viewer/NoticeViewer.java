@@ -177,24 +177,6 @@ public class NoticeViewer {
     }
   }
 
-  public static String generateHtmlForUnitTest(final String language, final String noticeXmlContent,
-      final String xsl, final Charset charset, final Optional<String> viewIdOpt) {
-    try {
-      return generateHtml(language, noticeXmlContent, xsl, charset, viewIdOpt);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static Path generateHtmlForUnitTest(final String language, final Path noticeXmlPath,
-      final Optional<String> viewIdOpt) {
-    try {
-      return generateHtml(language, noticeXmlPath, viewIdOpt);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-  }
-
   static Path applyXslTransform(final String language, String sdkVersion, final Path noticeXmlPath,
       final Path xslPath, final String viewId) throws IOException {
     // XML as input.
@@ -214,17 +196,6 @@ public class NoticeViewer {
   static void applyXslTransform(final String language, String sdkVersion, final Source xmlInput,
       final Source xslSource, final StreamResult outputTarget) {
     try {
-      // https://www.saxonica.com/documentation11/#!using-xsl/embedding
-      // Use Saxon HE so that we can evaluate XSL 2.0:
-      System.setProperty("javax.xml.transform.TransformerFactory",
-          "net.sf.saxon.TransformerFactoryImpl"); // Use
-                                                  // the
-                                                  // "net.sf.saxon"
-                                                  // we
-                                                  // have
-                                                  // in
-                                                  // the
-                                                  // pom.xml
       // XSL for input transformation.
       final TransformerFactory factory = TransformerFactory.newInstance();
       // SECURITY SETUP.
@@ -317,7 +288,7 @@ public class NoticeViewer {
    * @param sdkVersion The SDK version to load the path from
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion) {
-    return SdkResourcesLoader.getInstance().getResourceAsPath(
+    return SdkResourcesLoader.INSTANCE.getResourceAsPath(
         SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, sdkVersion, viewId + ".efx");
   }
 }

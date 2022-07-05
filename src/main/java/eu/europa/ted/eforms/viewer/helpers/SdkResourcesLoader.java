@@ -14,12 +14,13 @@ import eu.europa.ted.eforms.viewer.helpers.SdkConstants.ResourceType;
 public class SdkResourcesLoader {
   private String root = SdkConstants.DEFAULT_SDK_ROOT;
 
-  private static final SdkResourcesLoader INSTANCE = new SdkResourcesLoader();
+  public static final SdkResourcesLoader INSTANCE = new SdkResourcesLoader();
 
   private SdkResourcesLoader() {}
 
-  public SdkResourcesLoader setRoot(Optional<String> root) {
-    this.root = root.orElse(SdkConstants.DEFAULT_SDK_ROOT);
+  public SdkResourcesLoader setRoot(String root) {
+    Optional.ofNullable(root).ifPresent((String s) -> this.root = s);
+
     return this;
   }
 
@@ -43,9 +44,5 @@ public class SdkResourcesLoader {
   public InputStream getResourceAsStream(final ResourceType resourceType, String sdkVersion,
       final String filename) throws IOException {
     return Files.newInputStream(getResourceAsPath(resourceType, sdkVersion, filename));
-  }
-
-  public static SdkResourcesLoader getInstance() {
-    return INSTANCE;
   }
 }

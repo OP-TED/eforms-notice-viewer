@@ -25,7 +25,7 @@ public final class CustomUriResolver implements URIResolver {
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = SdkResourcesLoader.getInstance()
+    try (InputStream is = SdkResourcesLoader.INSTANCE
         .getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
       if (is == null) {
         throw new RuntimeException(

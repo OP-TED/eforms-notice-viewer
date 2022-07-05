@@ -56,10 +56,12 @@ class CliCommand implements Callable<Integer> {
    */
   @Override
   public Integer call() throws IOException, SAXException, ParserConfigurationException {
-    SdkResourcesLoader.getInstance().setRoot(Optional.ofNullable(sdkResourcesRoot));
+    SdkResourcesLoader.INSTANCE.setRoot(sdkResourcesRoot);
+
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId));
     logger.info("Created HTML file: {}", htmlPath);
+
     return 0;
   }
 }
