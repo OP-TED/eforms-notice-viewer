@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -50,7 +49,7 @@ public class NoticeViewerTest {
     final String noticeXmlFilename = "pin-buyer_24_minimal";
     testGenerateHtmlFromFile(language, noticeXmlFilename);
   }
-  
+
   @Test
   public void testEfxToHtmlX01GreekFromString() throws IOException {
     final String language = "el"; // In greek.
@@ -89,7 +88,7 @@ public class NoticeViewerTest {
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtmlForUnitTest(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId));
-    logger.info("TEST: Wrote html {} ...",  StringUtils.left(html, 50));
+    logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));
     // The test would have failed if there were errors, this is what the check is really about.
   }

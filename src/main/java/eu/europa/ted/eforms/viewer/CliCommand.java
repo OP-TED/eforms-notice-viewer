@@ -5,14 +5,11 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.concurrent.Callable;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -42,26 +39,26 @@ class CliCommand implements Callable<Integer> {
   @Parameters(index = "0", description = "Two letter language code.")
   public void setLanguage(String language) {
     if (StringUtils.isBlank(language) || language.length() != 2) {
-      throw new ParameterException(spec.commandLine(), MessageFormat.format("Language: expecting two letter code like 'en', 'fr', ..., but found \'\'{0}\'\'", language));
+      throw new ParameterException(spec.commandLine(),
+          MessageFormat.format(
+              "Language: expecting two letter code like 'en', 'fr', ..., but found \'\'{0}\'\'",
+              language));
     }
     this.language = language;
   }
 
   /**
-   * @param args
-   *          Command line arguments. See usage.
+   * @param args Command line arguments. See usage.
    *
-   * @throws IOException
-   *           If an error occurs during input or output
-   * @throws ParserConfigurationException
-   *           Error related to XML reader configuration
-   * @throws SAXException
-   *           XML parse error related
+   * @throws IOException If an error occurs during input or output
+   * @throws ParserConfigurationException Error related to XML reader configuration
+   * @throws SAXException XML parse error related
    */
   @Override
   public Integer call() throws IOException, SAXException, ParserConfigurationException {
     SdkResourcesLoader.getInstance().setRoot(Optional.ofNullable(sdkResourcesRoot));
-    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId));
+    final Path htmlPath =
+        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId));
     logger.info("Created HTML file: {}", htmlPath);
     return 0;
   }
