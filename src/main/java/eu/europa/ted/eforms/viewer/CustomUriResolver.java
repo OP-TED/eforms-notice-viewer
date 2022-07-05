@@ -17,11 +17,10 @@ import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 
 public final class CustomUriResolver implements URIResolver {
-
   private String sdkVersion;
 
   public CustomUriResolver(String sdkVersion) {
-  this.sdkVersion=sdkVersion;  
+    this.sdkVersion = sdkVersion;
   }
 
   /**
@@ -29,10 +28,10 @@ public final class CustomUriResolver implements URIResolver {
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
+    try (
+        InputStream is = SdkResourcesLoader.getInstance().getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
       if (is == null) {
-        throw new RuntimeException(
-            String.format("inputStream is null for href=%s, base=%s", href, base));
+        throw new RuntimeException(String.format("inputStream is null for href=%s, base=%s", href, base));
       }
       // DOM parser based.
       final DocumentBuilder builder = SafeDocumentBuilder.buildSafeDocumentBuilderAllowDoctype();
@@ -45,5 +44,4 @@ public final class CustomUriResolver implements URIResolver {
     // This can fail when it tries to load a dtd (proxy issues ...).
     // return new StreamSource(is);
   }
-
 }
