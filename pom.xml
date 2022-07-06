@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>eu.europa.ted.eforms</groupId>
@@ -49,10 +48,11 @@
     <jackson.version>2.13.1</jackson.version>
     <junit.version>5.7.2</junit.version>
     <picocli.version>4.6.3</picocli.version>
+    <shrinkwrap.resolvers.version>3.1.4</shrinkwrap.resolvers.version>
+    <zip4j.version>2.11.1</zip4j.version>
 
     <!-- Plugins -->
     <compiler.plugin.version>3.10.1</compiler.plugin.version>
-    <dependency.plugin.version>3.3.0</dependency.plugin.version>
     <surefire.plugin.version>3.0.0-M7</surefire.plugin.version>
   </properties>
 
@@ -87,6 +87,11 @@
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-params</artifactId>
         <version>${junit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.lingala.zip4j</groupId>
+        <artifactId>zip4j</artifactId>
+        <version>${zip4j.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -125,6 +130,7 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.2.11</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- For XSL 2.0 -->
@@ -178,6 +184,59 @@
       <artifactId>picocli</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <version>${shrinkwrap.resolvers.version}</version>
+      <type>pom</type>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+      <version>${shrinkwrap.resolvers.version}</version>
+    </dependency>
+    <!--dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-spi</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-spi-maven</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-api-maven-archive</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-api-maven-embedded</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-impl-maven-embedded</artifactId>
+      <scope>runtime</scope>
+    </dependency-->
+    <dependency>
+      <groupId>net.lingala.zip4j</groupId>
+      <artifactId>zip4j</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -227,11 +286,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>${dependency.plugin.version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
           <version>${compiler.plugin.version}</version>
           <configuration>
@@ -253,52 +307,6 @@
     </pluginManagement>
 
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>unpack-sdk</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <artifactItems>
-            <artifactItem>
-              <groupId>eu.europa.ted.eforms</groupId>
-              <artifactId>eforms-sdk</artifactId>
-              <version>0.6.2</version>
-              <type>jar</type>
-              <includes>eforms-sdk/**/*</includes>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-              <fileMappers>
-                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                  <pattern>^(eforms-sdk)/(.*)$</pattern>
-                  <replacement>$1/0.6/$2</replacement>
-                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-              </fileMappers>
-            </artifactItem>
-            <artifactItem>
-              <groupId>eu.europa.ted.eforms</groupId>
-              <artifactId>eforms-sdk</artifactId>
-              <version>0.7.0-SNAPSHOT</version>
-              <type>jar</type>
-              <includes>eforms-sdk/**/*</includes>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-              <fileMappers>
-                <org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-                  <pattern>^(eforms-sdk)/(.*)$</pattern>
-                  <replacement>$1/0.7/$2</replacement>
-                </org.codehaus.plexus.components.io.filemappers.RegExpFileMapper>
-              </fileMappers>
-            </artifactItem>
-          </artifactItems>
-        </configuration>
-      </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

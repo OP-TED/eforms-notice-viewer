@@ -34,6 +34,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
 import eu.europa.ted.efx.EfxTranslator;
 
@@ -220,7 +221,8 @@ public class NoticeViewer {
       // Currently this is what allows to load the labels (i18n).
       factory.setURIResolver(new CustomUriResolver(sdkVersion));
       final Transformer transformer = factory.newTransformer(xslSource);
-
+      // transformer.setURIResolver(uriResolver); Already set by the factory!
+      // Parameters.
       transformer.setParameter("language", language);
       transformer.transform(xmlInput, outputTarget);
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
@@ -296,8 +298,12 @@ public class NoticeViewer {
    * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
    *        something else for custom views
    * @param sdkVersion The SDK version to load the path from
+   * @throws IOException
    */
-  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion) {
+  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
+      throws IOException {
+    SdkDownloader.downloadSdk(sdkVersion, SdkResourcesLoader.INSTANCE.getRoot());
+
     return SdkResourcesLoader.INSTANCE.getResourceAsPath(
         SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, sdkVersion, viewId + ".efx");
   }

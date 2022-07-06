@@ -23,6 +23,10 @@ public class SdkResourcesLoader {
     return this;
   }
 
+  public String getRoot() {
+    return root;
+  }
+
   public Path getResourceAsPath(final ResourceType resourceType, final String sdkVersion) {
     return getResourceAsPath(resourceType, sdkVersion, null);
   }
