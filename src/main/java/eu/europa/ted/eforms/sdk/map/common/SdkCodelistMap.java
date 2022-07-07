@@ -10,14 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
-
 import eu.europa.ted.eforms.sdk.annotation.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
 import eu.europa.ted.eforms.sdk.map.SdkMap;
@@ -43,14 +40,11 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
   }
 
   /**
-   * Builds EFX list from the passed codelist reference. This will lazily
-   * compute and cache the result for reuse as the operation can be costly on
-   * some large lists.
+   * Builds EFX list from the passed codelist reference. This will lazily compute and cache the
+   * result for reuse as the operation can be costly on some large lists.
    *
-   * @param codelistId
-   *          A reference to an SDK codelist.
-   * @return The EFX string representation of the list of all the codes of the
-   *         referenced codelist.
+   * @param codelistId A reference to an SDK codelist.
+   * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
   @Override
   public final SdkCodelist get(final String codelistId) {
@@ -88,7 +82,9 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
       // We assume there are no duplicate code values in the referenced
       // codelists.
       final List<String> codes = scl.getRow().stream().map(row -> {
-        return row.getValue().stream().filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v))).findFirst()//
+        return row.getValue().stream()
+            .filter(v -> GenericodeTools.KEY_CODE.equals(GenericodeTools.extractColRefId(v)))
+            .findFirst()//
             .orElseThrow(RuntimeException::new)//
             .getSimpleValue()//
             .getValue().strip();
@@ -99,7 +95,8 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
     }
   }
 
-  private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder, final Genericode10CodeListMarshaller marshaller) throws IOException {
+  private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder,
+      final Genericode10CodeListMarshaller marshaller) throws IOException {
     final int depth = 1; // Flat folder, not recursive for now.
     return getFilePathsAsSet(pathFolder, depth, GenericodeTools.EXTENSION_DOT_GC)//
         // .parallelStream() // Overkill and also messes with logs order.
@@ -115,8 +112,10 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
         }).collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
   }
 
-  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive.")
-  private static Set<Path> getFilePathsAsSet(final Path pathFolder, final int depth, final String extension) throws IOException {
+  @edu.umd.cs.findbugs.annotations.SuppressFBWarnings(
+      value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "False positive.")
+  private static Set<Path> getFilePathsAsSet(final Path pathFolder, final int depth,
+      final String extension) throws IOException {
     if (!pathFolder.toFile().isDirectory()) {
       throw new RuntimeException(String.format("Expecting folder but got: %s", pathFolder));
     }

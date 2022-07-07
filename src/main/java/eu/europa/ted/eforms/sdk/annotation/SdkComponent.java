@@ -4,9 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
 import org.atteo.classindex.IndexAnnotated;
-
 import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
 
 @IndexAnnotated

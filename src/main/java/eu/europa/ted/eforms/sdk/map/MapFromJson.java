@@ -7,10 +7,8 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +40,8 @@ public abstract class MapFromJson<T> implements SdkMap<T> {
     try {
       populateMap(jsonPath);
     } catch (IOException e) {
-      throw new RuntimeException(MessageFormat.format("Failed to set resource filepath to [{}]", jsonPath, e));
+      throw new RuntimeException(
+          MessageFormat.format("Failed to set resource filepath to [{}]", jsonPath, e));
     }
 
     return this;

@@ -1,10 +1,8 @@
 package eu.europa.ted.eforms.sdk.map.common;
 
 import java.io.IOException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import eu.europa.ted.eforms.sdk.annotation.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
 import eu.europa.ted.eforms.sdk.map.MapFromJson;

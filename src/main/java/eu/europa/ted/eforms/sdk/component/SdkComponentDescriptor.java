@@ -14,7 +14,8 @@ public class SdkComponentDescriptor<T> implements Serializable {
 
   private Class<T> implType;
 
-  public SdkComponentDescriptor(String sdkVersion, SdkComponentTypeEnum componentType, Class<T> implType) {
+  public SdkComponentDescriptor(String sdkVersion, SdkComponentTypeEnum componentType,
+      Class<T> implType) {
     this.sdkVersion = sdkVersion;
     this.componentType = componentType;
     this.implType = implType;
@@ -23,10 +24,11 @@ public class SdkComponentDescriptor<T> implements Serializable {
   public T createInstance() throws InstantiationException {
     try {
       return implType.getDeclaredConstructor().newInstance();
-    } catch (InstantiationException | IllegalAccessException
-        | IllegalArgumentException | InvocationTargetException
-        | NoSuchMethodException | SecurityException e) {
-      throw new InstantiationException(MessageFormat.format("Failed to instantiate [{0}] as SDK component type [{1}] for SDK [{2}]. Error was: {3}", implType, componentType, sdkVersion, e.getMessage()));
+    } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+      throw new InstantiationException(MessageFormat.format(
+          "Failed to instantiate [{0}] as SDK component type [{1}] for SDK [{2}]. Error was: {3}",
+          implType, componentType, sdkVersion, e.getMessage()));
     }
   }
 

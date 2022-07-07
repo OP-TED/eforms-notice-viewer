@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer.helpers;
 
 import java.nio.charset.StandardCharsets;
-
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.Column;
 import com.helger.genericode.v10.Value;
