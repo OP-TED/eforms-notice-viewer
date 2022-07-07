@@ -4,7 +4,6 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,15 +14,18 @@ public class SafeDocumentBuilder {
     throw new AssertionError("Utility class.");
   }
 
-  public static DocumentBuilder buildSafeDocumentBuilderAllowDoctype() throws ParserConfigurationException {
+  public static DocumentBuilder buildSafeDocumentBuilderAllowDoctype()
+      throws ParserConfigurationException {
     return buildSafeDocumentBuilder(false);
   }
 
-  public static DocumentBuilder buildSafeDocumentBuilderStrict() throws ParserConfigurationException {
+  public static DocumentBuilder buildSafeDocumentBuilderStrict()
+      throws ParserConfigurationException {
     return buildSafeDocumentBuilder(true);
   }
 
-  private static DocumentBuilder buildSafeDocumentBuilder(final boolean disallowDoctypeDecl) throws ParserConfigurationException {
+  private static DocumentBuilder buildSafeDocumentBuilder(final boolean disallowDoctypeDecl)
+      throws ParserConfigurationException {
     // https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#java
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
     String FEATURE = null;
@@ -87,7 +89,8 @@ public class SafeDocumentBuilder {
       return dbf.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
       // This should catch a failed setFeature feature
-      logger.info("ParserConfigurationException was thrown. The feature '" + FEATURE + "' is probably not supported by your XML processor.");
+      logger.info("ParserConfigurationException was thrown. The feature '" + FEATURE
+          + "' is probably not supported by your XML processor.");
       throw e;
     }
   }
