@@ -77,20 +77,20 @@ class NoticeViewerTest {
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtml")
   void testEfxToHtml(String language, String noticeXmlFilename, String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     testGenerateHtmlFromFile(language, noticeXmlFilename, sdkVersion);
   }
 
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtmlFromString")
   void testEfxToHtmlFromString(String language, String noticeXmlFilename, String viewId,
-      String sdkVersion) throws IOException, SAXException, ParserConfigurationException {
+      String sdkVersion) throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     testGenerateHtmlFromString(language, noticeXmlFilename, viewId, sdkVersion);
   }
 
   @ParameterizedTest
   @MethodSource("provideArgsEfxToXsl")
-  void testEfxToXsl(String sdkVersion) throws IOException {
+  void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
     final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion);
     logger.info("TEST: Wrote file: {}", xsl);
@@ -103,7 +103,7 @@ class NoticeViewerTest {
   }
 
   private void testGenerateHtmlFromFile(final String language, final String noticeXmlName,
-      final String sdkVersion) throws IOException, SAXException, ParserConfigurationException {
+      final String sdkVersion) throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
@@ -117,7 +117,7 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
       final String viewId, final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);

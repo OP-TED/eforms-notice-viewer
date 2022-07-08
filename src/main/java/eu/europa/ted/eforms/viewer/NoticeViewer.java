@@ -36,7 +36,7 @@ import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
-import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.efx.translator.EfxTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -54,10 +54,11 @@ public class NoticeViewer {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
+   * @throws InstantiationException 
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt)
-      throws IOException, SAXException, ParserConfigurationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.info("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
     Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
@@ -238,9 +239,10 @@ public class NoticeViewer {
    * @param sdkVersion The version of the desired SDK
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
+   * @throws InstantiationException 
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
-      throws IOException {
+      throws IOException, InstantiationException {
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
 
     Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);

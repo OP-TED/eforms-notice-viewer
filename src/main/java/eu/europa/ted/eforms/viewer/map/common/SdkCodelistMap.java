@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.sdk.map.common;
+package eu.europa.ted.eforms.viewer.map.common;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,11 +17,11 @@ import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 import eu.europa.ted.eforms.sdk.annotation.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
-import eu.europa.ted.eforms.sdk.map.SdkMap;
 import eu.europa.ted.eforms.viewer.helpers.GenericodeTools;
+import eu.europa.ted.eforms.viewer.map.SdkMap;
 import eu.europa.ted.efx.model.SdkCodelist;
 
-@SdkComponent(componentType = SdkComponentTypeEnum.CODELIST_MAP, resourceType = SdkCodelist.class)
+@SdkComponent(componentType = SdkComponentTypeEnum.CODELIST_MAP)
 public class SdkCodelistMap implements SdkMap<SdkCodelist> {
   private static final long serialVersionUID = 1L;
 

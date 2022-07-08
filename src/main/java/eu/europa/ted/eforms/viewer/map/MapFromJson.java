@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.sdk.map;
+package eu.europa.ted.eforms.viewer.map;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public abstract class MapFromJson<T> implements SdkMap<T> {
       populateMap(jsonPath);
     } catch (IOException e) {
       throw new RuntimeException(
-          MessageFormat.format("Failed to set resource filepath to [{}]", jsonPath, e));
+          MessageFormat.format("Failed to set resource filepath to [{0}]. Error was: {1}", jsonPath, e));
     }
 
     return this;

@@ -53,9 +53,10 @@ class CliCommand implements Callable<Integer> {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
+   * @throws InstantiationException 
    */
   @Override
-  public Integer call() throws IOException, SAXException, ParserConfigurationException {
+  public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     SdkResourcesLoader.INSTANCE.setRoot(sdkResourcesRoot);
 
     final Path htmlPath =
