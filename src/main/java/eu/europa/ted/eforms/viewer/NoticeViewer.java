@@ -36,7 +36,7 @@ import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
-import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.efx.translator.EfxTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
