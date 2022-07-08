@@ -13,9 +13,7 @@ import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
 public @interface SdkComponent {
   public static final String ANY = "any";
 
-  public String version() default ANY;
+  public String[] versions() default {ANY};
 
   public SdkComponentTypeEnum componentType();
-
-  public Class<?> resourceType();
 }

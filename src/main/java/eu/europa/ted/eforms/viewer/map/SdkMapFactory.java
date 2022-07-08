@@ -29,25 +29,35 @@ public class SdkMapFactory {
     if (componentsMap == null) {
       componentsMap = new HashMap<>();
     }
+
     ClassIndex.getAnnotated(SdkComponent.class).forEach((Class<?> clazz) -> {
       SdkComponent annotation = clazz.getAnnotation(SdkComponent.class);
-      String sdkVersion = annotation.version();
+
+      String[] supportedSdkVersions = annotation.versions();
       SdkComponentTypeEnum componentType = annotation.componentType();
-      Map<SdkComponentTypeEnum, SdkComponentDescriptor<?>> components =
-          componentsMap.get(sdkVersion);
-      if (components == null) {
-        components = new HashMap<>();
-        componentsMap.put(sdkVersion, components);
+
+      for (String sdkVersion : supportedSdkVersions) {
+        Map<SdkComponentTypeEnum, SdkComponentDescriptor<?>> components =
+            componentsMap.get(sdkVersion);
+
+        if (components == null) {
+          components = new HashMap<>();
+          componentsMap.put(sdkVersion, components);
+        }
+
+        SdkComponentDescriptor<?> component =
+            new SdkComponentDescriptor<>(sdkVersion, componentType, clazz);
+        SdkComponentDescriptor<?> existingComponent = components.get(componentType);
+
+        if (existingComponent != null && !existingComponent.equals(component)) {
+          throw new IllegalArgumentException(MessageFormat.format(
+              "More than one components of type [{0}] have been found for SDK version [{1}]:\n\t- {2}\n\t- {3}",
+              componentType, sdkVersion, existingComponent.getImplType().getName(),
+              clazz.getName()));
+        }
+
+        components.put(componentType, component);
       }
-      SdkComponentDescriptor<?> component =
-          new SdkComponentDescriptor<>(sdkVersion, componentType, clazz);
-      SdkComponentDescriptor<?> existingComponent = components.get(componentType);
-      if (existingComponent != null && !existingComponent.equals(component)) {
-        throw new IllegalArgumentException(MessageFormat.format(
-            "More than one components of type [{0}] have been found for SDK version [{1}]:\n\t- {2}\n\t- {3}",
-            componentType, sdkVersion, existingComponent.getImplType().getName(), clazz.getName()));
-      }
-      components.put(componentType, component);
     });
   }
 

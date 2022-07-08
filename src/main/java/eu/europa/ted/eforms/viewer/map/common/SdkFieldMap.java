@@ -9,7 +9,7 @@ import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
 import eu.europa.ted.eforms.viewer.map.MapFromJson;
 import eu.europa.ted.efx.model.SdkField;
 
-@SdkComponent(componentType = SdkComponentTypeEnum.FIELD_MAP, resourceType = SdkField.class)
+@SdkComponent(componentType = SdkComponentTypeEnum.FIELD_MAP)
 public class SdkFieldMap extends MapFromJson<SdkField> {
   private static final long serialVersionUID = 1L;
 
