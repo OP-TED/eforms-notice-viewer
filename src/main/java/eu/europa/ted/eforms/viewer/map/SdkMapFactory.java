@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.map;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -10,19 +10,18 @@ import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.annotation.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentDescriptor;
 import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
-import eu.europa.ted.eforms.sdk.map.SdkMap;
 import eu.europa.ted.efx.model.SdkCodelist;
 import eu.europa.ted.efx.model.SdkField;
 import eu.europa.ted.efx.model.SdkNode;
 
-public class SdkObjectFactory {
-  private static final Logger log = LoggerFactory.getLogger(SdkObjectFactory.class);
+public class SdkMapFactory {
+  private static final Logger log = LoggerFactory.getLogger(SdkMapFactory.class);
 
   private Map<String, Map<SdkComponentTypeEnum, SdkComponentDescriptor<?>>> componentsMap;
 
-  public static final SdkObjectFactory INSTANCE = new SdkObjectFactory();
+  public static final SdkMapFactory INSTANCE = new SdkMapFactory();
 
-  private SdkObjectFactory() {
+  private SdkMapFactory() {
     populateComponents();
   }
 
@@ -79,7 +78,7 @@ public class SdkObjectFactory {
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkCodelist> getCodelistsMap(String sdkVersion, Path codelistsPath)
       throws InstantiationException {
-    return SdkObjectFactory.INSTANCE
+    return SdkMapFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.CODELIST_MAP, SdkMap.class)
         .setResourceFilepath(codelistsPath);
   }
@@ -87,7 +86,7 @@ public class SdkObjectFactory {
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkField> getFieldsMap(String sdkVersion, Path jsonPath)
       throws InstantiationException {
-    return SdkObjectFactory.INSTANCE
+    return SdkMapFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.FIELD_MAP, SdkMap.class)
         .setResourceFilepath(jsonPath);
   }
@@ -95,7 +94,7 @@ public class SdkObjectFactory {
   @SuppressWarnings("unchecked")
   public static SdkMap<SdkNode> getNodesMap(String sdkVersion, Path jsonPath)
       throws InstantiationException {
-    return SdkObjectFactory.INSTANCE
+    return SdkMapFactory.INSTANCE
         .getComponentImpl(sdkVersion, SdkComponentTypeEnum.NODE_MAP, SdkMap.class)
         .setResourceFilepath(jsonPath);
   }

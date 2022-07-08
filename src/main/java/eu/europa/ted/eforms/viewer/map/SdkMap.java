@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.sdk.map;
+package eu.europa.ted.eforms.viewer.map;
 
 import java.io.Serializable;
 import java.nio.file.Path;

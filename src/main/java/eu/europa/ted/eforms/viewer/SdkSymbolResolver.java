@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import eu.europa.ted.eforms.sdk.map.SdkMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkObjectFactory;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
+import eu.europa.ted.eforms.viewer.map.SdkMap;
+import eu.europa.ted.eforms.viewer.map.SdkMapFactory;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.SdkCodelist;
@@ -78,9 +78,9 @@ public class SdkSymbolResolver implements SymbolResolver {
     Path codelistsPath = SdkResourcesLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
 
-    this.fieldById = SdkObjectFactory.getFieldsMap(sdkVersion, jsonPath);
-    this.nodeById = SdkObjectFactory.getNodesMap(sdkVersion, jsonPath);
-    this.codelistById = SdkObjectFactory.getCodelistsMap(sdkVersion, codelistsPath);
+    this.fieldById = SdkMapFactory.getFieldsMap(sdkVersion, jsonPath);
+    this.nodeById = SdkMapFactory.getNodesMap(sdkVersion, jsonPath);
+    this.codelistById = SdkMapFactory.getCodelistsMap(sdkVersion, codelistsPath);
   }
 
   /**
