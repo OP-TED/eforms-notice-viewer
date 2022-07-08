@@ -47,13 +47,14 @@
     <classindex.version>3.11</classindex.version>
     <jackson.version>2.13.1</jackson.version>
     <junit.version>5.7.2</junit.version>
+    <logback.version>1.2.11</logback.version>
     <picocli.version>4.6.3</picocli.version>
     <shrinkwrap.resolvers.version>3.1.4</shrinkwrap.resolvers.version>
-    <zip4j.version>2.11.1</zip4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
 
     <!-- Plugins -->
     <compiler.plugin.version>3.10.1</compiler.plugin.version>
-    <surefire.plugin.version>3.0.0-M7</surefire.plugin.version>
+    <surefire.plugin.version>3.0.0-M7</surefire.plugin.version> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
   </properties>
 
   <dependencyManagement>
@@ -89,9 +90,14 @@
         <version>${junit.version}</version>
       </dependency>
       <dependency>
-        <groupId>net.lingala.zip4j</groupId>
-        <artifactId>zip4j</artifactId>
-        <version>${zip4j.version}</version>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -129,7 +135,6 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -174,12 +179,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.atteo.classindex</groupId>
-      <artifactId>classindex</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
     </dependency>
@@ -195,47 +194,16 @@
       <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
       <version>${shrinkwrap.resolvers.version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-api</artifactId>
-    </dependency>
+
     <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-spi</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-api-maven</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-spi-maven</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-api-maven-archive</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven-archive</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-api-maven-embedded</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven-embedded</artifactId>
-      <scope>runtime</scope>
-    </dependency-->
-    <dependency>
-      <groupId>net.lingala.zip4j</groupId>
-      <artifactId>zip4j</artifactId>
+      <groupId>org.atteo.classindex</groupId>
+      <artifactId>classindex</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
@@ -327,19 +295,6 @@
               <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
               </descriptorRefs>
-            </configuration>
-          </execution>
-          <execution>
-            <id>create-bundle</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <appendAssemblyId>false</appendAssemblyId>
-              <descriptors>
-                <descriptor>src/main/assembly/bundle.xml</descriptor>
-              </descriptors>
             </configuration>
           </execution>
         </executions>
