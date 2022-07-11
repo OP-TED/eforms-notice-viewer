@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.management;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinates;
 import org.jboss.shrinkwrap.resolver.impl.maven.MavenWorkingSessionContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import eu.europa.ted.eforms.sdk.SdkConstants;
 
 public class SdkDownloader {
   private static final Logger log = LoggerFactory.getLogger(SdkDownloader.class);
@@ -93,7 +94,7 @@ public class SdkDownloader {
    * @return
    */
   private static String getLatestSdkVersion(final String baseVersion) {
-    Version currentVersion = new Version(baseVersion);
+    SdkVersion currentVersion = new SdkVersion(baseVersion);
     RegExUtils.replaceAll(baseVersion, "^(.*?)-SNAPSHOT$", "$1");
 
     MavenVersionRangeResult versions = Maven.resolver()
@@ -103,9 +104,9 @@ public class SdkDownloader {
     try {
       if (currentVersion.getMajor().equals("0")) {
         return versions.getVersions().stream()
-            .map((MavenCoordinate coord) -> new Version(coord.getVersion()))
-            .filter((Version v) -> v.getMinor().equals(currentVersion.getMinor()))
-            .max((Version i, Version j) -> i.compareTo(j)).orElseThrow().toString();
+            .map((MavenCoordinate coord) -> new SdkVersion(coord.getVersion()))
+            .filter((SdkVersion v) -> v.getMinor().equals(currentVersion.getMinor()))
+            .max((SdkVersion i, SdkVersion j) -> i.compareTo(j)).orElseThrow().toString();
       } else {
         MavenCoordinate latestCoord = versions.getHighestVersion();
 

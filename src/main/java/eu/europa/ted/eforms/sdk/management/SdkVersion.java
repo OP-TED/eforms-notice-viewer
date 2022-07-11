@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.management;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -7,16 +7,16 @@ import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
-public class Version implements Comparable<Version> {
+public class SdkVersion implements Comparable<SdkVersion> {
   private String major;
   private String minor;
   private String patch;
 
-  public Version() {
+  public SdkVersion() {
     this(null);
   }
 
-  public Version(final String version) {
+  public SdkVersion(final String version) {
     Validate.notBlank(version, "Undefined version");
     Validate.matchesPattern(version, "[0-9]+(\\.[0-9]+(-SNAPSHOT)?)*", "Invalid version format");
 
@@ -56,7 +56,7 @@ public class Version implements Comparable<Version> {
   }
 
   @Override
-  public int compareTo(Version that) {
+  public int compareTo(SdkVersion that) {
     if (that == null) {
       return 1;
     }
@@ -93,7 +93,7 @@ public class Version implements Comparable<Version> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    Version other = (Version) obj;
+    SdkVersion other = (SdkVersion) obj;
     return Objects.equals(major, other.major) && Objects.equals(minor, other.minor)
         && Objects.equals(patch, other.patch);
   }

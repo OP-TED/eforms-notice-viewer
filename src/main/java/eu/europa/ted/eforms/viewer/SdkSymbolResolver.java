@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.metadata.SdkCodelistRepository;
+import eu.europa.ted.eforms.sdk.metadata.SdkFieldRepository;
+import eu.europa.ted.eforms.sdk.metadata.SdkNodeRepository;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SdkCodelist;
 import eu.europa.ted.efx.interfaces.SdkField;
 import eu.europa.ted.efx.interfaces.SdkNode;
@@ -74,14 +74,14 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   protected void loadMapData(final String sdkVersion) throws InstantiationException {
-    Path jsonPath = SdkResourcesLoader.INSTANCE
+    Path jsonPath = SdkResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
-    Path codelistsPath = SdkResourcesLoader.INSTANCE
+    Path codelistsPath = SdkResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
 
-    this.fieldById = new SdkFieldMap(sdkVersion, jsonPath);
-    this.nodeById = new SdkNodeMap(sdkVersion, jsonPath);
-    this.codelistById = new SdkCodelistMap(sdkVersion, codelistsPath);
+    this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);
+    this.nodeById = new SdkNodeRepository(sdkVersion, jsonPath);
+    this.codelistById = new SdkCodelistRepository(sdkVersion, codelistsPath);
   }
 
   /**

@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.metadata;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,21 +15,22 @@ import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
+import eu.europa.ted.eforms.sdk.helpers.GenericodeTools;
 import eu.europa.ted.efx.interfaces.SdkCodelist;
 import eu.europa.ted.efx.model.EfxEntityFactory;
 
-public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
+public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
   private static final long serialVersionUID = 1L;
 
   private transient Path codelistsPath;
   private String sdkVersion;
 
   @SuppressWarnings("unused")
-  private SdkCodelistMap() {
+  private SdkCodelistRepository() {
     throw new UnsupportedOperationException();
   }
 
-  public SdkCodelistMap(String sdkVersion, Path codelistsPath) {
+  public SdkCodelistRepository(String sdkVersion, Path codelistsPath) {
     this.sdkVersion = sdkVersion;
     this.codelistsPath = codelistsPath;
   }

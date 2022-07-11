@@ -1,15 +1,17 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.sdk.metadata;
 
 import java.nio.file.Path;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.helpers.MapFromJson;
 import eu.europa.ted.efx.interfaces.SdkNode;
 import eu.europa.ted.efx.model.EfxEntityFactory;
 
-public class SdkNodeMap extends MapFromJson<SdkNode> {
+public class SdkNodeRepository extends MapFromJson<SdkNode> {
   private static final long serialVersionUID = 1L;
 
-  public SdkNodeMap(String sdkVersion, Path jsonPath) throws InstantiationException {
+  public SdkNodeRepository(String sdkVersion, Path jsonPath) throws InstantiationException {
     super(sdkVersion, jsonPath);
   }
 

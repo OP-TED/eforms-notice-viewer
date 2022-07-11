@@ -21,8 +21,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
@@ -42,7 +42,7 @@ class NoticeViewerTest {
 
   @BeforeEach
   public void setUp() {
-    SdkResourcesLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
+    SdkResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
   }
 
   private static Stream<Arguments> provideArgsEfxToHtml() {
