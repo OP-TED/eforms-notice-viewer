@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.map;
+package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -14,55 +13,50 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-public abstract class MapFromJson<T> implements SdkMap<T> {
+public abstract class MapFromJson<T> extends HashMap<String, T> {
   private static final long serialVersionUID = 1L;
 
   private static final Logger logger = LoggerFactory.getLogger(MapFromJson.class);
 
-  protected transient Map<String, T> _map;
+  protected final String sdkVersion;
 
-  protected MapFromJson() throws IOException {
-    _map = new HashMap<>();
+  @SuppressWarnings("unused")
+  private MapFromJson() {
+    throw new UnsupportedOperationException();
   }
 
-  @Override
-  public T get(String resourceId) {
-    return _map.get(resourceId);
-  }
+  protected MapFromJson(final String sdkVersion, final Path jsonPath)
+      throws InstantiationException {
+    this.sdkVersion = sdkVersion;
 
-  @Override
-  public T getOrDefault(String resourceId, T defaultValue) {
-    return _map.getOrDefault(resourceId, defaultValue);
-  }
-
-  @Override
-  public SdkMap<T> setResourceFilepath(Path jsonPath) {
     try {
       populateMap(jsonPath);
     } catch (IOException e) {
-      throw new RuntimeException(
-          MessageFormat.format("Failed to set resource filepath to [{0}]. Error was: {1}", jsonPath, e));
+      throw new RuntimeException(MessageFormat
+          .format("Failed to set resource filepath to [{0}]. Error was: {1}", jsonPath, e));
     }
-
-    return this;
   }
 
-  private final void populateMap(final Path jsonPath) throws IOException {
+  private final void populateMap(final Path jsonPath) throws IOException, InstantiationException {
     logger.info("Populating maps for context, jsonPath={}", jsonPath);
+
     final ObjectMapper mapper = buildStandardJacksonObjectMapper();
+
     try (InputStream fieldsJsonInputStream = Files.newInputStream(jsonPath)) {
       if (fieldsJsonInputStream == null) {
         throw new RuntimeException(String.format("File not found: %s", jsonPath));
       }
+
       if (fieldsJsonInputStream.available() == 0) {
         throw new RuntimeException(String.format("File is empty: %s", jsonPath));
       }
+
       final JsonNode json = mapper.readTree(fieldsJsonInputStream);
       populateMap(json);
     }
   }
 
-  protected abstract void populateMap(final JsonNode json);
+  protected abstract void populateMap(final JsonNode json) throws InstantiationException;
 
   /**
    * @return A reusable Jackson object mapper instance.

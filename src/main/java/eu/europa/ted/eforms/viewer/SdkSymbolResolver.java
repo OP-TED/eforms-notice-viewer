@@ -6,23 +6,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
+import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
+import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
+import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
-import eu.europa.ted.eforms.viewer.map.SdkMap;
-import eu.europa.ted.eforms.viewer.map.SdkMapFactory;
+import eu.europa.ted.efx.interfaces.SdkCodelist;
+import eu.europa.ted.efx.interfaces.SdkField;
+import eu.europa.ted.efx.interfaces.SdkNode;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.SdkCodelist;
-import eu.europa.ted.efx.model.SdkField;
-import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
-  protected SdkMap<SdkField> fieldById;
+  protected Map<String, SdkField> fieldById;
 
-  protected SdkMap<SdkNode> nodeById;
+  protected Map<String, SdkNode> nodeById;
 
-  protected SdkMap<SdkCodelist> codelistById;
+  protected Map<String, SdkCodelist> codelistById;
 
   /**
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
@@ -78,9 +79,9 @@ public class SdkSymbolResolver implements SymbolResolver {
     Path codelistsPath = SdkResourcesLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
 
-    this.fieldById = SdkMapFactory.getFieldsMap(sdkVersion, jsonPath);
-    this.nodeById = SdkMapFactory.getNodesMap(sdkVersion, jsonPath);
-    this.codelistById = SdkMapFactory.getCodelistsMap(sdkVersion, codelistsPath);
+    this.fieldById = new SdkFieldMap(sdkVersion, jsonPath);
+    this.nodeById = new SdkNodeMap(sdkVersion, jsonPath);
+    this.codelistById = new SdkCodelistMap(sdkVersion, codelistsPath);
   }
 
   /**

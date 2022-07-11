@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.map.common;
+package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,28 +15,23 @@ import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
-import eu.europa.ted.eforms.sdk.annotation.SdkComponent;
-import eu.europa.ted.eforms.sdk.component.SdkComponentTypeEnum;
-import eu.europa.ted.eforms.viewer.helpers.GenericodeTools;
-import eu.europa.ted.eforms.viewer.map.SdkMap;
-import eu.europa.ted.efx.model.SdkCodelist;
+import eu.europa.ted.efx.interfaces.SdkCodelist;
+import eu.europa.ted.efx.model.EfxEntityFactory;
 
-@SdkComponent(componentType = SdkComponentTypeEnum.CODELIST_MAP)
-public class SdkCodelistMap implements SdkMap<SdkCodelist> {
+public class SdkCodelistMap extends HashMap<String, SdkCodelist> {
   private static final long serialVersionUID = 1L;
 
-  private transient Map<String, SdkCodelist> _map;
-
   private transient Path codelistsPath;
+  private String sdkVersion;
 
-  public SdkCodelistMap() {
-    _map = new HashMap<>();
+  @SuppressWarnings("unused")
+  private SdkCodelistMap() {
+    throw new UnsupportedOperationException();
   }
 
-  @Override
-  public SdkCodelistMap setResourceFilepath(Path codelistsPath) {
+  public SdkCodelistMap(String sdkVersion, Path codelistsPath) {
+    this.sdkVersion = sdkVersion;
     this.codelistsPath = codelistsPath;
-    return this;
   }
 
   /**
@@ -47,19 +42,33 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
    * @return The EFX string representation of the list of all the codes of the referenced codelist.
    */
   @Override
-  public final SdkCodelist get(final String codelistId) {
-    if (StringUtils.isBlank(codelistId)) {
+  public final SdkCodelist get(final Object codelistId) {
+    if (StringUtils.isBlank((String) codelistId)) {
       throw new RuntimeException("CodelistId is blank.");
     }
-    return _map.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
+
+    return computeIfAbsent((String) codelistId, key -> {
+      try {
+        return loadSdkCodelist(sdkVersion, key, codelistsPath);
+      } catch (InstantiationException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
   @Override
-  public SdkCodelist getOrDefault(final String codelistId, final SdkCodelist defaultValue) {
-    return _map.computeIfAbsent(codelistId, key -> loadSdkCodelist(key, codelistsPath));
+  public SdkCodelist getOrDefault(final Object codelistId, final SdkCodelist defaultValue) {
+    return computeIfAbsent((String) codelistId, key -> {
+      try {
+        return loadSdkCodelist(sdkVersion, key, codelistsPath);
+      } catch (InstantiationException e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
-  private static SdkCodelist loadSdkCodelist(final String codeListId, Path codelistsPath) {
+  private static SdkCodelist loadSdkCodelist(final String sdkVersion, final String codeListId,
+      final Path codelistsPath) throws InstantiationException {
     // Find the SDK codelist .gc file that corresponds to the passed reference.
     // Stream the data from that file.
     final Genericode10CodeListMarshaller marshaller = GenericodeTools.getMarshaller();
@@ -89,7 +98,7 @@ public class SdkCodelistMap implements SdkMap<SdkCodelist> {
             .getSimpleValue()//
             .getValue().strip();
       }).collect(Collectors.toList());
-      return new SdkCodelist(codeListId, codelistVersion, codes);
+      return EfxEntityFactory.getSdkCodelist(sdkVersion, codeListId, codelistVersion, codes);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
