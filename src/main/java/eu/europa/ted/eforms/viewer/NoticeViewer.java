@@ -32,11 +32,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkDownloader;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
-import eu.europa.ted.efx.translator.EfxTranslator;
+import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
+import eu.europa.ted.efx.EfxTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -304,9 +305,9 @@ public class NoticeViewer {
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
       throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, SdkResourcesLoader.INSTANCE.getRoot());
+    SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
 
-    return SdkResourcesLoader.INSTANCE.getResourceAsPath(
+    return SdkResourceLoader.INSTANCE.getResourceAsPath(
         SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, sdkVersion, viewId + ".efx");
   }
 }

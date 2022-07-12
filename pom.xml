@@ -70,11 +70,6 @@
         <version>${antlr4.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.atteo.classindex</groupId>
-        <artifactId>classindex</artifactId>
-        <version>${classindex.version}</version>
-      </dependency>
-      <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
         <version>${picocli.version}</version>
@@ -199,12 +194,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>org.atteo.classindex</groupId>
-      <artifactId>classindex</artifactId>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 
   <build>
@@ -262,11 +251,6 @@
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli-codegen</artifactId>
                 <version>${picocli.version}</version>
-              </annotationProcessorPath>
-              <annotationProcessorPath>
-                <groupId>org.atteo.classindex</groupId>
-                <artifactId>classindex</artifactId>
-                <version>${classindex.version}</version>
               </annotationProcessorPath>
             </annotationProcessorPaths>
           </configuration>

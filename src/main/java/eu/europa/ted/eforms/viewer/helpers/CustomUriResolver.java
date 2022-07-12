@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,9 +9,7 @@ import javax.xml.transform.URIResolver;
 import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
+import eu.europa.ted.eforms.sdk.SdkConstants;
 
 public final class CustomUriResolver implements URIResolver {
   private String sdkVersion;
@@ -25,7 +23,7 @@ public final class CustomUriResolver implements URIResolver {
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = SdkResourcesLoader.INSTANCE
+    try (InputStream is = SdkResourceLoader.INSTANCE
         .getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
       if (is == null) {
         throw new RuntimeException(

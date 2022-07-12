@@ -8,16 +8,17 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants.ResourceType;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.SdkConstants.ResourceType;
 
-public class SdkResourcesLoader {
+public class SdkResourceLoader {
   private String root = SdkConstants.DEFAULT_SDK_ROOT;
 
-  public static final SdkResourcesLoader INSTANCE = new SdkResourcesLoader();
+  public static final SdkResourceLoader INSTANCE = new SdkResourceLoader();
 
-  private SdkResourcesLoader() {}
+  private SdkResourceLoader() {}
 
-  public SdkResourcesLoader setRoot(String root) {
+  public SdkResourceLoader setRoot(String root) {
     Optional.ofNullable(root).ifPresent((String s) -> this.root = s);
 
     return this;
