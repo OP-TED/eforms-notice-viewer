@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
@@ -57,7 +57,7 @@ class CliCommand implements Callable<Integer> {
    */
   @Override
   public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    SdkResourcesLoader.INSTANCE.setRoot(sdkResourcesRoot);
+    SdkResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
 
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId));

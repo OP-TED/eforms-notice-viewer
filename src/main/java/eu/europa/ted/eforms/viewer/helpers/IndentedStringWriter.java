@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.StringWriter;
 
@@ -9,15 +9,15 @@ public class IndentedStringWriter extends StringWriter {
     this.indent = indent;
   }
 
-  void writeLine(String text) {
+  public void writeLine(String text) {
     this.write(String.format("%s%s\n", "\t".repeat(indent), text));
   }
 
-  void writeBlock(String text) {
+  public void writeBlock(String text) {
     this.write(String.format("%s\n", text.replaceAll("(?m)^", "\t".repeat(indent))));
   }
 
-  void openTag(String tag, String attributes) {
+  public void openTag(String tag, String attributes) {
     if (attributes == null || attributes.isEmpty()) {
       this.writeLine(String.format("<%s>", tag));
     } else {

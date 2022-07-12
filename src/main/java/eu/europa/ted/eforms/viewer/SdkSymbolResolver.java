@@ -6,23 +6,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-import eu.europa.ted.eforms.viewer.helpers.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourcesLoader;
-import eu.europa.ted.eforms.viewer.map.SdkMap;
-import eu.europa.ted.eforms.viewer.map.SdkMapFactory;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelist;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelistRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkField;
+import eu.europa.ted.eforms.sdk.entity.SdkFieldRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkNode;
+import eu.europa.ted.eforms.sdk.entity.SdkNodeRepository;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.SdkCodelist;
-import eu.europa.ted.efx.model.SdkField;
-import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
-  protected SdkMap<SdkField> fieldById;
+  protected Map<String, SdkField> fieldById;
 
-  protected SdkMap<SdkNode> nodeById;
+  protected Map<String, SdkNode> nodeById;
 
-  protected SdkMap<SdkCodelist> codelistById;
+  protected Map<String, SdkCodelist> codelistById;
 
   /**
    * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
@@ -73,14 +74,14 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   protected void loadMapData(final String sdkVersion) throws InstantiationException {
-    Path jsonPath = SdkResourcesLoader.INSTANCE
+    Path jsonPath = SdkResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
-    Path codelistsPath = SdkResourcesLoader.INSTANCE
+    Path codelistsPath = SdkResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
 
-    this.fieldById = SdkMapFactory.getFieldsMap(sdkVersion, jsonPath);
-    this.nodeById = SdkMapFactory.getNodesMap(sdkVersion, jsonPath);
-    this.codelistById = SdkMapFactory.getCodelistsMap(sdkVersion, codelistsPath);
+    this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);
+    this.nodeById = new SdkNodeRepository(sdkVersion, jsonPath);
+    this.codelistById = new SdkCodelistRepository(sdkVersion, codelistsPath);
   }
 
   /**
