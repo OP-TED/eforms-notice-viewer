@@ -37,7 +37,7 @@ import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
-import eu.europa.ted.efx.translator.EfxTranslator;
+import eu.europa.ted.efx.EfxTranslator;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
