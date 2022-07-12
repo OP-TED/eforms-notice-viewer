@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.sdk.metadata;
+package eu.europa.ted.eforms.sdk.entity;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,8 +16,6 @@ import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 import eu.europa.ted.eforms.sdk.helpers.GenericodeTools;
-import eu.europa.ted.efx.model.EfxEntityFactory;
-import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
   private static final long serialVersionUID = 1L;
@@ -99,7 +97,7 @@ public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
             .getSimpleValue()//
             .getValue().strip();
       }).collect(Collectors.toList());
-      return EfxEntityFactory.getSdkCodelist(sdkVersion, codeListId, codelistVersion, codes);
+      return SdkEntityFactory.getSdkCodelist(sdkVersion, codeListId, codelistVersion, codes);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }

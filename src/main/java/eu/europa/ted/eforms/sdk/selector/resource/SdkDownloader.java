@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.sdk.management;
+package eu.europa.ted.eforms.sdk.selector.resource;
 
 import java.io.File;
 import java.io.IOException;

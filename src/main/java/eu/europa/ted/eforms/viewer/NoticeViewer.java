@@ -33,7 +33,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.management.SdkDownloader;
+import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;

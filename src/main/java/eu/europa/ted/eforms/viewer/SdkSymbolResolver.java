@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.metadata.SdkCodelistRepository;
-import eu.europa.ted.eforms.sdk.metadata.SdkFieldRepository;
-import eu.europa.ted.eforms.sdk.metadata.SdkNodeRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelist;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelistRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkField;
+import eu.europa.ted.eforms.sdk.entity.SdkFieldRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkNode;
+import eu.europa.ted.eforms.sdk.entity.SdkNodeRepository;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.SdkCodelist;
-import eu.europa.ted.efx.model.SdkField;
-import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
