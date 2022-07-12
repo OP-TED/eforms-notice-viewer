@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.sdk.selector.resource;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +9,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RegExUtils;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
@@ -34,32 +34,28 @@ public class SdkUnpacker {
     try (ZipFile file = new ZipFile(archive)) {
       Files.createDirectories(targetDir);
 
-      file.stream().forEach((ZipEntry entry) -> {
-        if (entry.getName().startsWith("eforms-sdk/")) {
-          Path targetEntryPath =
-              Path.of(targetDir.toString(), RegExUtils.removeFirst(entry.getName(), "eforms-sdk/"));
-          try {
-            if (entry.isDirectory()) {
-              log.trace("Creating directory [{}]", targetEntryPath);
-              Files.createDirectories(targetEntryPath);
-            } else {
-              try (InputStream inputStream = file.getInputStream(entry);
-                  BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
-                  FileOutputStream fileOutputStream =
-                      new FileOutputStream(targetEntryPath.toFile());) {
-                while (bufferedInputStream.available() > 0) {
-                  fileOutputStream.write(bufferedInputStream.read());
-                }
-              }
+      file.stream().filter((ZipEntry entry) -> entry.getName().startsWith("eforms-sdk/"))
+          .forEach((ZipEntry entry) -> {
+            Path targetEntryPath = Path.of(targetDir.toString(),
+                RegExUtils.removeFirst(entry.getName(), "eforms-sdk/"));
 
-              log.trace("Written file [{}]", targetEntryPath);
+            try {
+              if (entry.isDirectory()) {
+                log.trace("Creating directory [{}]", targetEntryPath);
+                Files.createDirectories(targetEntryPath);
+              } else {
+                try (InputStream fileInput = file.getInputStream(entry);
+                    FileOutputStream fileOutput = new FileOutputStream(targetEntryPath.toFile());) {
+                  IOUtils.copy(fileInput, fileOutput);
+                }
+
+                log.trace("Written file [{}]", targetEntryPath);
+              }
+            } catch (IOException e) {
+              throw new RuntimeException(MessageFormat.format(
+                  "Failed to extract files from archive [{0}]. Reason was: {1}", archive, e));
             }
-          } catch (IOException e) {
-            throw new RuntimeException(MessageFormat
-                .format("Failed to extract files from archive [{0}]. Reason was: {1}", archive, e));
-          }
-        }
-      });
+          });
     }
 
     log.info("Successfully unpacked artifact file [{}] onto [{}]", archive,
