@@ -1,27 +1,28 @@
 package eu.europa.ted.eforms.viewer;
 
-
-import java.io.IOException;
+import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.antlr.v4.runtime.misc.ParseCancellationException;
-
-import eu.europa.ted.eforms.viewer.helpers.SdkCodelistMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkFieldMap;
-import eu.europa.ted.eforms.viewer.helpers.SdkNodeMap;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelist;
+import eu.europa.ted.eforms.sdk.entity.SdkCodelistRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkField;
+import eu.europa.ted.eforms.sdk.entity.SdkFieldRepository;
+import eu.europa.ted.eforms.sdk.entity.SdkNode;
+import eu.europa.ted.eforms.sdk.entity.SdkNodeRepository;
+import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.SdkCodelist;
-import eu.europa.ted.efx.model.SdkField;
-import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {
-
   protected Map<String, SdkField> fieldById;
+
   protected Map<String, SdkNode> nodeById;
+
   protected Map<String, SdkCodelist> codelistById;
 
   /**
@@ -36,7 +37,14 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @param sdkVersion Version of the SDK
    */
   public static SdkSymbolResolver getInstance(final String sdkVersion) {
-    return instances.computeIfAbsent(sdkVersion, k -> new SdkSymbolResolver(sdkVersion));
+    return instances.computeIfAbsent(sdkVersion, k -> {
+      try {
+        return new SdkSymbolResolver(sdkVersion);
+      } catch (InstantiationException e) {
+        throw new RuntimeException(MessageFormat.format(
+            "Failed to instantiate SDK Symbol Resolver for SDK version [{0}]", sdkVersion), e);
+      }
+    });
   }
 
   /**
@@ -59,20 +67,21 @@ public class SdkSymbolResolver implements SymbolResolver {
    * Private, use getInstance method instead.
    *
    * @param sdkVersion The version of the SDK.
+   * @throws InstantiationException
    */
-  protected SdkSymbolResolver(final String sdkVersion) {
+  protected SdkSymbolResolver(final String sdkVersion) throws InstantiationException {
     this.loadMapData(sdkVersion);
   }
 
-  protected void loadMapData(final String sdkVersion) {
-    try {
-      this.fieldById = new SdkFieldMap(sdkVersion);
-      this.nodeById = new SdkNodeMap(sdkVersion);
-      this.codelistById = new SdkCodelistMap(sdkVersion);
-    } catch (IOException e) {
-      throw new RuntimeException(
-          String.format("Unable to load Symbols for eForms-SDK version=%s", sdkVersion), e);
-    }
+  protected void loadMapData(final String sdkVersion) throws InstantiationException {
+    Path jsonPath = SdkResourceLoader.INSTANCE
+        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
+    Path codelistsPath = SdkResourceLoader.INSTANCE
+        .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
+
+    this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);
+    this.nodeById = new SdkNodeRepository(sdkVersion, jsonPath);
+    this.codelistById = new SdkCodelistRepository(sdkVersion, codelistsPath);
   }
 
   /**
@@ -116,7 +125,6 @@ public class SdkSymbolResolver implements SymbolResolver {
     }
     return new PathExpression(sdkNode.getXpathAbsolute());
   }
-
 
   /**
    * Gets the xPath of the given field relative to the given context.

@@ -9,7 +9,6 @@ import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.xpath.XPathScriptGenerator;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
-
   @Override
   public SymbolResolver createSymbolResolver(String sdkVersion) {
     return SdkSymbolResolver.getInstance(sdkVersion);

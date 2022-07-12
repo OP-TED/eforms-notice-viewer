@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import eu.europa.ted.eforms.viewer.helpers.IndentedStringWriter;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
@@ -11,7 +12,6 @@ import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
-
   private static int variableCounter = 0;
 
   public XslMarkupGenerator() {
@@ -19,6 +19,7 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   private final String[] assetTypes = {"business_term", "field", "code", "decoration"};
+
   private final String translations = Arrays.stream(assetTypes)
       .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
       .collect(Collectors.joining(", "));
@@ -30,26 +31,20 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
 
   @Override
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
-
-    // NOTE: you should use a library to build HTML and handle escaping, here we just use String
+    // NOTE: you should use a library to build HTML and handle escaping, here we
+    // just use String
     // format for demonstration purposes.
-
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     writer.openTag("xsl:stylesheet",
         "version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:fn=\"http://www.w3.org/2005/xpath-functions\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\"");
-
     writer.writeLine("<xsl:output method=\"html\" encoding=\"UTF-8\" indent=\"yes\"/>");
-
     writer.writeLine("<xsl:param name=\"language\" />");
     writer.writeLine(
         String.format("<xsl:variable name=\"labels\" select=\"(%s)\"/>", this.translations));
-
     // Root template.
     writer.openTag("xsl:template", "match=\"/\"");
-
     writer.openTag("html");
-
     writer.openTag("head");
     writer.openTag("style");
     writer.writeLine("section { padding: 6px 6px 6px 36px; }");
@@ -59,18 +54,14 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     writer.writeLine(".value { font-size: 12pt; color: red; }");
     writer.closeTag("style");
     writer.closeTag("head");
-
     writer.openTag("body");
     writer.writeBlock(body.stream().map(item -> item.script).collect(Collectors.joining("\n")));
     writer.closeTag("body");
-
     writer.closeTag("html");
-
     writer.closeTag("xsl:template");
     writer.writeBlock(
         templates.stream().map(template -> template.script).collect(Collectors.joining("\n")));
     writer.closeTag("xsl:stylesheet");
-
     return new Markup(writer.toString());
   }
 
@@ -108,11 +99,11 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   @Override
-  public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
+  public Markup composeFragmentDefinition(final String name, final String number,
+      final Markup content) {
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     final String tagTemplate = "xsl:template";
     writer.openTag(tagTemplate, String.format("name='%s'", name));
-
     final String tagSection = "section";
     writer.openTag(String.format(tagSection, "title=\"%s\"", name));
     if (StringUtils.isNotBlank(number)) {
@@ -120,7 +111,6 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     }
     writer.writeBlock(content.script);
     writer.closeTag(tagSection);
-
     writer.closeTag(tagTemplate);
     return new Markup(writer.toString());
   }

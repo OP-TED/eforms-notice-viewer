@@ -26,6 +26,12 @@ Execute the following on the root folder of this project:
 mvn clean install
 ```
 
+For forcing update of snapshots:
+
+```
+mvn clean install -U
+```
+
 ## Usage
 
 ### Requirements
