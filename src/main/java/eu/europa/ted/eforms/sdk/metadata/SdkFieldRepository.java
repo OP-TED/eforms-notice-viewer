@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.helpers.MapFromJson;
-import eu.europa.ted.efx.interfaces.SdkField;
 import eu.europa.ted.efx.model.EfxEntityFactory;
+import eu.europa.ted.efx.model.SdkField;
 
 public class SdkFieldRepository extends MapFromJson<SdkField> {
   private static final long serialVersionUID = 1L;

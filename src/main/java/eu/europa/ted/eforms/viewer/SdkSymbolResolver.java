@@ -11,11 +11,11 @@ import eu.europa.ted.eforms.sdk.metadata.SdkCodelistRepository;
 import eu.europa.ted.eforms.sdk.metadata.SdkFieldRepository;
 import eu.europa.ted.eforms.sdk.metadata.SdkNodeRepository;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
-import eu.europa.ted.efx.interfaces.SdkCodelist;
-import eu.europa.ted.efx.interfaces.SdkField;
-import eu.europa.ted.efx.interfaces.SdkNode;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
+import eu.europa.ted.efx.model.SdkCodelist;
+import eu.europa.ted.efx.model.SdkField;
+import eu.europa.ted.efx.model.SdkNode;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
 public class SdkSymbolResolver implements SymbolResolver {

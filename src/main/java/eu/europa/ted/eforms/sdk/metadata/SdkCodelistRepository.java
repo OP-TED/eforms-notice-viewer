@@ -16,8 +16,8 @@ import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
 import com.helger.genericode.v10.SimpleCodeList;
 import eu.europa.ted.eforms.sdk.helpers.GenericodeTools;
-import eu.europa.ted.efx.interfaces.SdkCodelist;
 import eu.europa.ted.efx.model.EfxEntityFactory;
+import eu.europa.ted.efx.model.SdkCodelist;
 
 public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
   private static final long serialVersionUID = 1L;
