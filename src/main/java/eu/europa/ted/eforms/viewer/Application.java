@@ -7,7 +7,13 @@ import picocli.CommandLine;
  */
 public class Application {
   public static void main(String... args) {
-    int exitCode = new CommandLine(new CliCommand()).execute(args);
+    int exitCode = 0;
+    if (args.length == 0) {
+      exitCode = new CommandLine(new CliCommand()).execute("-l", "-p");
+    } else {
+      exitCode = new CommandLine(new CliCommand()).execute(args);
+    }
+
     System.exit(exitCode);
   }
 }

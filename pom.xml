@@ -61,6 +61,11 @@
     <dependencies>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
       </dependency>
@@ -98,6 +103,30 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.commons</groupId>
+      <artifactId>ph-commons</artifactId>
+      <version>10.0.0</version>
+    </dependency>
+
     <!-- EFX. -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
@@ -164,11 +193,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
     </dependency>
@@ -178,12 +202,6 @@
       <artifactId>picocli</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <version>${shrinkwrap.resolvers.version}</version>
-      <type>pom</type>
-    </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
@@ -261,28 +279,158 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.3.0</version>
         <executions>
           <execution>
-            <id>create-jar</id>
             <phase>package</phase>
             <goals>
-              <goal>single</goal>
+              <goal>shade</goal>
             </goals>
             <configuration>
-              <appendAssemblyId>false</appendAssemblyId>
-              <archive>
-                <manifest>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
-                </manifest>
-              </archive>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
+                  <manifestEntries>
+                    <Specification-Title>${project.artifactId}</Specification-Title>
+                    <Specification-Version>${project.version}</Specification-Version>
+                    <Implementation-Title>${project.artifactId}</Implementation-Title>
+                    <Implementation-Version>${project.version}</Implementation-Version>
+                    <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
+                  </manifestEntries>
+                </transformer>
+              </transformers>
+              <filters>
+                <filter>
+                  <artifact>*:*</artifact>
+                  <excludes>
+                    <exclude>META-INF/*.SF</exclude>
+                    <exclude>META-INF/*.DSA</exclude>
+                    <exclude>META-INF/*.RSA</exclude>
+                  </excludes>
+                </filter>
+              </filters>
             </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>build-installers</id>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+              <execution>
+                <id>copy-packr</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>com.nimblygames.packr</groupId>
+                      <artifactId>packr-all</artifactId>
+                      <version>2.7.0</version>
+                      <type>jar</type>
+                      <overWrite>false</overWrite>
+                      <outputDirectory>${project.build.directory}/packr</outputDirectory>
+                      <destFileName>packr-all.jar</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+              <execution>
+                <id>build-jri</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${java.home}/bin/jlink</executable>
+                  <arguments>
+                    <argument>--compress</argument>
+                    <argument>2</argument>
+                    <argument>-G</argument>
+                    <argument>--no-header-files</argument>
+                    <argument>--no-man-pages</argument>
+                    <argument>--output</argument>
+                    <argument>${project.build.directory}/jri</argument>
+                    <argument>--add-modules</argument>
+                    <argument>java.base,java.compiler,java.desktop,java.management,java.naming,java.security.jgss,java.sql</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>create-executable</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${java.home}/bin/java</executable>
+                  <arguments>
+                    <argument>-jar</argument>
+                    <argument>${project.build.directory}/packr/packr-all.jar</argument>
+                    <argument>--executable</argument>
+                    <argument>${project.build.finalName}</argument>
+                    <argument>--jdk</argument>
+                    <argument>${project.build.directory}/jri</argument>
+                    <argument>--mainclass</argument>
+                    <argument>eu.europa.ted.eforms.viewer.Application</argument>
+                    <argument>--output</argument>
+                    <argument>${project.build.directory}/bundle</argument>
+                    <argument>--platform</argument>
+                    <argument>windows64</argument>
+                    <argument>--useZgcIfSupportedOs</argument>
+                    <argument>-v</argument>
+                    <argument>--classpath</argument>
+                    <argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                    <gment>--minimizejre</gment>
+                    <argument>hard</argument>
+                    <argument>--vmargs</argument>
+                    <argument>Dpicocli.ansi=false</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>create-bundle</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <descriptors>
+                    <descriptor>${basedir}/src/main/assembly/bundle.xml</descriptor>
+                  </descriptors>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
