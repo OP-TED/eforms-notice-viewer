@@ -40,7 +40,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- EFX -->
-    <efx.toolkit.version>0.2.0</efx.toolkit.version>
+    <efx.toolkit.version>0.2.1-SNAPSHOT</efx.toolkit.version>
 
     <!-- Third-party libraries -->
     <antlr4.version>4.9.3</antlr4.version>
