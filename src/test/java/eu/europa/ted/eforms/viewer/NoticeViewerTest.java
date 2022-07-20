@@ -35,7 +35,7 @@ class NoticeViewerTest {
   private static final String[] SOURCE_NOTICE_XML_FILENAMES2 =
       new String[] {"X01_EEIG", "X02_registration"};
 
-  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.6", "0.7"};
+  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.6", "0.7", "0.8"};
 
   private static final String SDK_RESOURCES_ROOT =
       Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString();
