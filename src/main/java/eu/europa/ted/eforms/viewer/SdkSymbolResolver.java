@@ -153,6 +153,11 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   @Override
+  public PathExpression getRelativePath(PathExpression absolutePath, PathExpression contextPath) {
+    return XPathContextualizer.contextualize(contextPath, absolutePath);
+  }
+
+  @Override
   public String getTypeOfField(String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
