@@ -252,9 +252,14 @@
                 <artifactId>picocli-codegen</artifactId>
                 <version>${picocli.version}</version>
               </annotationProcessorPath>
+              <annotationProcessorPath>
+                <groupId>org.atteo.classindex</groupId>
+                <artifactId>classindex</artifactId>
+                <version>${classindex.version}</version>
+              </annotationProcessorPath>
             </annotationProcessorPaths>
           </configuration>
-        </plugin>
+        </plugin>        
       </plugins>
     </pluginManagement>
 

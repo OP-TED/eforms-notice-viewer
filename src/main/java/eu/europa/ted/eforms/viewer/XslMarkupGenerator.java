@@ -10,7 +10,10 @@ import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponent;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponentType;
 
+@VersionDependentComponent(versions = {"0.6", "0.7"}, componentType = VersionDependentComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
   private static int variableCounter = 0;
 
@@ -18,9 +21,11 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     super(10);
   }
 
-  private final String[] assetTypes = {"business_term", "field", "code", "decoration"};
+  protected String[] getAssetTypes() {
+    return new String[]  {"business_term", "field", "code", "decoration"};
+  }
 
-  private final String translations = Arrays.stream(assetTypes)
+  private final String translations = Arrays.stream(getAssetTypes())
       .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
       .collect(Collectors.joining(", "));
 

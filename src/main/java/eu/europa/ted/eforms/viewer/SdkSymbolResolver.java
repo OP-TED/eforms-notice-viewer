@@ -1,8 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.nio.file.Path;
-import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -13,39 +11,20 @@ import eu.europa.ted.eforms.sdk.entity.SdkField;
 import eu.europa.ted.eforms.sdk.entity.SdkFieldRepository;
 import eu.europa.ted.eforms.sdk.entity.SdkNode;
 import eu.europa.ted.eforms.sdk.entity.SdkNodeRepository;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponent;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponentType;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
+@VersionDependentComponent(versions = {VersionDependentComponent.ANY_VERSION}, componentType = VersionDependentComponentType.SYMBOL_RESOLVER)
 public class SdkSymbolResolver implements SymbolResolver {
   protected Map<String, SdkField> fieldById;
 
   protected Map<String, SdkNode> nodeById;
 
   protected Map<String, SdkCodelist> codelistById;
-
-  /**
-   * EfxToXpathSymbols is implemented as a "kind-of" singleton. One instance per version of the
-   * eForms SDK.
-   */
-  private static final Map<String, SdkSymbolResolver> instances = new HashMap<>();
-
-  /**
-   * Gets the single instance containing the symbols defined in the given version of the eForms SDK.
-   *
-   * @param sdkVersion Version of the SDK
-   */
-  public static SdkSymbolResolver getInstance(final String sdkVersion) {
-    return instances.computeIfAbsent(sdkVersion, k -> {
-      try {
-        return new SdkSymbolResolver(sdkVersion);
-      } catch (InstantiationException e) {
-        throw new RuntimeException(MessageFormat.format(
-            "Failed to instantiate SDK Symbol Resolver for SDK version [{0}]", sdkVersion), e);
-      }
-    });
-  }
 
   /**
    * Builds EFX list from the passed codelist reference. This will lazily compute and cache the
@@ -69,7 +48,7 @@ public class SdkSymbolResolver implements SymbolResolver {
    * @param sdkVersion The version of the SDK.
    * @throws InstantiationException
    */
-  protected SdkSymbolResolver(final String sdkVersion) throws InstantiationException {
+  public SdkSymbolResolver(final String sdkVersion) throws InstantiationException {
     this.loadMapData(sdkVersion);
   }
 
