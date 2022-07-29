@@ -55,7 +55,7 @@ public class SdkDownloader {
       SdkUnpacker.unpack(resolve(artifactVersion), sdkDir);
       resolve(artifactVersion);
 
-      logger.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
+      logger.info("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
           sdkDir.toAbsolutePath());
     }
   }
@@ -93,7 +93,7 @@ public class SdkDownloader {
 
     File artifactFile =
         getMavenResolver().resolve(coords.toCanonicalForm()).withoutTransitivity().asSingleFile();
-    logger.info("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
+    logger.debug("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
 
     return artifactFile;
   }

@@ -22,14 +22,14 @@ public class SdkUnpacker {
 
   public static void unpack(File archive, Path targetDir) throws IOException {
     if (archive == null) {
-      logger.warn("Undefined archive. Nothing to do!");
+      logger.warn("Undefined archive for unpacking. Nothing to do!");
       return;
     }
 
     Validate.isTrue(Files.isRegularFile(archive.toPath()),
         MessageFormat.format("[{0}] is not a file.", archive));
 
-    logger.info("Unpacking file [{}] onto [{}]", archive, targetDir.toAbsolutePath());
+    logger.debug("Unpacking file [{}] onto [{}]", archive, targetDir.toAbsolutePath());
 
     try (ZipFile file = new ZipFile(archive)) {
       Files.createDirectories(targetDir);
@@ -58,7 +58,7 @@ public class SdkUnpacker {
           });
     }
 
-    logger.info("Successfully unpacked artifact file [{}] onto [{}]", archive,
+    logger.debug("Successfully unpacked artifact file [{}] onto [{}]", archive,
         targetDir.toAbsolutePath());
   }
 }

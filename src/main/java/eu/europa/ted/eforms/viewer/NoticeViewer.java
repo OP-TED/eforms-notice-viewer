@@ -34,8 +34,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
-import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
+import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.EfxTranslator;
 
@@ -86,7 +86,6 @@ public class NoticeViewer {
     logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
     final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
-    logger.info("Created xsl file: {}", xslPath);
     final Path htmlPath =
         applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath, viewId);
     // Ensure the HTML can be parsed.
@@ -210,6 +209,8 @@ public class NoticeViewer {
 
   static void applyXslTransform(final String language, String sdkVersion, final Source xmlInput,
       final Source xslSource, final StreamResult outputTarget) {
+    logger.info("Applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}", language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
+
     try {
       // XSL for input transformation.
       final TransformerFactory factory = TransformerFactory.newInstance();
@@ -230,6 +231,8 @@ public class NoticeViewer {
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
       throw new RuntimeException(e.toString(), e);
     }
+
+    logger.info("Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}", language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
   }
 
   /**
@@ -244,7 +247,11 @@ public class NoticeViewer {
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
       throws IOException, InstantiationException {
+    logger.info("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
+
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
+
+    logger.debug("View path: {}", viewPath);
 
     Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);
 
@@ -259,6 +266,8 @@ public class NoticeViewer {
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
         writer.write(translation);
       }
+
+      logger.info("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId, sdkVersion, filePath);
 
       return filePath;
     }
