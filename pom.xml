@@ -287,13 +287,15 @@
         <artifactId>maven-shade-plugin</artifactId>
         <executions>
           <execution>
-            <id>create-jar</id>
+            <id>create-app-jar</id>
             <phase>package</phase>
             <goals>
               <goal>shade</goal>
             </goals>
             <configuration>
               <createDependencyReducedPom>false</createDependencyReducedPom>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <shadedClassifierName>app</shadedClassifierName>
               <transformers>
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
