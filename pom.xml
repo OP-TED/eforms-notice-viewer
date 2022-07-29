@@ -305,6 +305,7 @@
                     <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                   </manifestEntries>
                 </transformer>
+                <transformer implementation="org.atteo.classindex.ClassIndexTransformer"/>
               </transformers>
               <filters>
                 <filter>
@@ -319,6 +320,13 @@
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+            <dependency>
+                <groupId>org.atteo.classindex</groupId>
+                <artifactId>classindex-transformer</artifactId>
+                <version>${classindex.version}</version>
+            </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
