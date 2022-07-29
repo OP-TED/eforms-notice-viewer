@@ -36,6 +36,9 @@ class CliCommand implements Callable<Integer> {
   @Option(names = {"-r", "--sdkRoot"}, description = "SDK resources root folder.")
   private String sdkResourcesRoot;
 
+  @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling.")
+  private boolean profileXslt;
+
   @Parameters(index = "0", description = "Two letter language code.")
   public void setLanguage(String language) {
     if (StringUtils.isBlank(language) || language.length() != 2) {
@@ -60,7 +63,7 @@ class CliCommand implements Callable<Integer> {
     SdkResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
 
     final Path htmlPath =
-        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId));
+        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

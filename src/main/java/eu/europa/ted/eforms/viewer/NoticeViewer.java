@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -38,9 +39,14 @@ import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.EfxTranslator;
+import net.sf.saxon.lib.FeatureKeys;
+import net.sf.saxon.trace.TimingTraceListener;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
+
+  private static final Path OUTPUT_FOLDER_HTML = Path.of("target", "output-html");
+  private static final Path OUTPUT_FOLDER_XSL = Path.of("target", "output-xsl");
 
   private NoticeViewer() {}
 
@@ -50,15 +56,16 @@ public class NoticeViewer {
    * @param viewIdOpt An optional SDK view id to use, this can be used to enforce a custom view like
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
+   * @param profileXslt If set to true, XSLT profiling will be enabled
    * @return The path of the generated HTML file
    *
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
-   * @throws InstantiationException 
+   * @throws InstantiationException
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
-      final Optional<String> viewIdOpt)
+      final Optional<String> viewIdOpt, final boolean profileXslt)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.info("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -85,9 +92,9 @@ public class NoticeViewer {
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
     logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
-    final Path xslPath = NoticeViewer.buildXsl(viewId, eformsSdkVersion);
+    final Path xslPath = buildXsl(viewId, eformsSdkVersion);
     final Path htmlPath =
-        applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath, viewId);
+        applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath, viewId, profileXslt);
     // Ensure the HTML can be parsed.
     Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
     return htmlPath;
@@ -109,8 +116,8 @@ public class NoticeViewer {
    * @throws SAXException XML parse related errors
    */
   public static String generateHtml(final String language, final String noticeXmlContent,
-      final String xsl, final Charset charset, final Optional<String> viewIdOpt)
-      throws IOException, SAXException, ParserConfigurationException {
+      final String xsl, final Charset charset, final Optional<String> viewIdOpt,
+      final boolean profileXslt) throws IOException, SAXException, ParserConfigurationException {
     logger.info("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
     try (
@@ -118,7 +125,8 @@ public class NoticeViewer {
             new ByteArrayInputStream(noticeXmlContent.trim().getBytes(charset));
         final ByteArrayInputStream xslInputStream =
             new ByteArrayInputStream(xsl.getBytes(charset));) {
-      return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt);
+      return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt,
+          profileXslt);
     }
   }
 
@@ -138,7 +146,7 @@ public class NoticeViewer {
    */
   public static String generateHtml(final String language,
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
-      final Charset charset, final Optional<String> viewIdOpt)
+      final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt)
       throws IOException, ParserConfigurationException, SAXException {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
       noticeXmlContent.transferTo(baos);
@@ -174,8 +182,8 @@ public class NoticeViewer {
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
           final StreamResult htmlResult = new StreamResult(outputStream);
 
-          applyXslTransform(language, eformsSdkVersion, new StreamSource(noticeXmlIsClone2),
-              new StreamSource(xslIs), htmlResult);
+          applyXslTransform(language, eformsSdkVersion, viewId, new StreamSource(noticeXmlIsClone2),
+              new StreamSource(xslIs), htmlResult, profileXslt);
 
           // Ensure the HTML can be parsed.
           final String htmlText = outputStream.toString(charset);
@@ -187,52 +195,92 @@ public class NoticeViewer {
     }
   }
 
+  static TransformerFactory getTransformerFactory(final String sdkVersion, final String viewId,
+      final boolean profileXslt) throws TransformerConfigurationException {
+    logger.debug("Creating XSL transformer factory for SDK version [{}]", sdkVersion);
+
+    // XSL for input transformation.
+    final TransformerFactory factory = TransformerFactory.newInstance();
+
+    // SECURITY SETUP.
+    // https://stackoverflow.com/questions/40649152/how-to-prevent-xxe-attack
+    factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+    // Currently this is what allows to load the labels (i18n).
+    factory.setURIResolver(new CustomUriResolver(sdkVersion));
+
+    if (profileXslt) {
+      final Path xsltProfilePath = OUTPUT_FOLDER_HTML.resolve(viewId + "-xslt_profile.html");
+      logger.info("XSLT profiling is enabled. The result can be found at: {}", xsltProfilePath);
+
+      factory.setAttribute(FeatureKeys.TRACE_LISTENER_CLASS, TimingTraceListener.class.getName());
+      factory.setAttribute(FeatureKeys.TRACE_LISTENER_OUTPUT_FILE, xsltProfilePath.toString());
+    }
+
+    logger.debug("Successfully created XSL transformer factory for SDK version [{}]", sdkVersion);
+
+    return factory;
+  }
+
+  static Transformer getTransformer(final String language, final String sdkVersion,
+      final String viewId, final Source xslSource, final boolean profileXslt)
+      throws TransformerConfigurationException {
+    final TransformerFactory factory = getTransformerFactory(sdkVersion, viewId, profileXslt);
+
+    logger.debug("Creating XSL transformer for SDK version [{}], language [{}] and view ID [{}]",
+        sdkVersion, language, viewId);
+
+    final Transformer transformer = factory.newTransformer(xslSource);
+    transformer.setParameter("language", language);
+
+    logger.debug(
+        "Successfully created XSL transformer for SDK version [{}], language [{}] and view ID [{}]",
+        sdkVersion, language, viewId);
+
+    return transformer;
+  }
+
   static Path applyXslTransform(final String language, String sdkVersion, final Path noticeXmlPath,
-      final Path xslPath, final String viewId) throws IOException {
+      final Path xslPath, final String viewId, final boolean profileXslt) throws IOException {
     // XML as input.
     final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
 
     // HTML as output of the transformation.
-    final Path outFolder = Path.of("target", "output-html");
-    Files.createDirectories(outFolder);
+    Files.createDirectories(OUTPUT_FOLDER_HTML);
 
-    final Path htmlPath = outFolder.resolve(viewId + ".html");
+    final Path htmlPath = OUTPUT_FOLDER_HTML.resolve(viewId + ".html");
     final StreamResult outputTarget = new StreamResult(htmlPath.toFile());
     try (InputStream inputStream = Files.newInputStream(xslPath)) {
       final Source xslSource = new StreamSource(inputStream);
 
-      applyXslTransform(language, sdkVersion, xmlInput, xslSource, outputTarget);
+      applyXslTransform(language, sdkVersion, viewId, xmlInput, xslSource, outputTarget,
+          profileXslt);
 
       return htmlPath;
     }
   }
 
-  static void applyXslTransform(final String language, String sdkVersion, final Source xmlInput,
-      final Source xslSource, final StreamResult outputTarget) {
-    logger.info("Applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}", language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
-
+  static void applyXslTransform(final String language, String sdkVersion, String viewId,
+      final Source xmlInput, final Source xslSource, final StreamResult outputTarget,
+      final boolean profileXslt) {
     try {
-      // XSL for input transformation.
-      final TransformerFactory factory = TransformerFactory.newInstance();
+      final Transformer transformer =
+          getTransformer(language, sdkVersion, viewId, xslSource, profileXslt);
 
-      // SECURITY SETUP.
-      // https://stackoverflow.com/questions/40649152/how-to-prevent-xxe-attack
-      factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-      factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+      logger.info(
+          "Applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}",
+          language, sdkVersion, xmlInput.getSystemId());
 
-      // Currently this is what allows to load the labels (i18n).
-      factory.setURIResolver(new CustomUriResolver(sdkVersion));
-      final Transformer transformer = factory.newTransformer(xslSource);
-      // transformer.setURIResolver(uriResolver); Already set by the factory!
-      // Parameters.
-      transformer.setParameter("language", language);
       transformer.transform(xmlInput, outputTarget);
+
+      logger.info(
+          "Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}",
+          language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
       throw new RuntimeException(e.toString(), e);
     }
-
-    logger.info("Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}", language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
   }
 
   /**
@@ -243,7 +291,7 @@ public class NoticeViewer {
    * @param sdkVersion The version of the desired SDK
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
-   * @throws InstantiationException 
+   * @throws InstantiationException
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
       throws IOException, InstantiationException {
@@ -258,16 +306,16 @@ public class NoticeViewer {
     try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
       final String translation =
           EfxTranslator.translateTemplate(viewInputStream, new DependencyFactory(), sdkVersion);
-      final Path outFolder = Path.of("target", "output-xsl");
-      Files.createDirectories(outFolder);
+      Files.createDirectories(OUTPUT_FOLDER_XSL);
 
       final String nameByConvention = viewId + ".xsl";
-      final Path filePath = outFolder.resolve(nameByConvention);
+      final Path filePath = OUTPUT_FOLDER_XSL.resolve(nameByConvention);
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
         writer.write(translation);
       }
 
-      logger.info("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId, sdkVersion, filePath);
+      logger.info("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
+          sdkVersion, filePath);
 
       return filePath;
     }
