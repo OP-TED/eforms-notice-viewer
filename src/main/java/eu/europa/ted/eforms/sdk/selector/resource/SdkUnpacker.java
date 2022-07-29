@@ -16,20 +16,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SdkUnpacker {
-  private static final Logger log = LoggerFactory.getLogger(SdkUnpacker.class);
+  private static final Logger logger = LoggerFactory.getLogger(SdkUnpacker.class);
 
   private SdkUnpacker() {}
 
   public static void unpack(File archive, Path targetDir) throws IOException {
     if (archive == null) {
-      log.warn("Undefined archive. Nothing to do!");
+      logger.warn("Undefined archive. Nothing to do!");
       return;
     }
 
     Validate.isTrue(Files.isRegularFile(archive.toPath()),
         MessageFormat.format("[{0}] is not a file.", archive));
 
-    log.info("Unpacking file [{}] onto [{}]", archive, targetDir.toAbsolutePath());
+    logger.info("Unpacking file [{}] onto [{}]", archive, targetDir.toAbsolutePath());
 
     try (ZipFile file = new ZipFile(archive)) {
       Files.createDirectories(targetDir);
@@ -41,7 +41,7 @@ public class SdkUnpacker {
 
             try {
               if (entry.isDirectory()) {
-                log.trace("Creating directory [{}]", targetEntryPath);
+                logger.trace("Creating directory [{}]", targetEntryPath);
                 Files.createDirectories(targetEntryPath);
               } else {
                 try (InputStream fileInput = file.getInputStream(entry);
@@ -49,7 +49,7 @@ public class SdkUnpacker {
                   IOUtils.copy(fileInput, fileOutput);
                 }
 
-                log.trace("Written file [{}]", targetEntryPath);
+                logger.trace("Written file [{}]", targetEntryPath);
               }
             } catch (IOException e) {
               throw new RuntimeException(MessageFormat.format(
@@ -58,7 +58,7 @@ public class SdkUnpacker {
           });
     }
 
-    log.info("Successfully unpacked artifact file [{}] onto [{}]", archive,
+    logger.info("Successfully unpacked artifact file [{}] onto [{}]", archive,
         targetDir.toAbsolutePath());
   }
 }

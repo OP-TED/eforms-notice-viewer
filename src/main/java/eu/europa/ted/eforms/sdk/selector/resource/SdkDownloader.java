@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 
 public class SdkDownloader {
-  private static final Logger log = LoggerFactory.getLogger(SdkDownloader.class);
+  private static final Logger logger = LoggerFactory.getLogger(SdkDownloader.class);
 
   static {
     String mavenOpts = System.getenv("MAVEN_OPTS");
@@ -47,15 +47,15 @@ public class SdkDownloader {
     String artifactVersion = getLatestSdkVersion(sdkVersion);
 
     if (sdkExistsAt(artifactVersion, sdkDir)) {
-      log.debug("SDK [{}] found at [{}]. No download required.", sdkVersion, sdkDir);
+      logger.debug("SDK [{}] found at [{}]. No download required.", sdkVersion, sdkDir);
     } else {
-      log.info("Downloading eForms SDK [{}]", sdkVersion);
-      log.debug("Target directory: {}", sdkDir.toAbsolutePath());
+      logger.info("Downloading eForms SDK [{}]", sdkVersion);
+      logger.debug("Target directory: {}", sdkDir.toAbsolutePath());
 
       SdkUnpacker.unpack(resolve(artifactVersion), sdkDir);
       resolve(artifactVersion);
 
-      log.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
+      logger.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
           sdkDir.toAbsolutePath());
     }
   }
@@ -73,7 +73,7 @@ public class SdkDownloader {
     if (StringUtils.isNotBlank(userHome)) {
       Path settingsFile = Path.of(userHome, ".m2", "settings.xml");
       if (settingsFile.toFile().exists()) {
-        log.debug("Using Maven settings file [{}]", settingsFile);
+        logger.debug("Using Maven settings file [{}]", settingsFile);
         maven.fromFile(settingsFile.toFile());
       }
     }
@@ -84,16 +84,16 @@ public class SdkDownloader {
   private static File resolve(String artifactVersion) {
     Validate.notBlank(artifactVersion, "Undefined SDK version.");
 
-    log.debug("Resolving eforms-sdk artifact with version [{}]", artifactVersion);
+    logger.debug("Resolving eforms-sdk artifact with version [{}]", artifactVersion);
 
     MavenCoordinate coords =
         MavenCoordinates.createCoordinate(SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID,
             artifactVersion, PackagingType.of(SdkConstants.SDK_PACKAGING), StringUtils.EMPTY);
-    log.debug("Maven coordinates for eforms-sdk artifact: {}", coords.toCanonicalForm());
+    logger.debug("Maven coordinates for eforms-sdk artifact: {}", coords.toCanonicalForm());
 
     File artifactFile =
         getMavenResolver().resolve(coords.toCanonicalForm()).withoutTransitivity().asSingleFile();
-    log.info("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
+    logger.info("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
 
     return artifactFile;
   }
@@ -148,7 +148,7 @@ public class SdkDownloader {
       }
     } catch (NoSuchElementException e) {
       String snapshotVersion = MessageFormat.format("{0}.0-SNAPSHOT", baseVersion);
-      log.warn("No artifacts were found for SDK version [{}]. Trying with [{}]", baseVersion,
+      logger.warn("No artifacts were found for SDK version [{}]. Trying with [{}]", baseVersion,
           snapshotVersion);
 
       List<MavenCoordinate> snapshotCoords = getMavenResolver()
