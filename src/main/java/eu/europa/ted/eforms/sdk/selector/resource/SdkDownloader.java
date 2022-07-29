@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import org.apache.commons.lang3.RegExUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenVersionRangeResult;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenWorkingSession;
@@ -23,6 +26,13 @@ import eu.europa.ted.eforms.sdk.SdkConstants;
 
 public class SdkDownloader {
   private static final Logger log = LoggerFactory.getLogger(SdkDownloader.class);
+
+  static {
+    String mavenOpts = System.getenv("MAVEN_OPTS");
+    if (StringUtils.isNotBlank(mavenOpts)) {
+      System.setProperty("MAVEN_OPTS", System.getenv("MAVEN_OPTS"));
+    }
+  }
 
   private SdkDownloader() {}
 
@@ -50,6 +60,27 @@ public class SdkDownloader {
     }
   }
 
+  private static ConfigurableMavenResolverSystem getMavenResolver() {
+    ConfigurableMavenResolverSystem maven = Maven.configureResolver();
+
+    String userHome = Arrays
+        .asList(Optional.ofNullable(System.getProperty("MAVEN_OPTS")).orElse(StringUtils.EMPTY)
+            .split("\\s"))
+        .stream().filter((String s) -> s.startsWith("-Duser.home="))
+        .map((String s) -> s.replaceAll("-Duser.home=", StringUtils.EMPTY)).findFirst()
+        .orElse(StringUtils.EMPTY);
+
+    if (StringUtils.isNotBlank(userHome)) {
+      Path settingsFile = Path.of(userHome, ".m2", "settings.xml");
+      if (settingsFile.toFile().exists()) {
+        log.debug("Using Maven settings file [{}]", settingsFile);
+        maven.fromFile(settingsFile.toFile());
+      }
+    }
+
+    return maven;
+  }
+
   private static File resolve(String artifactVersion) {
     Validate.notBlank(artifactVersion, "Undefined SDK version.");
 
@@ -61,7 +92,7 @@ public class SdkDownloader {
     log.debug("Maven coordinates for eforms-sdk artifact: {}", coords.toCanonicalForm());
 
     File artifactFile =
-        Maven.resolver().resolve(coords.toCanonicalForm()).withoutTransitivity().asSingleFile();
+        getMavenResolver().resolve(coords.toCanonicalForm()).withoutTransitivity().asSingleFile();
     log.info("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
 
     return artifactFile;
@@ -78,7 +109,7 @@ public class SdkDownloader {
     }
 
     MavenWorkingSession mws =
-        ((MavenWorkingSessionContainer) Maven.resolver()).getMavenWorkingSession();
+        ((MavenWorkingSessionContainer) getMavenResolver()).getMavenWorkingSession();
     mws.loadPomFromFile(pomFile);
 
     return sdkVersion.equals(mws.getParsedPomFile().getVersion());
@@ -95,9 +126,8 @@ public class SdkDownloader {
    */
   private static String getLatestSdkVersion(final String baseVersion) {
     SdkVersion currentVersion = new SdkVersion(baseVersion);
-    RegExUtils.replaceAll(baseVersion, "^(.*?)-SNAPSHOT$", "$1");
 
-    MavenVersionRangeResult versions = Maven.resolver()
+    MavenVersionRangeResult versions = getMavenResolver()
         .resolveVersionRange(MessageFormat.format("{0}:{1}:(,{2})", SdkConstants.SDK_GROUP_ID,
             SdkConstants.SDK_ARTIFACT_ID, currentVersion.getNextMajor()));
 
@@ -117,8 +147,21 @@ public class SdkDownloader {
         return latestCoord.getVersion();
       }
     } catch (NoSuchElementException e) {
-      throw new IllegalArgumentException(
-          MessageFormat.format("No artifacts were found for base SDK version [{0}]", baseVersion));
+      String snapshotVersion = MessageFormat.format("{0}.0-SNAPSHOT", baseVersion);
+      log.warn("No artifacts were found for SDK version [{}]. Trying with [{}]", baseVersion,
+          snapshotVersion);
+
+      List<MavenCoordinate> snapshotCoords = Maven
+          .resolver().resolveVersionRange(MessageFormat.format("{0}:{1}:{2}",
+              SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID, snapshotVersion))
+          .getVersions();
+
+      if (CollectionUtils.isEmpty(snapshotCoords)) {
+        throw new IllegalArgumentException(
+            MessageFormat.format("No artifacts were found for SDK version [{0}]", snapshotVersion));
+      }
+
+      return snapshotCoords.get(0).getVersion();
     }
   }
 }
