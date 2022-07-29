@@ -151,9 +151,9 @@ public class SdkDownloader {
       log.warn("No artifacts were found for SDK version [{}]. Trying with [{}]", baseVersion,
           snapshotVersion);
 
-      List<MavenCoordinate> snapshotCoords = Maven
-          .resolver().resolveVersionRange(MessageFormat.format("{0}:{1}:{2}",
-              SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID, snapshotVersion))
+      List<MavenCoordinate> snapshotCoords = getMavenResolver()
+          .resolveVersionRange(MessageFormat.format("{0}:{1}:{2}", SdkConstants.SDK_GROUP_ID,
+              SdkConstants.SDK_ARTIFACT_ID, snapshotVersion))
           .getVersions();
 
       if (CollectionUtils.isEmpty(snapshotCoords)) {
