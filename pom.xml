@@ -52,20 +52,41 @@
     <shrinkwrap.resolvers.version>3.1.4</shrinkwrap.resolvers.version>
     <slf4j.version>1.7.36</slf4j.version>
     <version.commons-collections>3.2.2</version.commons-collections>
+    <version.commons-io>2.11.0</version.commons-io>
+    <version.ph-commons>10.0.0</version.ph-commons>
+    <version.ph-genericode>6.2.0</version.ph-genericode>
 
     <!-- Plugins -->
     <compiler.plugin.version>3.10.1</compiler.plugin.version>
     <surefire.plugin.version>3.0.0-M7</surefire.plugin.version> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
+    <version.jar.plugin>3.2.2</version.jar.plugin>
     <version.shade.plugin>3.3.0</version.shade.plugin>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-api-maven</artifactId>
+        <version>${shrinkwrap.resolvers.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.shrinkwrap.resolver</groupId>
+        <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+        <version>${shrinkwrap.resolvers.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
@@ -101,7 +122,30 @@
         <artifactId>commons-collections</artifactId>
         <version>${version.commons-collections}</version>
       </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${version.commons-io}</version>
+      </dependency>
 
+      <!-- For genericode .gc files (SDK codelist related) -->
+      <dependency>
+        <groupId>com.helger</groupId>
+        <artifactId>ph-genericode</artifactId>
+        <version>${version.ph-genericode}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>jakarta.activation</groupId>
+            <artifactId>jakarta.activation-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.helger.commons</groupId>
+        <artifactId>ph-commons</artifactId>
+        <version>${version.ph-commons}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -133,6 +177,14 @@
       <artifactId>commons-lang3</artifactId>
       <version>3.12.0</version>
     </dependency>
+    <dependency>
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
 
     <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
     <dependency>
@@ -160,7 +212,11 @@
     <dependency>
       <groupId>com.helger</groupId>
       <artifactId>ph-genericode</artifactId>
-      <version>6.2.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.helger.commons</groupId>
+      <artifactId>ph-commons</artifactId>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
@@ -173,6 +229,10 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
     </dependency>
 
     <dependency>
@@ -187,30 +247,27 @@
 
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-depchain</artifactId>
-      <version>${shrinkwrap.resolvers.version}</version>
-      <type>pom</type>
+      <artifactId>shrinkwrap-resolver-api-maven</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.shrinkwrap.resolver</groupId>
       <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-      <version>${shrinkwrap.resolvers.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
     <pluginManagement>
       <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${version.jar.plugin}</version>
+      </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.plugin.version}</version>
@@ -273,9 +330,9 @@
           </configuration>
         </plugin>
         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>${version.shade.plugin}</version>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>${version.shade.plugin}</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -296,6 +353,10 @@
               <shadedArtifactAttached>true</shadedArtifactAttached>
               <shadedClassifierName>app</shadedClassifierName>
               <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                   <mainClass>eu.europa.ted.eforms.viewer.Application</mainClass>
                   <manifestEntries>
@@ -306,15 +367,22 @@
                     <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                   </manifestEntries>
                 </transformer>
-                <transformer implementation="org.atteo.classindex.ClassIndexTransformer"/>
+                <transformer implementation="org.atteo.classindex.ClassIndexTransformer" />
+                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                  <resource>logback.xml</resource>
+                  <file>${basedir}/src/main/resources/logback.xml</file>
+                </transformer>
               </transformers>
               <filters>
                 <filter>
                   <artifact>*:*</artifact>
                   <excludes>
+                    <exclude>module-info.class</exclude>
                     <exclude>META-INF/*.SF</exclude>
                     <exclude>META-INF/*.DSA</exclude>
                     <exclude>META-INF/*.RSA</exclude>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                    <exclude>META-INF/DEPENDENCIES</exclude>
                   </excludes>
                 </filter>
               </filters>
@@ -322,12 +390,21 @@
           </execution>
         </executions>
         <dependencies>
-            <dependency>
-                <groupId>org.atteo.classindex</groupId>
-                <artifactId>classindex-transformer</artifactId>
-                <version>${classindex.version}</version>
-            </dependency>
+          <dependency>
+            <groupId>org.atteo.classindex</groupId>
+            <artifactId>classindex-transformer</artifactId>
+            <version>${classindex.version}</version>
+          </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/logback.xml</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>
