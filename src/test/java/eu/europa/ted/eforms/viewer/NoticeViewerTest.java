@@ -84,7 +84,8 @@ class NoticeViewerTest {
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtmlFromString")
   void testEfxToHtmlFromString(String language, String noticeXmlFilename, String viewId,
-      String sdkVersion) throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      String sdkVersion)
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     testGenerateHtmlFromString(language, noticeXmlFilename, viewId, sdkVersion);
   }
 
@@ -103,11 +104,12 @@ class NoticeViewerTest {
   }
 
   private void testGenerateHtmlFromFile(final String language, final String noticeXmlName,
-      final String sdkVersion) throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      final String sdkVersion)
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
-    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt);
+    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -124,7 +126,7 @@ class NoticeViewerTest {
     final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        charsetUtf8, Optional.of(viewId));
+        charsetUtf8, Optional.of(viewId), false);
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));
     // The test would have failed if there were errors, this is what the check

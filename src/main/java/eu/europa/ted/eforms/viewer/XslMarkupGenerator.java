@@ -4,17 +4,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponent;
+import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponentType;
 import eu.europa.ted.eforms.viewer.helpers.IndentedStringWriter;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
-import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponent;
-import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponentType;
 
 @VersionDependentComponent(versions = {"0.6", "0.7"}, componentType = VersionDependentComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
+  private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
+
   private static int variableCounter = 0;
 
   public XslMarkupGenerator() {
@@ -67,6 +71,7 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     writer.writeBlock(
         templates.stream().map(template -> template.script).collect(Collectors.joining("\n")));
     writer.closeTag("xsl:stylesheet");
+
     return new Markup(writer.toString());
   }
 
@@ -106,6 +111,8 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   @Override
   public Markup composeFragmentDefinition(final String name, final String number,
       final Markup content) {
+    logger.trace("Composing fragment definition with: name={}, number={}", name, number);
+
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     final String tagTemplate = "xsl:template";
     writer.openTag(tagTemplate, String.format("name='%s'", name));
@@ -122,6 +129,8 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
 
   @Override
   public Markup renderFragmentInvocation(final String name, final PathExpression context) {
+    logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.script);
+
     final IndentedStringWriter writer = new IndentedStringWriter(0);
     final String tag = "xsl:for-each";
     writer.openTag(tag, String.format("select=\"%s\"", context.script));
