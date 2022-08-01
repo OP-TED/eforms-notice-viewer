@@ -273,12 +273,8 @@ public class NoticeViewer {
     // We assume that length equals 1 exactly. Anything else is considered
     // empty.
     return nodeList.getLength() == 1
-        ? Optional.of(normalizeVersion(nodeList.item(0).getTextContent().strip()))
+        ? Optional.of(StringUtils.removeStart(nodeList.item(0).getTextContent().strip(), "eforms-sdk-"))
         : Optional.empty();
-  }
-
-  private static String normalizeVersion(final String sdkVersion) {
-    return StringUtils.removeStart(sdkVersion, "eforms-sdk-");
   }
 
   /**
