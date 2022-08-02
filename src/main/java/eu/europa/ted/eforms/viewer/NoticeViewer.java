@@ -361,6 +361,6 @@ public class NoticeViewer {
     SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
 
     return SdkResourceLoader.INSTANCE.getResourceAsPath(
-        SdkConstants.ResourceType.NOTICE_TYPES_VIEW_TEMPLATE, sdkVersion, viewId + ".efx");
+        SdkConstants.SdkResource.VIEW_TEMPLATES, sdkVersion, viewId + ".efx");
   }
 }

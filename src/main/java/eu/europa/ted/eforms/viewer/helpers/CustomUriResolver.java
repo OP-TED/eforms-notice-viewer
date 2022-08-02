@@ -24,7 +24,7 @@ public final class CustomUriResolver implements URIResolver {
   @Override
   public Source resolve(final String href, final String base) {
     try (InputStream is = SdkResourceLoader.INSTANCE
-        .getResourceAsStream(SdkConstants.ResourceType.TRANSLATION, sdkVersion, href)) {
+        .getResourceAsStream(SdkConstants.SdkResource.TRANSLATIONS, sdkVersion, href)) {
       if (is == null) {
         throw new RuntimeException(
             String.format("inputStream is null for href=%s, base=%s", href, base));

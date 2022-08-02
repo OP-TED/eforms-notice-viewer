@@ -54,9 +54,9 @@ public class SdkSymbolResolver implements SymbolResolver {
 
   protected void loadMapData(final String sdkVersion) throws InstantiationException {
     Path jsonPath = SdkResourceLoader.INSTANCE
-        .getResourceAsPath(SdkConstants.ResourceType.SDK_FIELDS_FIELDS_JSON, sdkVersion);
+        .getResourceAsPath(SdkConstants.SdkResource.FIELDS_JSON, sdkVersion);
     Path codelistsPath = SdkResourceLoader.INSTANCE
-        .getResourceAsPath(SdkConstants.ResourceType.CODELISTS, sdkVersion);
+        .getResourceAsPath(SdkConstants.SdkResource.CODELISTS, sdkVersion);
 
     this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);
     this.nodeById = new SdkNodeRepository(sdkVersion, jsonPath);

@@ -14,18 +14,16 @@ public class SdkConstants {
 
   private SdkConstants() {}
 
-  public enum ResourceType {
-    CODELISTS(Path.of("codelists")), NOTICE_TYPES_VIEW_TEMPLATE(
-        Path.of("view-templates")), SDK_FIELD(Path.of("fields")), TRANSLATION(
-            Path.of("translations")), SDK_FIELDS_FIELDS_JSON(Path.of("fields", "fields.json"));
-
-    public static final String FIELDS_JSON_XML_STRUCTURE_KEY = "xmlStructure";
-
-    public static final String FIELDS_JSON_FIELDS_KEY = "fields";
+  public enum SdkResource {
+    CODELISTS(Path.of("codelists")), //
+    VIEW_TEMPLATES(Path.of("view-templates")), //
+    FIELDS(Path.of("fields")), //
+    TRANSLATIONS(Path.of("translations")), //
+    FIELDS_JSON(Path.of("fields", "fields.json"));
 
     private Path path;
 
-    private ResourceType(Path path) {
+    private SdkResource(Path path) {
       this.path = path;
     }
 
