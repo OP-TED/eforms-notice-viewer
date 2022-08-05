@@ -305,7 +305,7 @@ public class NoticeViewer {
 
     try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
       final String translation =
-          EfxTranslator.translateTemplate(viewInputStream, new DependencyFactory(), sdkVersion);
+          EfxTranslator.translateTemplate(new DependencyFactory(), sdkVersion, viewInputStream);
       Files.createDirectories(OUTPUT_FOLDER_XSL);
 
       final String nameByConvention = viewId + ".xsl";
