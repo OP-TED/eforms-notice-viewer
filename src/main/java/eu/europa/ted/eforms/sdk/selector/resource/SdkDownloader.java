@@ -55,7 +55,7 @@ public class SdkDownloader {
       SdkUnpacker.unpack(resolve(artifactVersion), sdkDir);
       resolve(artifactVersion);
 
-      logger.info("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
+      logger.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion,
           sdkDir.toAbsolutePath());
     }
   }

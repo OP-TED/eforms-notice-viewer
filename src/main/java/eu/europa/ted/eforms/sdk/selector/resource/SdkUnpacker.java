@@ -22,7 +22,7 @@ public class SdkUnpacker {
 
   public static void unpack(File archive, Path targetDir) throws IOException {
     if (archive == null) {
-      logger.warn("Undefined archive for unpacking. Nothing to do!");
+      logger.debug("Undefined archive for unpacking. Nothing to do!");
       return;
     }
 
