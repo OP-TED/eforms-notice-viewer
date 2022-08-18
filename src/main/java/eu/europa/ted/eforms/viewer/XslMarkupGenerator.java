@@ -15,7 +15,7 @@ import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
-@VersionDependentComponent(versions = {"0.6", "0.7"}, componentType = VersionDependentComponentType.MARKUP_GENERATOR)
+@VersionDependentComponent(versions = {"0.6", "0.7", "0.8"}, componentType = VersionDependentComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
