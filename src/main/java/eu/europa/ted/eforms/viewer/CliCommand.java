@@ -27,7 +27,7 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
-@Command(name = "view", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
+@Command(name = "", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
     versionProvider = CliCommand.ManifestVersionProvider.class)
 class CliCommand implements Callable<Integer> {
   private static final Logger logger = LoggerFactory.getLogger(CliCommand.class);
