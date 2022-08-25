@@ -38,7 +38,7 @@ public abstract class MapFromJson<T> extends HashMap<String, T> {
   }
 
   private final void populateMap(final Path jsonPath) throws IOException, InstantiationException {
-    logger.info("Populating maps for context, jsonPath={}", jsonPath);
+    logger.debug("Populating maps for context, jsonPath={}", jsonPath);
 
     final ObjectMapper mapper = buildStandardJacksonObjectMapper();
 

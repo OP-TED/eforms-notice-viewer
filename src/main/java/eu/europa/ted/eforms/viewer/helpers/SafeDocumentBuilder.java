@@ -89,8 +89,8 @@ public class SafeDocumentBuilder {
       return dbf.newDocumentBuilder();
     } catch (ParserConfigurationException e) {
       // This should catch a failed setFeature feature
-      logger.info("ParserConfigurationException was thrown. The feature '" + FEATURE
-          + "' is probably not supported by your XML processor.");
+      logger.info("Error: The feature '{}' is probably not supported by your XML processor.", FEATURE);
+      logger.debug("ParserConfigurationException was thrown:",e);
       throw e;
     }
   }

@@ -67,7 +67,7 @@ public class NoticeViewer {
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    logger.info("noticeXmlPath={}", noticeXmlPath);
+    logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
     Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
     final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
@@ -90,7 +90,7 @@ public class NoticeViewer {
     final String noticeSubType = noticeSubTypeFromXmlOpt.get();
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
-    logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
+    logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
     final Path xslPath = buildXsl(viewId, eformsSdkVersion);
     final Path htmlPath =
@@ -118,7 +118,7 @@ public class NoticeViewer {
   public static String generateHtml(final String language, final String noticeXmlContent,
       final String xsl, final Charset charset, final Optional<String> viewIdOpt,
       final boolean profileXslt) throws IOException, SAXException, ParserConfigurationException {
-    logger.info("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
+    logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
     try (
         final ByteArrayInputStream noticeXmlInputStream =
@@ -176,7 +176,7 @@ public class NoticeViewer {
         final String noticeSubType = noticeSubTypeFromXmlOpt.get();
         final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
         final String eformsSdkVersion = eformsSdkVersionOpt.get();
-        logger.info("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
+        logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
             eformsSdkVersion);
 
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -275,7 +275,7 @@ public class NoticeViewer {
 
       transformer.transform(xmlInput, outputTarget);
 
-      logger.info(
+      logger.debug(
           "Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}, XSL Source={}",
           language, sdkVersion, xmlInput.getSystemId(), xslSource.getSystemId());
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
@@ -295,7 +295,7 @@ public class NoticeViewer {
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
       throws IOException, InstantiationException {
-    logger.info("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
+    logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
 
@@ -314,7 +314,7 @@ public class NoticeViewer {
         writer.write(translation);
       }
 
-      logger.info("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
+      logger.debug("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
           sdkVersion, filePath);
 
       return filePath;
