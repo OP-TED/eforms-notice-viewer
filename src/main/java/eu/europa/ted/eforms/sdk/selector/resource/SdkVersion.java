@@ -39,7 +39,7 @@ public class SdkVersion implements Comparable<SdkVersion> {
   }
 
   public String getNextMajor() {
-    return String.valueOf(major + 1);
+    return String.valueOf(getAsInt(major) + 1);
   }
 
   public String getNextMinor() {
