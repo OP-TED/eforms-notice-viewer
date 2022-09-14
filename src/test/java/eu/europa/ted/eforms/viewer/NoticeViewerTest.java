@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -78,7 +79,7 @@ class NoticeViewerTest {
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtml")
   void testEfxToHtml(String language, String noticeXmlFilename, String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     testGenerateHtmlFromFile(language, noticeXmlFilename, sdkVersion);
   }
 
@@ -86,13 +87,13 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToHtmlFromString")
   void testEfxToHtmlFromString(String language, String noticeXmlFilename, String viewId,
       String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     testGenerateHtmlFromString(language, noticeXmlFilename, viewId, sdkVersion);
   }
 
   @ParameterizedTest
   @MethodSource("provideArgsEfxToXsl")
-  void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
+  void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException, VersionRangeResolutionException {
     final String viewId = "X02";
     final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion);
     logger.info("TEST: Wrote file: {}", xsl);
@@ -106,7 +107,7 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromFile(final String language, final String noticeXmlName,
       final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
@@ -120,7 +121,7 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
       final String viewId, final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);

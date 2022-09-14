@@ -4,20 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.jboss.shrinkwrap.resolver.api.maven.ConfigurableMavenResolverSystem;
-import org.jboss.shrinkwrap.resolver.api.maven.Maven;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenVersionRangeResult;
-import org.jboss.shrinkwrap.resolver.api.maven.PackagingType;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinate;
-import org.jboss.shrinkwrap.resolver.api.maven.coordinate.MavenCoordinates;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
+import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.version.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +26,10 @@ import com.fasterxml.jackson.core.JsonToken;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.SdkConstants.SdkResource;
 import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
+import eu.europa.ted.maven.MavenBooter;
 
 public class SdkDownloader {
   private static final Logger logger = LoggerFactory.getLogger(SdkDownloader.class);
-
-  static {
-    String mavenOpts = System.getenv("MAVEN_OPTS");
-    if (StringUtils.isNotBlank(mavenOpts)) {
-      System.setProperty("MAVEN_OPTS", System.getenv("MAVEN_OPTS"));
-    }
-  }
 
   private SdkDownloader() {
   }
@@ -49,51 +41,40 @@ public class SdkDownloader {
   public static void downloadSdk(String sdkVersion, String rootDir) throws IOException {
     Path sdkDir = Path.of(Optional.ofNullable(rootDir).orElse(SdkConstants.DEFAULT_SDK_ROOT), sdkVersion);
 
-    String artifactVersion = getLatestSdkVersion(sdkVersion);
+    try {
+      if (sdkExistsAt(sdkVersion, sdkDir)) {
+        logger.debug("SDK [{}] found at [{}]. No download required.", sdkVersion, sdkDir);
+      } else {
+        logger.info("Downloading eForms SDK [{}]", sdkVersion);
+        logger.debug("Target directory: {}", sdkDir.toAbsolutePath());
 
-    if (sdkExistsAt(sdkVersion, sdkDir)) {
-      logger.debug("SDK [{}] found at [{}]. No download required.", sdkVersion, sdkDir);
-    } else {
-      logger.info("Downloading eForms SDK [{}]", sdkVersion);
-      logger.debug("Target directory: {}", sdkDir.toAbsolutePath());
+        String artifactVersion = getLatestSdkVersion(sdkVersion);
+        SdkUnpacker.unpack(resolve(artifactVersion), sdkDir);
 
-      SdkUnpacker.unpack(resolve(artifactVersion), sdkDir);
-      resolve(artifactVersion);
-
-      logger.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion, sdkDir.toAbsolutePath());
-    }
-  }
-
-  private static ConfigurableMavenResolverSystem getMavenResolver() {
-    ConfigurableMavenResolverSystem maven = Maven.configureResolver().workOffline(false).withMavenCentralRepo(true);
-
-    String userHome = Arrays
-        .asList(Optional.ofNullable(System.getProperty("MAVEN_OPTS")).orElse(StringUtils.EMPTY).split("\\s")).stream()
-        .filter((String s) -> s.startsWith("-Duser.home="))
-        .map((String s) -> s.replaceAll("-Duser.home=", StringUtils.EMPTY)).findFirst().orElse(StringUtils.EMPTY);
-
-    if (StringUtils.isNotBlank(userHome)) {
-      Path settingsFile = Path.of(userHome, ".m2", "settings.xml");
-      if (settingsFile.toFile().exists()) {
-        logger.debug("Using Maven settings file [{}]", settingsFile);
-        maven.fromFile(settingsFile.toFile());
+        logger.debug("Successfully downloaded eForms SDK [{}] onto [{}].", sdkVersion, sdkDir.toAbsolutePath());
       }
+    } catch (IOException e) {
+      logger.debug("Failed to download eForms SDK {}: {}", sdkVersion, e.getMessage());
+      throw e;
+    } catch (VersionRangeResolutionException | ArtifactResolutionException e) {
+      logger.debug("Failed to download eForms SDK {}: {}", sdkVersion, e.getMessage());
+      throw new IOException(e);
     }
-
-    return maven;
   }
 
-  private static File resolve(String artifactVersion) {
+  private static File resolve(String artifactVersion) throws ArtifactResolutionException {
     Validate.notBlank(artifactVersion, "Undefined SDK version.");
 
     logger.debug("Resolving eforms-sdk artifact with version [{}]", artifactVersion);
 
-    MavenCoordinate coords = MavenCoordinates.createCoordinate(SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID,
-        artifactVersion, PackagingType.of(SdkConstants.SDK_PACKAGING), StringUtils.EMPTY);
-    logger.debug("Maven coordinates for eforms-sdk artifact: {}", coords.toCanonicalForm());
+    Artifact artifact = new DefaultArtifact(SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID, "jar",
+        artifactVersion);
 
-    File artifactFile = getMavenResolver().resolve(coords.toCanonicalForm()).withoutTransitivity().asSingleFile();
-    logger.debug("Resolved [{}] as [{}].", coords.toCanonicalForm(), artifactFile);
+    logger.debug("Maven coordinates for eforms-sdk artifact: {}", artifact);
+
+    File artifactFile = MavenBooter.resolveArtifact(artifact);
+
+    logger.debug("Resolved [{}] as [{}].", artifact, artifactFile);
 
     return artifactFile;
   }
@@ -137,42 +118,43 @@ public class SdkDownloader {
    * @param sdkVersion The base version
    * @return
    */
-  private static String getLatestSdkVersion(final String baseVersion) {
+  private static String getLatestSdkVersion(final String baseVersion) throws VersionRangeResolutionException {
     SdkVersion currentVersion = new SdkVersion(baseVersion);
 
-    MavenVersionRangeResult versions = getMavenResolver()
-        .resolveVersionRange(MessageFormat.format("{0}:{1}:[{2},{3})", SdkConstants.SDK_GROUP_ID,
-            SdkConstants.SDK_ARTIFACT_ID, currentVersion.getMajor(), currentVersion.getNextMajor()));
+    Artifact artifact = new DefaultArtifact(SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID, "jar",
+        MessageFormat.format("[{0},{1})", currentVersion.getMajor(), currentVersion.getNextMajor()));
 
+    VersionRangeResult versions = MavenBooter.resolveVersionRange(artifact);
     try {
       if (currentVersion.getMajor().equals("0")) {
-        return versions.getVersions().stream().map((MavenCoordinate coord) -> new SdkVersion(coord.getVersion()))
+        return versions.getVersions().stream().map((Version version) -> new SdkVersion(version.toString()))
             .filter((SdkVersion v) -> v.getMajor().equals(currentVersion.getMajor())
                 && v.getMinor().equals(currentVersion.getMinor()))
             .max((SdkVersion i, SdkVersion j) -> i.compareTo(j)).orElseThrow().toString();
       } else {
-        MavenCoordinate latestCoord = versions.getHighestVersion();
+        Version highestVersion = versions.getHighestVersion();
 
-        if (latestCoord == null) {
+        if (highestVersion == null) {
           throw new NoSuchElementException();
         }
 
-        return latestCoord.getVersion();
+        return highestVersion.toString();
       }
     } catch (NoSuchElementException e) {
       String snapshotVersion = MessageFormat.format("{0}.0-SNAPSHOT", baseVersion);
       logger.warn("No artifacts were found for SDK version [{}]. Trying with [{}]", baseVersion, snapshotVersion);
 
-      List<MavenCoordinate> snapshotCoords = getMavenResolver().resolveVersionRange(
-          MessageFormat.format("{0}:{1}:{2}", SdkConstants.SDK_GROUP_ID, SdkConstants.SDK_ARTIFACT_ID, snapshotVersion))
-          .getVersions();
+      artifact = new DefaultArtifact(MessageFormat.format("{0}:{1}:{2}", SdkConstants.SDK_GROUP_ID,
+          SdkConstants.SDK_ARTIFACT_ID, snapshotVersion));
 
-      if (CollectionUtils.isEmpty(snapshotCoords)) {
+      versions = MavenBooter.resolveVersionRange(artifact);
+
+      if (CollectionUtils.isEmpty(versions.getVersions())) {
         throw new IllegalArgumentException(
             MessageFormat.format("No artifacts were found for SDK version [{0}]", snapshotVersion));
       }
 
-      return snapshotCoords.get(0).getVersion();
+      return versions.getVersions().get(0).toString();
     }
   }
 }

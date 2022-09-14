@@ -13,6 +13,7 @@ import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -69,7 +70,7 @@ class CliCommand implements Callable<Integer> {
    * @throws InstantiationException 
    */
   @Override
-  public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+  public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     SdkResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
 
     final Path htmlPath =

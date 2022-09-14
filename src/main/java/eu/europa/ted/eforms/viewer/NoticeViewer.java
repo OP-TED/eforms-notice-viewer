@@ -24,6 +24,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +67,7 @@ public class NoticeViewer {
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
     Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
@@ -294,7 +295,7 @@ public class NoticeViewer {
    * @throws InstantiationException
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
-      throws IOException, InstantiationException {
+      throws IOException, InstantiationException, VersionRangeResolutionException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
@@ -357,7 +358,7 @@ public class NoticeViewer {
    * @throws IOException
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
-      throws IOException {
+      throws IOException, VersionRangeResolutionException {
     SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
 
     return SdkResourceLoader.INSTANCE.getResourceAsPath(
