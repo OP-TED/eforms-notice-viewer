@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,9 +23,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
@@ -67,7 +69,7 @@ public class NoticeViewer {
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException, VersionRangeResolutionException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
     Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
@@ -295,7 +297,7 @@ public class NoticeViewer {
    * @throws InstantiationException
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion)
-      throws IOException, InstantiationException, VersionRangeResolutionException {
+      throws IOException, InstantiationException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
     final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
@@ -358,7 +360,7 @@ public class NoticeViewer {
    * @throws IOException
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
-      throws IOException, VersionRangeResolutionException {
+      throws IOException {
     SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
 
     return SdkResourceLoader.INSTANCE.getResourceAsPath(
