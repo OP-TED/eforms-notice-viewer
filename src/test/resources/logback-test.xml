@@ -11,7 +11,7 @@
     </encoder>
   </appender>
 
-  <logger name="eu.europa.ted.eforms" level="DEBUG" />
+  <logger name="eu.europa.ted" level="DEBUG" />
   <logger name="net.sf.saxon.lib" level="DEBUG" />
   <root level="INFO">
     <appender-ref ref="STDOUT" />
