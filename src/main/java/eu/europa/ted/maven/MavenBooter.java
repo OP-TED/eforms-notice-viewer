@@ -1,6 +1,7 @@
 package eu.europa.ted.maven;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,9 @@ import org.slf4j.LoggerFactory;
 
 public class MavenBooter {
   private static final Logger logger = LoggerFactory.getLogger(MavenBooter.class);
+
+  private static final String SETTINGS_FILE_NAME = "settings.xml";
+  private static final Path DEFAULT_LOCAL_REPOSITORY_PATH = Path.of("local-maven-repo");
 
   private static final MavenBooter INSTANCE = new MavenBooter();
 
@@ -87,19 +91,20 @@ public class MavenBooter {
   }
 
   private static LocalRepository getLocalRepository(Settings settings) {
-    LocalRepository localRepository = new LocalRepository(settings.getLocalRepository());
+    Path localRepositoryPath = Path.of(Optional.ofNullable(settings.getLocalRepository())
+        .orElse(Path.of(System.getProperty("user.home"), ".m2", "repository").toString()));
 
-    logger.debug("Local repository: {}", localRepository);
+    LocalRepository localRepository = new LocalRepository(localRepositoryPath.toString());
+
+    logger.debug("Local repository: {}", localRepository.getBasedir());
 
     return localRepository;
   }
 
-  private static String getMavenHome() {
-    String envMavenHome = System.getenv("M2_HOME");
-    if (StringUtils.isNotBlank(envMavenHome)) {
-      return envMavenHome;
-    }
+  private static File getSettingsFile() {
+    Path settingsPath = null;
 
+    logger.debug("Looking for settings file using environment variable MAVEN_OPTS.");
     String mavenOpts = System.getenv("MAVEN_OPTS");
     if (StringUtils.isNotBlank(mavenOpts)) {
       String mavenOptsUserHome = Arrays.asList(mavenOpts.split("\\s")).stream()
@@ -107,24 +112,37 @@ public class MavenBooter {
           .map((String s) -> s.replaceAll("-Duser.home=", StringUtils.EMPTY)).findFirst().orElse(StringUtils.EMPTY);
 
       if (StringUtils.isNotBlank(mavenOptsUserHome)) {
-        return Path.of(mavenOptsUserHome, ".m2").toString();
+        settingsPath = Path.of(mavenOptsUserHome, ".m2", SETTINGS_FILE_NAME);
       }
     }
 
-    return Path.of(System.getProperty("user.home"), ".m2").toString();
-  }
+    if (settingsPath == null || !Files.exists(settingsPath)) {
+      logger.debug("Looking for settings file under user's home folder.");
+      settingsPath = Path.of(System.getProperty("user.home"), ".m2", SETTINGS_FILE_NAME);
+    }
 
-  private static File getSettingsPath() {
-    Path settingsPath = Path.of(getMavenHome(), "settings.xml");
+    if (settingsPath == null || !Files.exists(settingsPath)) {
+      logger.debug("Looking for settings file under Maven Home, as set by environment variale M2_HOME.");
+      settingsPath = Path.of(System.getenv("M2_HOME"), "conf", SETTINGS_FILE_NAME);
+    }
 
-    logger.debug("Settings path: {}", settingsPath);
-
-    return settingsPath.toFile();
+    if (settingsPath == null || !Files.exists(settingsPath)) {
+      logger.debug("No settings file found");
+      return null;
+    } else {
+      logger.debug("Settings path: {}", settingsPath);
+      return settingsPath.toFile();
+    }
   }
 
   private static Settings getSettings() throws SettingsBuildingException {
-    DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest()
-        .setGlobalSettingsFile(getSettingsPath());
+    File settingsFile = getSettingsFile();
+
+    if (settingsFile == null) {
+      return new Settings();
+    }
+
+    DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest().setGlobalSettingsFile(settingsFile);
 
     return new DefaultSettingsBuilderFactory().newInstance().build(request).getEffectiveSettings();
   }
