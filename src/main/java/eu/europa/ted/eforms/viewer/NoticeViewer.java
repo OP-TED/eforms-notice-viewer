@@ -40,8 +40,8 @@ import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.resource.ResourceLoader;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
@@ -361,9 +361,9 @@ public class NoticeViewer {
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
       throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
+    SdkDownloader.downloadSdk(sdkVersion, ResourceLoader.INSTANCE.getRoot());
 
-    return SdkResourceLoader.INSTANCE.getResourceAsPath(
+    return ResourceLoader.INSTANCE.getResourceAsPath(
         SdkConstants.SdkResource.VIEW_TEMPLATES, sdkVersion, viewId + ".efx");
   }
 }

@@ -39,28 +39,25 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <!-- EFX -->
+    <!-- Versions - eForms -->
+    <version.eforms-core>0.1.0-SNAPSHOT</version.eforms-core>
     <version.efx-toolkit>1.0.0</version.efx-toolkit>
 
-    <version.eforms-core>0.1.0-SNAPSHOT</version.eforms-core>
-
-    <!-- Third-party libraries -->
+    <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
     <version.classindex>3.11</version.classindex>
     <version.commons-lang3>3.12.0</version.commons-lang3>
-    <version.jackson>2.13.3</version.jackson>
+    <!--<version.jackson>2.13.3</version.jackson>-->
     <version.jsoup>1.14.3</version.jsoup>
     <version.junit>5.7.2</version.junit>
     <version.logback>1.2.11</version.logback>
     <version.picocli>4.6.3</version.picocli>
     <version.slf4j>1.7.36</version.slf4j>
-    <version.commons-collections>3.2.2</version.commons-collections>
-    <version.commons-io>2.11.0</version.commons-io>
     <version.ph-commons>10.0.0</version.ph-commons>
     <version.ph-genericode>6.2.0</version.ph-genericode>
     <version.saxon-he>11.3</version.saxon-he>
 
-    <!-- Plugins -->
+    <!-- Versions - Plugins -->
     <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
     <version.compiler.plugin>3.10.1</version.compiler.plugin>
     <version.install.plugin>2.5.2</version.install.plugin>
@@ -71,34 +68,16 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- eForms core. -->
+      <!-- eForms -->
       <dependency>
         <groupId>eu.europa.ted.eforms</groupId>
         <artifactId>eforms-core-java</artifactId>
         <version>${version.eforms-core}</version>
       </dependency>
-
-      <!-- EFX. -->
       <dependency>
         <groupId>eu.europa.ted.eforms</groupId>
         <artifactId>efx-toolkit-java</artifactId>
         <version>${version.efx-toolkit}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${version.jackson}</version>
       </dependency>
 
       <dependency>
@@ -132,32 +111,22 @@
         <version>${version.logback}</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>${version.commons-collections}</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>${version.commons-lang3}</version>
       </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${version.commons-io}</version>
-      </dependency>
 
-    <dependency>
-      <groupId>net.sf.saxon</groupId>
-      <artifactId>Saxon-HE</artifactId>
-      <version>${version.saxon-he}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+      <dependency>
+        <groupId>net.sf.saxon</groupId>
+        <artifactId>Saxon-HE</artifactId>
+        <version>${version.saxon-he}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
       <!-- For genericode .gc files (SDK codelist related) -->
       <dependency>
@@ -178,12 +147,12 @@
         <version>${version.ph-commons}</version>
       </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
-    <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
-      <version>${version.jsoup}</version>
-    </dependency>
+      <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+      <dependency>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>${version.jsoup}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -219,14 +188,6 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-    </dependency>
 
     <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
     <dependency>
@@ -258,19 +219,6 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
     </dependency>
 
     <dependency>

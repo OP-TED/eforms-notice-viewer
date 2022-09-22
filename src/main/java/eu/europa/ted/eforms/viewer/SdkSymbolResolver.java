@@ -13,10 +13,10 @@ import eu.europa.ted.eforms.sdk.entity.SdkNode;
 import eu.europa.ted.eforms.sdk.entity.SdkNodeRepository;
 import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponent;
 import eu.europa.ted.eforms.sdk.selector.component.VersionDependentComponentType;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
+import eu.europa.ted.resource.ResourceLoader;
 
 @VersionDependentComponent(versions = { "0.6", "0.7", "1" }, componentType = VersionDependentComponentType.SYMBOL_RESOLVER)
 public class SdkSymbolResolver implements SymbolResolver {
@@ -53,9 +53,9 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   protected void loadMapData(final String sdkVersion) throws InstantiationException {
-    Path jsonPath = SdkResourceLoader.INSTANCE
+    Path jsonPath = ResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.SdkResource.FIELDS_JSON, sdkVersion);
-    Path codelistsPath = SdkResourceLoader.INSTANCE
+    Path codelistsPath = ResourceLoader.INSTANCE
         .getResourceAsPath(SdkConstants.SdkResource.CODELISTS, sdkVersion);
 
     this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);

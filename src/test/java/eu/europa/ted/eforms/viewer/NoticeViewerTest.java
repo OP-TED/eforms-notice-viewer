@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
+import eu.europa.ted.resource.ResourceLoader;
 
 @SuppressWarnings("static-method")
 class NoticeViewerTest {
@@ -47,7 +47,7 @@ class NoticeViewerTest {
 
   @BeforeEach
   public void setUp() {
-    SdkResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
+    ResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
   }
 
   private static Stream<Arguments> provideArgsEfxToHtml() {
