@@ -47,7 +47,9 @@
     <!-- Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
     <version.classindex>3.11</version.classindex>
+    <version.commons-lang3>3.12.0</version.commons-lang3>
     <version.jackson>2.13.3</version.jackson>
+    <version.jsoup>1.14.3</version.jsoup>
     <version.junit>5.7.2</version.junit>
     <version.logback>1.2.11</version.logback>
     <version.picocli>4.6.3</version.picocli>
@@ -56,9 +58,12 @@
     <version.commons-io>2.11.0</version.commons-io>
     <version.ph-commons>10.0.0</version.ph-commons>
     <version.ph-genericode>6.2.0</version.ph-genericode>
+    <version.saxon-he>11.3</version.saxon-he>
 
     <!-- Plugins -->
+    <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
     <version.compiler.plugin>3.10.1</version.compiler.plugin>
+    <version.install.plugin>2.5.2</version.install.plugin>
     <version.surefire.plugin>3.0.0-M7</version.surefire.plugin> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
     <version.jar.plugin>3.2.2</version.jar.plugin>
     <version.shade.plugin>3.3.0</version.shade.plugin>
@@ -132,10 +137,27 @@
         <version>${version.commons-collections}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${version.commons-lang3}</version>
+      </dependency>
+      <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>${version.commons-io}</version>
       </dependency>
+
+    <dependency>
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+      <version>${version.saxon-he}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
       <!-- For genericode .gc files (SDK codelist related) -->
       <dependency>
@@ -155,6 +177,13 @@
         <artifactId>ph-commons</artifactId>
         <version>${version.ph-commons}</version>
       </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>${version.jsoup}</version>
+    </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -189,7 +218,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
@@ -213,13 +241,6 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>11.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- For genericode .gc files (SDK codelist related) -->
@@ -237,7 +258,6 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.14.3</version>
     </dependency>
 
     <dependency>
@@ -283,7 +303,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>${version.install.plugin}</version>
           <configuration>
             <createChecksum>true</createChecksum>
           </configuration>
@@ -292,7 +312,7 @@
           <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>${version.checkstyle.plugin}</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
