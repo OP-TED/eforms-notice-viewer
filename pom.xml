@@ -40,7 +40,9 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- EFX -->
-    <version.efx.toolkit>1.0.0</version.efx.toolkit>
+    <version.efx-toolkit>1.0.0</version.efx-toolkit>
+
+    <version.eforms-core>0.1.0-SNAPSHOT</version.eforms-core>
 
     <!-- Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
@@ -52,8 +54,6 @@
     <version.slf4j>1.7.36</version.slf4j>
     <version.commons-collections>3.2.2</version.commons-collections>
     <version.commons-io>2.11.0</version.commons-io>
-    <version.maven>3.8.6</version.maven>
-    <version.maven-resolver>1.8.2</version.maven-resolver>
     <version.ph-commons>10.0.0</version.ph-commons>
     <version.ph-genericode>6.2.0</version.ph-genericode>
 
@@ -66,6 +66,20 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- eForms core. -->
+      <dependency>
+        <groupId>eu.europa.ted.eforms</groupId>
+        <artifactId>eforms-core-java</artifactId>
+        <version>${version.eforms-core}</version>
+      </dependency>
+
+      <!-- EFX. -->
+      <dependency>
+        <groupId>eu.europa.ted.eforms</groupId>
+        <artifactId>efx-toolkit-java</artifactId>
+        <version>${version.efx-toolkit}</version>
+      </dependency>
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
@@ -141,58 +155,20 @@
         <artifactId>ph-commons</artifactId>
         <version>${version.ph-commons}</version>
       </dependency>
-
-      <!-- Maven Artifact Resolver -->
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-api</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-spi</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-impl</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-file</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-http</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-settings-builder</artifactId>
-        <version>${version.maven}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-resolver-provider</artifactId>
-        <version>${version.maven}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
+    <!-- eForms core. -->
+    <dependency>
+      <groupId>eu.europa.ted.eforms</groupId>
+      <artifactId>eforms-core-java</artifactId>
+    </dependency>
+
     <!-- EFX. -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
-      <version>${version.efx.toolkit}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
@@ -290,41 +266,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-
-    <!-- Maven Artifact Resolver -->
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-spi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-file</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-resolver-provider</artifactId>
     </dependency>
   </dependencies>
 
