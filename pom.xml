@@ -40,16 +40,16 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- EFX -->
-    <efx.toolkit.version>1.0.0</efx.toolkit.version>
+    <version.efx.toolkit>1.0.0</version.efx.toolkit>
 
     <!-- Third-party libraries -->
-    <antlr4.version>4.9.3</antlr4.version>
-    <classindex.version>3.11</classindex.version>
-    <jackson.version>2.13.1</jackson.version>
-    <junit.version>5.7.2</junit.version>
-    <logback.version>1.2.11</logback.version>
-    <picocli.version>4.6.3</picocli.version>
-    <slf4j.version>1.7.36</slf4j.version>
+    <version.antlr4>4.9.3</version.antlr4>
+    <version.classindex>3.11</version.classindex>
+    <version.jackson>2.13.3</version.jackson>
+    <version.junit>5.7.2</version.junit>
+    <version.logback>1.2.11</version.logback>
+    <version.picocli>4.6.3</version.picocli>
+    <version.slf4j>1.7.36</version.slf4j>
     <version.commons-collections>3.2.2</version.commons-collections>
     <version.commons-io>2.11.0</version.commons-io>
     <version.maven>3.8.6</version.maven>
@@ -58,8 +58,8 @@
     <version.ph-genericode>6.2.0</version.ph-genericode>
 
     <!-- Plugins -->
-    <compiler.plugin.version>3.10.1</compiler.plugin.version>
-    <surefire.plugin.version>3.0.0-M7</surefire.plugin.version> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
+    <version.compiler.plugin>3.10.1</version.compiler.plugin>
+    <version.surefire.plugin>3.0.0-M7</version.surefire.plugin> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
     <version.jar.plugin>3.2.2</version.jar.plugin>
     <version.shade.plugin>3.3.0</version.shade.plugin>
   </properties>
@@ -69,48 +69,48 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
+        <version>${version.jackson}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
+        <version>${version.jackson}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
+        <version>${version.jackson}</version>
       </dependency>
 
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
-        <version>${antlr4.version}</version>
+        <version>${version.antlr4}</version>
       </dependency>
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>${picocli.version}</version>
+        <version>${version.picocli}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-params</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
+        <version>${version.logback}</version>
       </dependency>
       <dependency>
         <groupId>commons-collections</groupId>
@@ -192,7 +192,7 @@
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
-      <version>${efx.toolkit.version}</version>
+      <version>${version.efx.toolkit}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
@@ -338,7 +338,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.plugin.version}</version>
+          <version>${version.surefire.plugin}</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
@@ -381,18 +381,18 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${compiler.plugin.version}</version>
+          <version>${version.compiler.plugin}</version>
           <configuration>
             <annotationProcessorPaths>
               <annotationProcessorPath>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli-codegen</artifactId>
-                <version>${picocli.version}</version>
+                <version>${version.picocli}</version>
               </annotationProcessorPath>
               <annotationProcessorPath>
                 <groupId>org.atteo.classindex</groupId>
                 <artifactId>classindex</artifactId>
-                <version>${classindex.version}</version>
+                <version>${version.classindex}</version>
               </annotationProcessorPath>
             </annotationProcessorPaths>
           </configuration>
@@ -461,7 +461,7 @@
           <dependency>
             <groupId>org.atteo.classindex</groupId>
             <artifactId>classindex-transformer</artifactId>
-            <version>${classindex.version}</version>
+            <version>${version.classindex}</version>
           </dependency>
         </dependencies>
       </plugin>
