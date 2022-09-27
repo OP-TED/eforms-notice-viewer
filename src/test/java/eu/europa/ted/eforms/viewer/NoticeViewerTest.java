@@ -38,8 +38,8 @@ class NoticeViewerTest {
 
   private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.7", "1.0"};
 
-  private static final String SDK_RESOURCES_ROOT =
-      Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString();
+  private static final Path SDK_RESOURCES_ROOT =
+      Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
 
   @BeforeEach
   public void setUp() {
