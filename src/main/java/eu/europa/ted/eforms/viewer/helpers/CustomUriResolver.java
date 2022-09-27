@@ -2,6 +2,7 @@ package eu.europa.ted.eforms.viewer.helpers;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -14,9 +15,11 @@ import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 
 public final class CustomUriResolver implements URIResolver {
   private String sdkVersion;
+  private Path sdkRootPath;
 
-  public CustomUriResolver(String sdkVersion) {
+  public CustomUriResolver(String sdkVersion, Path sdkRootPath) {
     this.sdkVersion = sdkVersion;
+    this.sdkRootPath = sdkRootPath;
   }
 
   /**
@@ -24,8 +27,8 @@ public final class CustomUriResolver implements URIResolver {
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = SdkResourceLoader.INSTANCE
-        .getResourceAsStream(SdkConstants.SdkResource.TRANSLATIONS, sdkVersion, href)) {
+    try (InputStream is = SdkResourceLoader.getResourceAsStream(sdkVersion,
+        SdkConstants.SdkResource.TRANSLATIONS, href, sdkRootPath)) {
       if (is == null) {
         throw new RuntimeException(
             String.format("inputStream is null for href=%s, base=%s", href, base));

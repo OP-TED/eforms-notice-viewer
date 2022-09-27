@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,12 +29,13 @@ public class ComponentFactory extends VersionDependentComponentFactory {
    *
    * @param sdkVersion Version of the SDK
    */
-  public static SymbolResolver getSymbolResolver(final String sdkVersion)
+  public static SymbolResolver getSymbolResolver(final String sdkVersion, final Path sdkRootPath)
       throws InstantiationException {
     return instances.computeIfAbsent(sdkVersion, k -> {
       try {
         return ComponentFactory.INSTANCE.getComponentImpl(sdkVersion,
-            VersionDependentComponentType.SYMBOL_RESOLVER, SymbolResolver.class, sdkVersion);
+            VersionDependentComponentType.SYMBOL_RESOLVER, SymbolResolver.class, sdkVersion,
+            sdkRootPath);
       } catch (InstantiationException e) {
         throw new RuntimeException(MessageFormat.format(
             "Failed to instantiate SDK Symbol Resolver for SDK version [{0}]", sdkVersion), e);
