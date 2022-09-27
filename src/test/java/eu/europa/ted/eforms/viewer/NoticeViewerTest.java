@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,9 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,9 +21,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.resource.ResourceLoader;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 
 @SuppressWarnings("static-method")
 class NoticeViewerTest {
@@ -47,7 +43,7 @@ class NoticeViewerTest {
 
   @BeforeEach
   public void setUp() {
-    ResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
+    SdkResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
   }
 
   private static Stream<Arguments> provideArgsEfxToHtml() {

@@ -9,14 +9,12 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.resource.ResourceLoader;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -69,7 +67,7 @@ class CliCommand implements Callable<Integer> {
    */
   @Override
   public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    ResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
+    SdkResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
 
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt);

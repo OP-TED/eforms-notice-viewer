@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,7 +22,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
@@ -35,13 +33,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
+import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.efx.EfxTranslator;
-import eu.europa.ted.resource.ResourceLoader;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
@@ -361,9 +358,9 @@ public class NoticeViewer {
    */
   public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
       throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, ResourceLoader.INSTANCE.getRoot());
+    SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
 
-    return ResourceLoader.INSTANCE.getResourceAsPath(
+    return SdkResourceLoader.INSTANCE.getResourceAsPath(
         SdkConstants.SdkResource.VIEW_TEMPLATES, sdkVersion, viewId + ".efx");
   }
 }

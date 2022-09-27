@@ -10,7 +10,7 @@ import javax.xml.transform.dom.DOMSource;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.resource.ResourceLoader;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 
 public final class CustomUriResolver implements URIResolver {
   private String sdkVersion;
@@ -24,7 +24,7 @@ public final class CustomUriResolver implements URIResolver {
    */
   @Override
   public Source resolve(final String href, final String base) {
-    try (InputStream is = ResourceLoader.INSTANCE
+    try (InputStream is = SdkResourceLoader.INSTANCE
         .getResourceAsStream(SdkConstants.SdkResource.TRANSLATIONS, sdkVersion, href)) {
       if (is == null) {
         throw new RuntimeException(
