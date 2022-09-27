@@ -41,13 +41,12 @@
 
     <!-- Versions - eForms -->
     <version.eforms-core>0.1.0-SNAPSHOT</version.eforms-core>
-    <version.efx-toolkit>1.0.0</version.efx-toolkit>
+    <version.efx-toolkit>1.0.2-SNAPSHOT</version.efx-toolkit>
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
     <version.classindex>3.11</version.classindex>
     <version.commons-lang3>3.12.0</version.commons-lang3>
-    <!--<version.jackson>2.13.3</version.jackson>-->
     <version.jsoup>1.14.3</version.jsoup>
     <version.junit>5.7.2</version.junit>
     <version.logback>1.2.11</version.logback>
