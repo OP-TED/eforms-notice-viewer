@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,7 +22,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
@@ -35,12 +33,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.selector.resource.SdkDownloader;
+import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import eu.europa.ted.efx.EfxTranslator;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
@@ -60,6 +57,7 @@ public class NoticeViewer {
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
    * @param profileXslt If set to true, XSLT profiling will be enabled
+   * @param sdkRootPath Path of the root SDK folder
    * @return The path of the generated HTML file
    *
    * @throws IOException If an error occurs during input or output
@@ -68,7 +66,7 @@ public class NoticeViewer {
    * @throws InstantiationException
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
-      final Optional<String> viewIdOpt, final boolean profileXslt)
+      final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -95,9 +93,9 @@ public class NoticeViewer {
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
     logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
-    final Path xslPath = buildXsl(viewId, eformsSdkVersion);
-    final Path htmlPath =
-        applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath, viewId, profileXslt);
+    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath);
+    final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
+        viewId, profileXslt, sdkRootPath);
     // Ensure the HTML can be parsed.
     Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
     return htmlPath;
@@ -120,7 +118,8 @@ public class NoticeViewer {
    */
   public static String generateHtml(final String language, final String noticeXmlContent,
       final String xsl, final Charset charset, final Optional<String> viewIdOpt,
-      final boolean profileXslt) throws IOException, SAXException, ParserConfigurationException {
+      final boolean profileXslt, final Path sdkRootPath)
+      throws IOException, SAXException, ParserConfigurationException {
     logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
     try (
@@ -129,7 +128,7 @@ public class NoticeViewer {
         final ByteArrayInputStream xslInputStream =
             new ByteArrayInputStream(xsl.getBytes(charset));) {
       return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt,
-          profileXslt);
+          profileXslt, sdkRootPath);
     }
   }
 
@@ -149,8 +148,8 @@ public class NoticeViewer {
    */
   public static String generateHtml(final String language,
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
-      final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt)
-      throws IOException, ParserConfigurationException, SAXException {
+      final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt,
+      final Path sdkRootPath) throws IOException, ParserConfigurationException, SAXException {
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
       noticeXmlContent.transferTo(baos);
 
@@ -186,7 +185,7 @@ public class NoticeViewer {
           final StreamResult htmlResult = new StreamResult(outputStream);
 
           applyXslTransform(language, eformsSdkVersion, viewId, new StreamSource(noticeXmlIsClone2),
-              new StreamSource(xslIs), htmlResult, profileXslt);
+              new StreamSource(xslIs), htmlResult, profileXslt, sdkRootPath);
 
           // Ensure the HTML can be parsed.
           final String htmlText = outputStream.toString(charset);
@@ -199,7 +198,7 @@ public class NoticeViewer {
   }
 
   static TransformerFactory getTransformerFactory(final String sdkVersion, final String viewId,
-      final boolean profileXslt) throws TransformerConfigurationException {
+      final boolean profileXslt, final Path sdkRootPath) throws TransformerConfigurationException {
     logger.debug("Creating XSL transformer factory for SDK version [{}]", sdkVersion);
 
     // XSL for input transformation.
@@ -212,7 +211,7 @@ public class NoticeViewer {
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
     // Currently this is what allows to load the labels (i18n).
-    factory.setURIResolver(new CustomUriResolver(sdkVersion));
+    factory.setURIResolver(new CustomUriResolver(sdkVersion, sdkRootPath));
 
     if (profileXslt) {
       final Path xsltProfilePath = OUTPUT_FOLDER_HTML.resolve(viewId + "-xslt_profile.html");
@@ -228,9 +227,10 @@ public class NoticeViewer {
   }
 
   static Transformer getTransformer(final String language, final String sdkVersion,
-      final String viewId, final Source xslSource, final boolean profileXslt)
-      throws TransformerConfigurationException {
-    final TransformerFactory factory = getTransformerFactory(sdkVersion, viewId, profileXslt);
+      final String viewId, final Source xslSource, final boolean profileXslt,
+      final Path sdkRootPath) throws TransformerConfigurationException {
+    final TransformerFactory factory =
+        getTransformerFactory(sdkVersion, viewId, profileXslt, sdkRootPath);
 
     logger.debug("Creating XSL transformer for SDK version [{}], language [{}] and view ID [{}]",
         sdkVersion, language, viewId);
@@ -246,7 +246,8 @@ public class NoticeViewer {
   }
 
   static Path applyXslTransform(final String language, String sdkVersion, final Path noticeXmlPath,
-      final Path xslPath, final String viewId, final boolean profileXslt) throws IOException {
+      final Path xslPath, final String viewId, final boolean profileXslt, final Path sdkRootPath)
+      throws IOException {
     // XML as input.
     final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
 
@@ -259,7 +260,7 @@ public class NoticeViewer {
       final Source xslSource = new StreamSource(inputStream);
 
       applyXslTransform(language, sdkVersion, viewId, xmlInput, xslSource, outputTarget,
-          profileXslt);
+          profileXslt, sdkRootPath);
 
       return htmlPath;
     }
@@ -267,10 +268,10 @@ public class NoticeViewer {
 
   static void applyXslTransform(final String language, String sdkVersion, String viewId,
       final Source xmlInput, final Source xslSource, final StreamResult outputTarget,
-      final boolean profileXslt) {
+      final boolean profileXslt, final Path sdkRootPath) {
     try {
       final Transformer transformer =
-          getTransformer(language, sdkVersion, viewId, xslSource, profileXslt);
+          getTransformer(language, sdkVersion, viewId, xslSource, profileXslt, sdkRootPath);
 
       logger.info(
           "Applying XSL transformation for language [{}] and SDK version [{}] with: XML input={}",
@@ -292,23 +293,24 @@ public class NoticeViewer {
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
    * @param sdkVersion The version of the desired SDK
+   * @param sdkRootPath Path of the root SDK folder
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
    * @throws InstantiationException
    */
-  public static final Path buildXsl(final String viewId, final String sdkVersion)
+  public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath)
       throws IOException, InstantiationException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
-    final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion);
+    final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion, sdkRootPath);
 
     logger.debug("View path: {}", viewPath);
 
     Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);
 
     try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
-      final String translation =
-          EfxTranslator.translateTemplate(new DependencyFactory(), sdkVersion, viewInputStream);
+      final String translation = EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
+          sdkVersion, viewInputStream);
       Files.createDirectories(OUTPUT_FOLDER_XSL);
 
       final String nameByConvention = viewId + ".xsl";
@@ -333,7 +335,8 @@ public class NoticeViewer {
     // We assume that length equals 1 exactly. Anything else is considered
     // empty.
     return nodeList.getLength() == 1
-        ? Optional.of(StringUtils.removeStart(nodeList.item(0).getTextContent().strip(), "eforms-sdk-"))
+        ? Optional
+            .of(StringUtils.removeStart(nodeList.item(0).getTextContent().strip(), "eforms-sdk-"))
         : Optional.empty();
   }
 
@@ -357,13 +360,14 @@ public class NoticeViewer {
    * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
    *        something else for custom views
    * @param sdkVersion The SDK version to load the path from
+   * @param sdkRootPath Path of the root SDK folder
    * @throws IOException
    */
-  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion)
-      throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, SdkResourceLoader.INSTANCE.getRoot());
+  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion,
+      Path sdkRootPath) throws IOException {
+    SdkDownloader.downloadSdk(sdkVersion, sdkRootPath);
 
-    return SdkResourceLoader.INSTANCE.getResourceAsPath(
-        SdkConstants.SdkResource.VIEW_TEMPLATES, sdkVersion, viewId + ".efx");
+    return SdkResourceLoader.getResourceAsPath(sdkVersion, SdkConstants.SdkResource.VIEW_TEMPLATES,
+        viewId + ".efx", sdkRootPath);
   }
 }

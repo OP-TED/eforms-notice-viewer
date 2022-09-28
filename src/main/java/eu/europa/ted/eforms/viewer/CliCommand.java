@@ -9,15 +9,11 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -69,11 +65,10 @@ class CliCommand implements Callable<Integer> {
    * @throws InstantiationException 
    */
   @Override
-  public Integer call() throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    SdkResourceLoader.INSTANCE.setRoot(sdkResourcesRoot);
-
-    final Path htmlPath =
-        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt);
+  public Integer call()
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlPath,
+        Optional.ofNullable(viewId), profileXslt, Path.of(sdkResourcesRoot));
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

@@ -39,88 +39,92 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
-    <!-- EFX -->
-    <efx.toolkit.version>1.0.0</efx.toolkit.version>
+    <!-- Versions - eForms -->
+    <version.eforms-core>0.1.0-SNAPSHOT</version.eforms-core>
+    <version.efx-toolkit>1.0.2-SNAPSHOT</version.efx-toolkit>
 
-    <!-- Third-party libraries -->
-    <antlr4.version>4.9.3</antlr4.version>
-    <classindex.version>3.11</classindex.version>
-    <jackson.version>2.13.1</jackson.version>
-    <junit.version>5.7.2</junit.version>
-    <logback.version>1.2.11</logback.version>
-    <picocli.version>4.6.3</picocli.version>
-    <slf4j.version>1.7.36</slf4j.version>
-    <version.commons-collections>3.2.2</version.commons-collections>
-    <version.commons-io>2.11.0</version.commons-io>
-    <version.maven>3.8.6</version.maven>
-    <version.maven-resolver>1.8.2</version.maven-resolver>
+    <!-- Versions - Third-party libraries -->
+    <version.antlr4>4.9.3</version.antlr4>
+    <version.classindex>3.11</version.classindex>
+    <version.commons-lang3>3.12.0</version.commons-lang3>
+    <version.jsoup>1.14.3</version.jsoup>
+    <version.junit>5.7.2</version.junit>
+    <version.logback>1.2.11</version.logback>
+    <version.picocli>4.6.3</version.picocli>
+    <version.slf4j>1.7.36</version.slf4j>
     <version.ph-commons>10.0.0</version.ph-commons>
     <version.ph-genericode>6.2.0</version.ph-genericode>
+    <version.saxon-he>11.3</version.saxon-he>
 
-    <!-- Plugins -->
-    <compiler.plugin.version>3.10.1</compiler.plugin.version>
-    <surefire.plugin.version>3.0.0-M7</surefire.plugin.version> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
+    <!-- Versions - Plugins -->
+    <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
+    <version.compiler.plugin>3.10.1</version.compiler.plugin>
+    <version.install.plugin>2.5.2</version.install.plugin>
+    <version.surefire.plugin>3.0.0-M7</version.surefire.plugin> <!-- Versions prior to 3.0.x do not pick up Junit 5 tests correctly. -->
     <version.jar.plugin>3.2.2</version.jar.plugin>
     <version.shade.plugin>3.3.0</version.shade.plugin>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <!-- eForms -->
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
+        <groupId>eu.europa.ted.eforms</groupId>
+        <artifactId>eforms-core-java</artifactId>
+        <version>${version.eforms-core}</version>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
+        <groupId>eu.europa.ted.eforms</groupId>
+        <artifactId>efx-toolkit-java</artifactId>
+        <version>${version.efx-toolkit}</version>
       </dependency>
 
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
-        <version>${antlr4.version}</version>
+        <version>${version.antlr4}</version>
       </dependency>
       <dependency>
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
-        <version>${picocli.version}</version>
+        <version>${version.picocli}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-api</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
         <artifactId>junit-jupiter-params</artifactId>
-        <version>${junit.version}</version>
+        <version>${version.junit}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <version>${version.slf4j}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
+        <version>${version.logback}</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>${version.commons-collections}</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${version.commons-lang3}</version>
       </dependency>
+
       <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${version.commons-io}</version>
+        <groupId>net.sf.saxon</groupId>
+        <artifactId>Saxon-HE</artifactId>
+        <version>${version.saxon-he}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- For genericode .gc files (SDK codelist related) -->
@@ -142,57 +146,26 @@
         <version>${version.ph-commons}</version>
       </dependency>
 
-      <!-- Maven Artifact Resolver -->
+      <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
       <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-api</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-spi</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-impl</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-connector-basic</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-file</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.resolver</groupId>
-        <artifactId>maven-resolver-transport-http</artifactId>
-        <version>${version.maven-resolver}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-settings-builder</artifactId>
-        <version>${version.maven}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-resolver-provider</artifactId>
-        <version>${version.maven}</version>
+        <groupId>org.jsoup</groupId>
+        <artifactId>jsoup</artifactId>
+        <version>${version.jsoup}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
+    <!-- eForms core. -->
+    <dependency>
+      <groupId>eu.europa.ted.eforms</groupId>
+      <artifactId>eforms-core-java</artifactId>
+    </dependency>
+
     <!-- EFX. -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
-      <version>${efx.toolkit.version}</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
@@ -213,15 +186,6 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-collections</groupId>
-      <artifactId>commons-collections</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
@@ -237,13 +201,6 @@
     <dependency>
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
-      <version>11.3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- For genericode .gc files (SDK codelist related) -->
@@ -261,20 +218,6 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.14.3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
     </dependency>
 
     <dependency>
@@ -291,41 +234,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
-
-    <!-- Maven Artifact Resolver -->
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-spi</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-impl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-connector-basic</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-file</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-http</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-settings-builder</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-resolver-provider</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
@@ -338,11 +246,11 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${surefire.plugin.version}</version>
+          <version>${version.surefire.plugin}</version>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
+          <version>${version.install.plugin}</version>
           <configuration>
             <createChecksum>true</createChecksum>
           </configuration>
@@ -351,7 +259,7 @@
           <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>3.1.2</version>
+          <version>${version.checkstyle.plugin}</version>
           <dependencies>
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
@@ -381,18 +289,18 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${compiler.plugin.version}</version>
+          <version>${version.compiler.plugin}</version>
           <configuration>
             <annotationProcessorPaths>
               <annotationProcessorPath>
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli-codegen</artifactId>
-                <version>${picocli.version}</version>
+                <version>${version.picocli}</version>
               </annotationProcessorPath>
               <annotationProcessorPath>
                 <groupId>org.atteo.classindex</groupId>
                 <artifactId>classindex</artifactId>
-                <version>${classindex.version}</version>
+                <version>${version.classindex}</version>
               </annotationProcessorPath>
             </annotationProcessorPaths>
           </configuration>
@@ -461,7 +369,7 @@
           <dependency>
             <groupId>org.atteo.classindex</groupId>
             <artifactId>classindex-transformer</artifactId>
-            <version>${classindex.version}</version>
+            <version>${version.classindex}</version>
           </dependency>
         </dependencies>
       </plugin>

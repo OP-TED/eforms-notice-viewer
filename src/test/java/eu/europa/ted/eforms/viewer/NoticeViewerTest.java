@@ -1,7 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,20 +12,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.SdkResourceLoader;
 
 @SuppressWarnings("static-method")
 class NoticeViewerTest {
@@ -42,13 +36,8 @@ class NoticeViewerTest {
 
   private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.7", "1.0"};
 
-  private static final String SDK_RESOURCES_ROOT =
-      Path.of("target", SdkConstants.DEFAULT_SDK_ROOT).toString();
-
-  @BeforeEach
-  public void setUp() {
-    SdkResourceLoader.INSTANCE.setRoot(SDK_RESOURCES_ROOT);
-  }
+  private static final Path SDK_RESOURCES_ROOT =
+      Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
 
   private static Stream<Arguments> provideArgsEfxToHtml() {
     List<Arguments> arguments = new ArrayList<>();
@@ -98,7 +87,7 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToXsl")
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
-    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion);
+    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT);
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
     // The test would have failed if there were errors, this is what the check is really about.
@@ -114,7 +103,8 @@ class NoticeViewerTest {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
-    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false);
+    final Path path =
+        NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_RESOURCES_ROOT);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -128,10 +118,10 @@ class NoticeViewerTest {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
-    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion);
+    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        charsetUtf8, Optional.of(viewId), false);
+        charsetUtf8, Optional.of(viewId), false, SDK_RESOURCES_ROOT);
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));
     // The test would have failed if there were errors, this is what the check

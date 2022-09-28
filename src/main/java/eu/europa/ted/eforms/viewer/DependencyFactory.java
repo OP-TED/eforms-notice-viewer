@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
+import java.nio.file.Path;
 import org.antlr.v4.runtime.BaseErrorListener;
 import eu.europa.ted.efx.exceptions.ThrowingErrorListener;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
@@ -8,10 +9,19 @@ import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
+  private Path sdkRootPath;
+
+  @SuppressWarnings("unused")
+  private DependencyFactory() {}
+
+  public DependencyFactory(Path sdkRootPath) {
+    this.sdkRootPath = sdkRootPath;
+  }
+
   @Override
   public SymbolResolver createSymbolResolver(String sdkVersion) {
     try {
-      return ComponentFactory.getSymbolResolver(sdkVersion);
+      return ComponentFactory.getSymbolResolver(sdkVersion, sdkRootPath);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
