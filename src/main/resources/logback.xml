@@ -33,6 +33,8 @@
 		</encoder>
 	</appender>
 
+    <logger name="org.reflections" level="ERROR" />
+
 	<root level="DEBUG">
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />

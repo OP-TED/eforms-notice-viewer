@@ -45,7 +45,6 @@
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
-    <version.classindex>3.11</version.classindex>
     <version.commons-lang3>3.12.0</version.commons-lang3>
     <version.jsoup>1.14.3</version.jsoup>
     <version.junit>5.7.2</version.junit>
@@ -297,11 +296,6 @@
                 <artifactId>picocli-codegen</artifactId>
                 <version>${version.picocli}</version>
               </annotationProcessorPath>
-              <annotationProcessorPath>
-                <groupId>org.atteo.classindex</groupId>
-                <artifactId>classindex</artifactId>
-                <version>${version.classindex}</version>
-              </annotationProcessorPath>
             </annotationProcessorPaths>
           </configuration>
         </plugin>
@@ -343,7 +337,6 @@
                     <Implementation-Vendor-Id>${project.groupId}</Implementation-Vendor-Id>
                   </manifestEntries>
                 </transformer>
-                <transformer implementation="org.atteo.classindex.ClassIndexTransformer" />
                 <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
                   <resource>logback.xml</resource>
                   <file>${basedir}/src/main/resources/logback.xml</file>
@@ -365,13 +358,6 @@
             </configuration>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.atteo.classindex</groupId>
-            <artifactId>classindex-transformer</artifactId>
-            <version>${version.classindex}</version>
-          </dependency>
-        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
