@@ -97,7 +97,7 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     final String innerVariableName = String.format("label%d", variableCounter);
     writer.writeLine("");
     writer.openTag("span", "class=\"dynamic-label\"");
-    writer.openTag("xsl:variable", String.format("name=\"%s\" as=\"xs:string\"", outerVariableName));
+    writer.openTag("xsl:variable", String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
     writer.openTag("xsl:for-each", String.format("select=\"%s\"", expression.script));
     writer.writeLine(String.format("<xsl:variable name=\"%s\" select=\".\"/>", innerVariableName));
     writer.writeLine(String.format("<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>", innerVariableName, innerVariableName));
