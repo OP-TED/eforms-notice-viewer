@@ -21,7 +21,7 @@ public class Application {
       @Override
       public int handleExecutionException(Exception ex, CommandLine commandLine, ParseResult parseResult)
           throws Exception {
-        logger.error("Error executing the application with arguments [{}]", Arrays.asList(args));
+        logger.error("Error executing the application with arguments [{}]. Please see the logs.", Arrays.asList(args));
         logger.debug("Exception thrown:", ex);
 
         return 0;
