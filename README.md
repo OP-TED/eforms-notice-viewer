@@ -1,5 +1,17 @@
 # eForms Notice Viewer
 
+> Copyright 2022 European Union
+>
+>Licensed under the EUPL, Version 1.2 or – as soon they will be approved by the European Commission –
+subsequent versions of the EUPL (the "Licence");
+You may not use this work except in compliance with the Licence.
+You may obtain a copy of the Licence at: 
+https://joinup.ec.europa.eu/software/page/eupl5
+>
+>Unless required by applicable law or agreed to in writing, software distributed under the Licence is
+distributed on an "AS IS" basis, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the Licence for the specific language governing permissions and limitations under 
+the Licence.
+
 ## Introduction
 
 This is a sample command line application which demonstrates how you can use the eForms SDK in a metadata driven application that visualises eForms notices.
@@ -40,35 +52,26 @@ mvn clean install -U
 
 ### Command line
 
-1. Unzip the binary distribution (a .zip file), e.g. to `/path/to/eforms-notice-viewer`.
+Execute the binary `eforms-notice-viewer-<version>-app.jar` as follows:
 
-   The unpacked folder will contain the following:
-     - A JAR file named eforms-notice-viewer-<version>.jar
-     - A `eforms-sdk` containing all of the supported eForms SDKs
+    java -jar eforms-notice-viewer-<version>-app.jar <language> <xml file> [<view id>]
 
-2. Go to `/path/to/eforms-notice-viewer` and execute the following:
-
-   ```
-   java -jar eforms-notice-viewer-<version>.jar <language> <xml file> [<view id>] [<SDK resources>]
-   ```
-
-   - `<language>`: two letter code for the desired language of the output (en, fr, etc.)
-   - `<xml file>`: path to the XML notice to view
-   - `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
-   - `<SDK resources>`: path to the folder containing the SDK resources, organized by version. If omitted, the folder `eforms-sdk` is used.
+- `<language>`: two letter code for the desired language of the output (en, fr, etc.)
+- `<xml file>`: path to the XML notice to view
+- `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
 
 ### Example
 
 To generate an HTML to view the file `X02_registration.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/X02_registration.xml
+java -jar eforms-notice-viewer-<version>-αππ.jar en eforms-sdk/1/0/examples/notices/X02_registration.xml
 ```
 
 To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/cn_24_minimal.xml summary
+java -jar eforms-notice-viewer-<version>-app.jar en eforms-sdk/1.0/examples/notices/cn_24_minimal.xml summary
 ```
 
-While running, log output is generated in the console, giving information on the location of the generated XSL, HTML, and any problem encountered.
+While running, log output is generated in the console as well as under a folder named `logs`, giving information on the location of the generated XSL, HTML, and any problem encountered.

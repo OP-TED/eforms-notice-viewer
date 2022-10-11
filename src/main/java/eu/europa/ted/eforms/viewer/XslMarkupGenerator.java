@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer;
 
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,13 +93,18 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
     final IndentedStringWriter writer = new IndentedStringWriter(0);
-    final String variableName = String.format("label%d", ++variableCounter);
-    writer.writeLine(String.format("<xsl:variable name=\"%s\" select=\"%s\"/>", variableName,
-        expression.script));
-    writer.writeLine(String.format(
-        "<span class=\"dynamic-label\"><xsl:value-of "
-            + "select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/></span>",
-        variableName, variableName));
+    final String outerVariableName = String.format("labels%d", ++variableCounter);
+    final String innerVariableName = String.format("label%d", variableCounter);
+    writer.writeLine("");
+    writer.openTag("span", "class=\"dynamic-label\"");
+    writer.openTag("xsl:variable", String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
+    writer.openTag("xsl:for-each", String.format("select=\"%s\"", expression.script));
+    writer.writeLine(String.format("<xsl:variable name=\"%s\" select=\".\"/>", innerVariableName));
+    writer.writeLine(String.format("<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>", innerVariableName, innerVariableName));
+    writer.closeTag("xsl:for-each");
+    writer.closeTag("xsl:variable");
+    writer.writeLine(String.format("<xsl:value-of select=\"string-join($%s, ', ')\"/>", outerVariableName));
+    writer.closeTag("span");
     return new Markup(writer.toString());
   }
 
