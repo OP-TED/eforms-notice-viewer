@@ -52,39 +52,26 @@ mvn clean install -U
 
 ### Command line
 
-1. Unzip the binary distribution (a .zip file), e.g. to `/path/to/eforms-notice-viewer`.
+Execute the binary `eforms-notice-viewer-<version>-app.jar` as follows:
 
-   The unpacked folder will contain the following:
-     - A JAR file named eforms-notice-viewer-<version>.jar
-     - A `eforms-sdk` containing all of the supported eForms SDKs
+    java -jar eforms-notice-viewer-<version>-app.jar <language> <xml file> [<view id>]
 
-2. Go to `/path/to/eforms-notice-viewer` and execute the following:
-
-   ```
-   java -jar eforms-notice-viewer-<version>.jar <language> <xml file> [<view id>] [<SDK resources>]
-   ```
-
-   - `<language>`: two letter code for the desired language of the output (en, fr, etc.)
-   - `<xml file>`: path to the XML notice to view
-   - `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
-   - `<SDK resources>`: path to the folder containing the SDK resources, organized by version. If omitted, the folder `eforms-sdk` is used.
+- `<language>`: two letter code for the desired language of the output (en, fr, etc.)
+- `<xml file>`: path to the XML notice to view
+- `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
 
 ### Example
 
 To generate an HTML to view the file `X02_registration.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/X02_registration.xml
+java -jar eforms-notice-viewer-<version>-αππ.jar en eforms-sdk/1/0/examples/notices/X02_registration.xml
 ```
 
 To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>.jar en eforms-sdk/0.6/examples/notices/cn_24_minimal.xml summary
+java -jar eforms-notice-viewer-<version>-app.jar en eforms-sdk/1.0/examples/notices/cn_24_minimal.xml summary
 ```
 
-While running, log output is generated in the console, giving information on the location of the generated XSL, HTML, and any problem encountered.
-
-
-
-
+While running, log output is generated in the console as well as under a folder named `logs`, giving information on the location of the generated XSL, HTML, and any problem encountered.
