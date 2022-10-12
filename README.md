@@ -66,7 +66,7 @@ Execute the binary `eforms-notice-viewer-<version>-app.jar` as follows:
 To generate an HTML to view the file `X02_registration.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>-αππ.jar en eforms-sdk/1/0/examples/notices/X02_registration.xml
+java -jar eforms-notice-viewer-<version>-app.jar en eforms-sdk/1/0/examples/notices/X02_registration.xml
 ```
 
 To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
