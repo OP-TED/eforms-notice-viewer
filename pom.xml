@@ -47,13 +47,18 @@
     <version.antlr4>4.9.3</version.antlr4>
     <version.commons-lang3>3.12.0</version.commons-lang3>
     <version.jsoup>1.14.3</version.jsoup>
+    <version.jackson>2.13.4</version.jackson>
+    <version.jackson-databind>2.13.4.2</version.jackson-databind>
     <version.junit>5.7.2</version.junit>
     <version.logback>1.2.11</version.logback>
     <version.picocli>4.6.3</version.picocli>
     <version.slf4j>1.7.36</version.slf4j>
-    <version.ph-commons>10.0.0</version.ph-commons>
+    <version.ph>10.0.0</version.ph>
     <version.ph-genericode>6.2.0</version.ph-genericode>
     <version.saxon-he>11.3</version.saxon-he>
+    <version.xml-apis>1.4.01</version.xml-apis>
+    <version.xml.bind-api>2.3.3</version.xml.bind-api>
+    <version.xmlresolver>4.2.0</version.xmlresolver>
 
     <!-- Versions - Plugins -->
     <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
@@ -78,6 +83,73 @@
         <version>${version.efx-toolkit}</version>
       </dependency>
 
+      <!-- Apache Commons -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${version.commons-lang3}</version>
+      </dependency>
+
+      <!-- Jackson -->
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${version.jackson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${version.jackson}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${version.jackson-databind}</version>
+      </dependency>
+
+      <!-- Logback -->
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-core</artifactId>
+        <version>${version.logback}</version>
+      </dependency>
+
+      <!-- PH -->
+      <dependency>
+        <groupId>com.helger.commons</groupId>
+        <artifactId>ph-commons</artifactId>
+        <version>${version.ph}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger.commons</groupId>
+        <artifactId>ph-jaxb</artifactId>
+        <version>${version.ph}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.helger.commons</groupId>
+        <artifactId>ph-xml</artifactId>
+        <version>${version.ph}</version>
+      </dependency>
+      <dependency>
+        <!-- For genericode .gc files (SDK codelist related) -->
+        <groupId>com.helger</groupId>
+        <artifactId>ph-genericode</artifactId>
+        <version>${version.ph-genericode}</version>
+      </dependency>
+
+      <!-- SLF4J -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${version.slf4j}</version>
+      </dependency>
+
+      <!-- Other -->
       <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
@@ -87,6 +159,11 @@
         <groupId>info.picocli</groupId>
         <artifactId>picocli</artifactId>
         <version>${version.picocli}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+        <version>${version.xml.bind-api}</version>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
@@ -99,139 +176,145 @@
         <version>${version.junit}</version>
       </dependency>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${version.slf4j}</version>
-      </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${version.logback}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>${version.commons-lang3}</version>
-      </dependency>
-
-      <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
         <version>${version.saxon-he}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>xml-apis</groupId>
-            <artifactId>xml-apis</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
-
-      <!-- For genericode .gc files (SDK codelist related) -->
-      <dependency>
-        <groupId>com.helger</groupId>
-        <artifactId>ph-genericode</artifactId>
-        <version>${version.ph-genericode}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>jakarta.activation</groupId>
-            <artifactId>jakarta.activation-api</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>com.helger.commons</groupId>
-        <artifactId>ph-commons</artifactId>
-        <version>${version.ph-commons}</version>
-      </dependency>
-
-      <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
       <dependency>
         <groupId>org.jsoup</groupId>
         <artifactId>jsoup</artifactId>
         <version>${version.jsoup}</version>
       </dependency>
+      <dependency>
+        <groupId>org.xmlresolver</groupId>
+        <artifactId>xmlresolver</artifactId>
+        <version>${version.xmlresolver}</version>
+      </dependency>
+      <dependency>
+        <groupId>xml-apis</groupId>
+        <artifactId>xml-apis</artifactId>
+        <version>${version.xml-apis}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <dependencies>
-    <!-- eForms core. -->
+    <!-- eForms -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>eforms-core-java</artifactId>
     </dependency>
-
-    <!-- EFX. -->
     <dependency>
       <groupId>eu.europa.ted.eforms</groupId>
       <artifactId>efx-toolkit-java</artifactId>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-params</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+    <!-- Apache Commons -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+    <!-- Jackson -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+
+    </dependency>
+
+    <!-- Logback -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <scope>runtime</scope>
     </dependency>
-
-    <!-- For XSL 2.0 -->
-    <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
-    <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
     <dependency>
-      <groupId>net.sf.saxon</groupId>
-      <artifactId>Saxon-HE</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <scope>runtime</scope>
     </dependency>
 
-    <!-- For genericode .gc files (SDK codelist related) -->
-    <dependency>
-      <groupId>com.helger</groupId>
-      <artifactId>ph-genericode</artifactId>
-    </dependency>
-
+    <!-- PH -->
     <dependency>
       <groupId>com.helger.commons</groupId>
       <artifactId>ph-commons</artifactId>
     </dependency>
-
-    <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
     <dependency>
-      <groupId>org.jsoup</groupId>
-      <artifactId>jsoup</artifactId>
+      <groupId>com.helger.commons</groupId>
+      <artifactId>ph-jaxb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.helger.commons</groupId>
+      <artifactId>ph-xml</artifactId>
+    </dependency>
+    <dependency>
+      <!-- For genericode .gc files (SDK codelist related) -->
+      <groupId>com.helger</groupId>
+      <artifactId>ph-genericode</artifactId>
     </dependency>
 
+    <!-- SLF4J -->
     <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
 
+    <!-- Other -->
     <dependency>
       <groupId>info.picocli</groupId>
       <artifactId>picocli</artifactId>
     </dependency>
-
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <dependency>
+      <!-- For XSL 2.0 -->
+      <!-- https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE -->
+      <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
+      <groupId>net.sf.saxon</groupId>
+      <artifactId>Saxon-HE</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xmlresolver</groupId>
+      <artifactId>xmlresolver</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
     </dependency>
   </dependencies>
 
