@@ -56,7 +56,6 @@
     <version.ph>10.0.0</version.ph>
     <version.ph-genericode>6.2.0</version.ph-genericode>
     <version.saxon-he>11.3</version.saxon-he>
-    <version.xml-apis>1.4.01</version.xml-apis>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
     <version.xmlresolver>4.2.0</version.xmlresolver>
 
@@ -190,11 +189,6 @@
         <artifactId>xmlresolver</artifactId>
         <version>${version.xmlresolver}</version>
       </dependency>
-      <dependency>
-        <groupId>xml-apis</groupId>
-        <artifactId>xml-apis</artifactId>
-        <version>${version.xml-apis}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -282,6 +276,12 @@
       <!-- https://www.saxonica.com/products/products.xml (HE = Home Edition) -->
       <groupId>net.sf.saxon</groupId>
       <artifactId>Saxon-HE</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.antlr</groupId>
@@ -311,10 +311,12 @@
       <groupId>org.xmlresolver</groupId>
       <artifactId>xmlresolver</artifactId>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>xml-apis</groupId>
-      <artifactId>xml-apis</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
