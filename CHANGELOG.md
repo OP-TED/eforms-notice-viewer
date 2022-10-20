@@ -5,7 +5,7 @@ _The eForms Notice Viewer is a sample command line application that demonstrates
 ---
 ## In this release:
 
-We updated the Notice Viewer to use the latest version of the EFX Toolkit and eForms Core libraries.
+We updated the Notice Viewer to use the latest versions of the EFX Toolkit and eForms Core libraries.
 
 --- 
 
