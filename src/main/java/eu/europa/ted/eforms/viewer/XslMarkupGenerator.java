@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.Writer;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +15,8 @@ import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
-@VersionDependentComponent(versions = {"0.6", "0.7"}, componentType = VersionDependentComponentType.MARKUP_GENERATOR)
+@VersionDependentComponent(versions = {"1"},
+    componentType = VersionDependentComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
@@ -26,8 +26,9 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     super(10);
   }
 
+  @SuppressWarnings("static-method")
   protected String[] getAssetTypes() {
-    return new String[]  {"business_term", "field", "code", "decoration"};
+    return new String[] {"business_term", "field", "code", "decoration"};
   }
 
   private final String translations = Arrays.stream(getAssetTypes())
@@ -97,13 +98,17 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     final String innerVariableName = String.format("label%d", variableCounter);
     writer.writeLine("");
     writer.openTag("span", "class=\"dynamic-label\"");
-    writer.openTag("xsl:variable", String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
+    writer.openTag("xsl:variable",
+        String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
     writer.openTag("xsl:for-each", String.format("select=\"%s\"", expression.script));
     writer.writeLine(String.format("<xsl:variable name=\"%s\" select=\".\"/>", innerVariableName));
-    writer.writeLine(String.format("<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>", innerVariableName, innerVariableName));
+    writer.writeLine(String.format(
+        "<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>",
+        innerVariableName, innerVariableName));
     writer.closeTag("xsl:for-each");
     writer.closeTag("xsl:variable");
-    writer.writeLine(String.format("<xsl:value-of select=\"string-join($%s, ', ')\"/>", outerVariableName));
+    writer.writeLine(
+        String.format("<xsl:value-of select=\"string-join($%s, ', ')\"/>", outerVariableName));
     writer.closeTag("span");
     return new Markup(writer.toString());
   }

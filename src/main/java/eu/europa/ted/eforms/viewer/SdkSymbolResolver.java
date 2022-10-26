@@ -18,7 +18,7 @@ import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.xpath.XPathContextualizer;
 
-@VersionDependentComponent(versions = {"0.6", "0.7", "1"},
+@VersionDependentComponent(versions = {"1"},
     componentType = VersionDependentComponentType.SYMBOL_RESOLVER)
 public class SdkSymbolResolver implements SymbolResolver {
   protected Map<String, SdkField> fieldById;
@@ -44,8 +44,6 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   /**
-   * Private, use getInstance method instead.
-   *
    * @param sdkVersion The version of the SDK.
    * @throws InstantiationException
    */
@@ -56,9 +54,11 @@ public class SdkSymbolResolver implements SymbolResolver {
 
   protected void loadMapData(final String sdkVersion, final Path sdkRootPath)
       throws InstantiationException {
-    Path jsonPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
+
+    final Path jsonPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
         SdkConstants.SdkResource.FIELDS_JSON, sdkRootPath);
-    Path codelistsPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
+
+    final Path codelistsPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
         SdkConstants.SdkResource.CODELISTS, sdkRootPath);
 
     this.fieldById = new SdkFieldRepository(sdkVersion, jsonPath);
@@ -149,11 +149,21 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   @Override
-  public String getRootCodelistOfField(String fieldId) {
+  public String getRootCodelistOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new ParseCancellationException(String.format("Unknown field '%s'.", fieldId));
     }
-    return sdkField.getRootCodelistId();
+    final String codelistId = sdkField.getCodelistId();
+    if (codelistId == null) {
+      throw new ParseCancellationException(String.format("No codelist for field '%s'.", fieldId));
+    }
+
+    final SdkCodelist sdkCodelist = codelistById.get(codelistId);
+    if (sdkCodelist == null) {
+      throw new ParseCancellationException(String.format("Unknown codelist '%s'.", codelistId));
+    }
+
+    return sdkCodelist.getRootCodelistId();
   }
 }

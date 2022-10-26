@@ -34,13 +34,13 @@ class NoticeViewerTest {
   private static final String[] SOURCE_NOTICE_XML_FILENAMES2 =
       new String[] {"X01_EEIG", "X02_registration"};
 
-  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.7", "1.0"};
+  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.0"};
 
   private static final Path SDK_RESOURCES_ROOT =
       Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
 
   private static Stream<Arguments> provideArgsEfxToHtml() {
-    List<Arguments> arguments = new ArrayList<>();
+    final List<Arguments> arguments = new ArrayList<>();
     for (String language : SOURCE_LANGUAGES) {
       for (String noticeXmlFilename : SOURCE_NOTICE_XML_FILENAMES1) {
         for (String sdkVersion : SOURCE_SDK_VERSIONS) {
@@ -52,7 +52,7 @@ class NoticeViewerTest {
   }
 
   private static Stream<Arguments> provideArgsEfxToHtmlFromString() {
-    List<Arguments> arguments = new ArrayList<>();
+    final List<Arguments> arguments = new ArrayList<>();
     for (String language : SOURCE_LANGUAGES) {
       for (String noticeXmlFilename : SOURCE_NOTICE_XML_FILENAMES2) {
         for (String sdkVersion : SOURCE_SDK_VERSIONS) {
@@ -101,8 +101,8 @@ class NoticeViewerTest {
       final String sdkVersion)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
-    final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
-                                                         // passing any in cli.
+    // Equivalent to not passing any in cli.
+    final Optional<String> viewIdOpt = Optional.empty();
     final Path path =
         NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_RESOURCES_ROOT);
     logger.info("TEST: Wrote html file: {}", path);
@@ -116,12 +116,16 @@ class NoticeViewerTest {
       final String viewId, final String sdkVersion)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
-    Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
+
+    final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
+
     final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
+
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId), false, SDK_RESOURCES_ROOT);
+
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));
     // The test would have failed if there were errors, this is what the check
