@@ -40,7 +40,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Versions - eForms -->
-    <version.efx-toolkit>1.1.1</version.efx-toolkit>
+    <version.efx-toolkit>1.1.2-SNAPSHOT</version.efx-toolkit>
     <version.eforms-core>0.1.1</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
