@@ -41,7 +41,7 @@
 
     <!-- Versions - eForms -->
     <version.efx-toolkit>1.1.2-SNAPSHOT</version.efx-toolkit>
-    <version.eforms-core>0.1.1</version.eforms-core>
+    <version.eforms-core>0.1.2-SNAPSHOT</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
