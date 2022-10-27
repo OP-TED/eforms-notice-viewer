@@ -149,11 +149,21 @@ public class SdkSymbolResolver implements SymbolResolver {
   }
 
   @Override
-  public String getRootCodelistOfField(String fieldId) {
+  public String getRootCodelistOfField(final String fieldId) {
     final SdkField sdkField = fieldById.get(fieldId);
     if (sdkField == null) {
       throw new ParseCancellationException(String.format("Unknown field '%s'.", fieldId));
     }
-    return sdkField.getRootCodelistId();
+    final String codelistId = sdkField.getCodelistId();
+    if (codelistId == null) {
+      throw new ParseCancellationException(String.format("No codelist for field '%s'.", fieldId));
+    }
+
+    final SdkCodelist sdkCodelist = codelistById.get(codelistId);
+    if (sdkCodelist == null) {
+      throw new ParseCancellationException(String.format("Unknown codelist '%s'.", codelistId));
+    }
+
+    return sdkCodelist.getRootCodelistId();
   }
 }

@@ -7,6 +7,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -14,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.helger.genericode.Genericode10CodeListMarshaller;
 import com.helger.genericode.v10.CodeListDocument;
 import com.helger.genericode.v10.Identification;
+import com.helger.genericode.v10.LongName;
 import com.helger.genericode.v10.SimpleCodeList;
 import eu.europa.ted.eforms.sdk.helpers.GenericodeTools;
 
@@ -42,8 +45,8 @@ public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
    */
   @Override
   public final SdkCodelist get(final Object codelistId) {
-    if (StringUtils.isBlank((String) codelistId)) {
-      throw new RuntimeException("CodelistId is blank.");
+    if (codelistId == null || StringUtils.isBlank((String) codelistId)) {
+      throw new RuntimeException("codelistId is null or blank.");
     }
 
     return computeIfAbsent((String) codelistId, key -> {
@@ -79,13 +82,14 @@ public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
     }
     final String filename = codelistIdToFilename.get(codeListId);
     assert filename != null : "filename is null";
-    try (InputStream is = Files.newInputStream(codelistsPath)) {
+    try (InputStream is = Files.newInputStream(codelistsPath.resolve(Path.of(filename)))) {
       final CodeListDocument cl = marshaller.read(is);
       final SimpleCodeList scl = cl.getSimpleCodeList();
-      final String codelistVersion = cl.getIdentification().getVersion(); // Version
-                                                                          // tag
-                                                                          // of
-                                                                          // .gc
+
+      // Version tag of the genericode (gc) file.
+      final String codelistVersion = cl.getIdentification().getVersion();
+      final Optional<String> parentId = extractParentId(cl.getIdentification());
+
       // Get all the code values in a list.
       // We assume there are no duplicate code values in the referenced
       // codelists.
@@ -97,10 +101,32 @@ public class SdkCodelistRepository extends HashMap<String, SdkCodelist> {
             .getSimpleValue()//
             .getValue().strip();
       }).collect(Collectors.toList());
-      return SdkEntityFactory.getSdkCodelist(sdkVersion, codeListId, codelistVersion, codes);
+      return SdkEntityFactory.getSdkCodelist(sdkVersion, codeListId, codelistVersion, codes, parentId);
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  /**
+   * Get eForms parent id.
+   */
+  public static final Optional<String> extractParentId(final Identification ident) {
+    return extractLongNameWithIdentifier(ident, "eFormsParentId");
+  }
+
+  /**
+   * @return The extracted value as a stripped string if present, optional empty otherwise.
+   */
+  public static Optional<String> extractLongNameWithIdentifier(final Identification identity,
+      final String identifierStr) {
+    final Optional<LongName> valueOpt = identity.getLongName().stream()
+        .filter(item -> Objects.equals(item.getIdentifier(), identifierStr))//
+        .findFirst();
+    if (valueOpt.isPresent()) {
+      final String parentId = valueOpt.get().getValue();
+      return StringUtils.isBlank(parentId) ? Optional.empty() : Optional.of(parentId.strip());
+    }
+    return Optional.empty();
   }
 
   private static Map<String, String> buildMapCodelistIdToFilename(final Path pathFolder,
