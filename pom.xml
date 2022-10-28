@@ -41,7 +41,7 @@
 
     <!-- Versions - eForms -->
     <version.efx-toolkit>1.1.2-SNAPSHOT</version.efx-toolkit>
-    <version.eforms-core>0.1.1</version.eforms-core>
+    <version.eforms-core>0.1.2-SNAPSHOT</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
@@ -53,8 +53,6 @@
     <version.logback>1.2.11</version.logback>
     <version.picocli>4.6.3</version.picocli>
     <version.slf4j>1.7.36</version.slf4j>
-    <version.ph>10.0.0</version.ph>
-    <version.ph-genericode>6.2.0</version.ph-genericode>
     <version.saxon-he>11.3</version.saxon-he>
     <version.xml.bind-api>2.3.3</version.xml.bind-api>
     <version.xmlresolver>4.2.0</version.xmlresolver>
@@ -89,23 +87,6 @@
         <version>${version.commons-lang3}</version>
       </dependency>
 
-      <!-- Jackson -->
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${version.jackson}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${version.jackson-databind}</version>
-      </dependency>
-
       <!-- Logback -->
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -116,29 +97,6 @@
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
         <version>${version.logback}</version>
-      </dependency>
-
-      <!-- PH -->
-      <dependency>
-        <groupId>com.helger.commons</groupId>
-        <artifactId>ph-commons</artifactId>
-        <version>${version.ph}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.helger.commons</groupId>
-        <artifactId>ph-jaxb</artifactId>
-        <version>${version.ph}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.helger.commons</groupId>
-        <artifactId>ph-xml</artifactId>
-        <version>${version.ph}</version>
-      </dependency>
-      <dependency>
-        <!-- For genericode .gc files (SDK codelist related) -->
-        <groupId>com.helger</groupId>
-        <artifactId>ph-genericode</artifactId>
-        <version>${version.ph-genericode}</version>
       </dependency>
 
       <!-- SLF4J -->
@@ -209,21 +167,6 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
 
-    <!-- Jackson -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-
-    </dependency>
-
     <!-- Logback -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -234,25 +177,6 @@
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
       <scope>runtime</scope>
-    </dependency>
-
-    <!-- PH -->
-    <dependency>
-      <groupId>com.helger.commons</groupId>
-      <artifactId>ph-commons</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.commons</groupId>
-      <artifactId>ph-jaxb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.helger.commons</groupId>
-      <artifactId>ph-xml</artifactId>
-    </dependency>
-    <dependency>
-      <!-- For genericode .gc files (SDK codelist related) -->
-      <groupId>com.helger</groupId>
-      <artifactId>ph-genericode</artifactId>
     </dependency>
 
     <!-- SLF4J -->

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.SdkSymbolResolver;
 import eu.europa.ted.eforms.sdk.SdkVersion;
 import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 
