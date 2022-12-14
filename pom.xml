@@ -46,6 +46,7 @@
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
     <version.commons-lang3>3.12.0</version.commons-lang3>
+    <version.freemarker>2.3.31</version.freemarker>
     <version.jsoup>1.14.3</version.jsoup>
     <version.junit>5.7.2</version.junit>
     <version.logback>1.2.11</version.logback>
@@ -124,6 +125,11 @@
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
         <version>${version.antlr4}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.freemarker</groupId>
+        <artifactId>freemarker</artifactId>
+        <version>${version.freemarker}</version>
       </dependency>
       <dependency>
         <groupId>org.jsoup</groupId>
@@ -207,6 +213,11 @@
     <dependency>
       <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>

@@ -1,20 +1,29 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.Writer;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
+import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
+import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
 import eu.europa.ted.eforms.viewer.helpers.IndentedStringWriter;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
+import freemarker.template.TemplateException;
 
 @SdkComponent(versions = {"0.6", "0.7"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
@@ -27,12 +36,34 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   }
 
   protected String[] getAssetTypes() {
-    return new String[]  {"business_term", "field", "code", "decoration"};
+    return new String[] {"business_term", "field", "code", "decoration"};
   }
 
   private final String translations = Arrays.stream(getAssetTypes())
       .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
       .collect(Collectors.joining(", "));
+
+  private static List<String> markupsListToStringList(List<Markup> markupsList) {
+    return Optional.ofNullable(markupsList).orElse(Collections.emptyList()).stream()
+        .map((Markup markup) -> markup.script).collect(Collectors.toList());
+  }
+
+  private static Markup generateMarkup(final Map<String, Object> model,
+      final FreemarkerTemplate template) {
+    logger.debug("Generating markup using template [{}]", template.getPath());
+
+    try (StringWriter writer = new StringWriter()) {
+      FreemarkerHelper.processTemplate(template.getPath(),
+          Optional.ofNullable(model).orElseGet(HashMap::new), writer);
+
+      return new Markup(writer.toString());
+    } catch (IOException | TemplateException e) {
+      throw new RuntimeException(
+          MessageFormat.format("Failed to generate markup using template [{0}]",
+              template.getPath()),
+          e);
+    }
+  }
 
   @Override
   public String toString() {
@@ -41,39 +72,13 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
 
   @Override
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
-    // NOTE: you should use a library to build HTML and handle escaping, here we
-    // just use String
-    // format for demonstration purposes.
-    final IndentedStringWriter writer = new IndentedStringWriter(0);
-    writer.writeLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    writer.openTag("xsl:stylesheet",
-        "version=\"2.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" xmlns:fn=\"http://www.w3.org/2005/xpath-functions\" xmlns:cbc=\"urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2\" xmlns:cac=\"urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2\" xmlns:efext=\"http://data.europa.eu/p27/eforms-ubl-extensions/1\" xmlns:efac=\"http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1\" xmlns:efbc=\"http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1\" xmlns:ext=\"urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2\"");
-    writer.writeLine("<xsl:output method=\"html\" encoding=\"UTF-8\" indent=\"yes\"/>");
-    writer.writeLine("<xsl:param name=\"language\" />");
-    writer.writeLine(
-        String.format("<xsl:variable name=\"labels\" select=\"(%s)\"/>", this.translations));
-    // Root template.
-    writer.openTag("xsl:template", "match=\"/\"");
-    writer.openTag("html");
-    writer.openTag("head");
-    writer.openTag("style");
-    writer.writeLine("section { padding: 6px 6px 6px 36px; }");
-    writer.writeLine(".text { font-size: 12pt; color: black; }");
-    writer.writeLine(".label { font-size: 12pt; color: green; }");
-    writer.writeLine(".dynamic-label { font-size: 12pt; color: blue; }");
-    writer.writeLine(".value { font-size: 12pt; color: red; }");
-    writer.closeTag("style");
-    writer.closeTag("head");
-    writer.openTag("body");
-    writer.writeBlock(body.stream().map(item -> item.script).collect(Collectors.joining("\n")));
-    writer.closeTag("body");
-    writer.closeTag("html");
-    writer.closeTag("xsl:template");
-    writer.writeBlock(
-        templates.stream().map(template -> template.script).collect(Collectors.joining("\n")));
-    writer.closeTag("xsl:stylesheet");
+    final Map<String, Object> model = new HashMap<>();
 
-    return new Markup(writer.toString());
+    model.put("translations", this.translations);
+    model.put("body", markupsListToStringList(body));
+    model.put("templates", markupsListToStringList(templates));
+
+    return generateMarkup(model, FreemarkerTemplate.OUTPUT);
   }
 
   @Override
@@ -97,13 +102,17 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     final String innerVariableName = String.format("label%d", variableCounter);
     writer.writeLine("");
     writer.openTag("span", "class=\"dynamic-label\"");
-    writer.openTag("xsl:variable", String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
+    writer.openTag("xsl:variable",
+        String.format("name=\"%s\" as=\"xs:string*\"", outerVariableName));
     writer.openTag("xsl:for-each", String.format("select=\"%s\"", expression.script));
     writer.writeLine(String.format("<xsl:variable name=\"%s\" select=\".\"/>", innerVariableName));
-    writer.writeLine(String.format("<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>", innerVariableName, innerVariableName));
+    writer.writeLine(String.format(
+        "<xsl:value-of select=\"($labels//entry[@key=$%s]/text(), concat('{', $%s, '}'))[1]\"/>",
+        innerVariableName, innerVariableName));
     writer.closeTag("xsl:for-each");
     writer.closeTag("xsl:variable");
-    writer.writeLine(String.format("<xsl:value-of select=\"string-join($%s, ', ')\"/>", outerVariableName));
+    writer.writeLine(
+        String.format("<xsl:value-of select=\"string-join($%s, ', ')\"/>", outerVariableName));
     writer.closeTag("span");
     return new Markup(writer.toString());
   }
