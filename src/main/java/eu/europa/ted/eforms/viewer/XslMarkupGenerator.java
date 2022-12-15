@@ -16,7 +16,7 @@ import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
 import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
-import eu.europa.ted.eforms.viewer.helpers.IndentedStringWriter;
+import eu.europa.ted.eforms.viewer.helpers.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
@@ -25,14 +25,12 @@ import eu.europa.ted.efx.model.Markup;
 import freemarker.template.TemplateException;
 
 @SdkComponent(versions = {"0.6", "0.7"}, componentType = SdkComponentType.MARKUP_GENERATOR)
-public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGenerator {
+public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   private static int variableCounter = 0;
 
-  public XslMarkupGenerator() {
-    super(10);
-  }
+  public XslMarkupGenerator() {}
 
   protected String[] getAssetTypes() {
     return new String[] {"business_term", "field", "code", "decoration"};
@@ -80,11 +78,13 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
     logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, templates);
 
-    return generateMarkup(
-        FreemarkerTemplate.OUTPUT,
+    Markup unformattedMarkup = generateMarkup(
+        FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
         Pair.of("templates", markupsListToStringList(templates)));
+
+    return new Markup(XmlHelper.formatXml(unformattedMarkup.script, false));
   }
 
   @Override
@@ -92,7 +92,7 @@ public class XslMarkupGenerator extends IndentedStringWriter implements MarkupGe
     logger.trace("Rendering variable expression [{}]", valueReference);
 
     return generateMarkup(
-        FreemarkerTemplate.VAR_EXPRESSION,
+        FreemarkerTemplate.VARIABLE_EXPRESSION,
         Pair.of("valueReference", valueReference.script));
   }
 
