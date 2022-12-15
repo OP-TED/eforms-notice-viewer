@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer.config;
 
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import freemarker.template.Configuration;
@@ -10,9 +9,9 @@ public class NoticeViewerConfig {
 
   private static Configuration freemarkerConfig;
 
-  public NoticeViewerConfig() {}
+  private NoticeViewerConfig() {}
 
-  public static Configuration getFreemarkerConfig() throws IOException {
+  public static Configuration getFreemarkerConfig() {
     if (freemarkerConfig == null) {
       logger.debug("Configuring Freemarker");
 
