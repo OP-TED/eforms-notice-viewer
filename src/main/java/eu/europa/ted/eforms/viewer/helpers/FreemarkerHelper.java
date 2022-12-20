@@ -6,7 +6,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -15,14 +14,31 @@ public class FreemarkerHelper {
 
   private FreemarkerHelper() {}
 
-  public static void processTemplate(String templatePath, Map<String, Object> model, Writer out)
-      throws IOException, TemplateException {
+  /**
+   * Locates a Freemarker template by its path.
+   *
+   * @param templatePath The template's path
+   * @return A Freemarker template
+   * @throws IOException
+   */
+  public static Template getTemplate(final String templatePath) throws IOException {
+    return NoticeViewerConfig.getFreemarkerConfig().getTemplate(templatePath);
+  }
+
+  /**
+   * Processes a Freemarker template using a specified map of variables (model).
+   * 
+   * @param templatePath The template's path
+   * @param model The map of variables to load
+   * @param out A writer for the output
+   * @throws TemplateException
+   * @throws IOException
+   */
+  public static void processTemplate(final String templatePath, final Map<String, Object> model,
+      final Writer out) throws TemplateException, IOException {
     logger.debug("Processing Freemarker template [{}]", templatePath);
 
-    final Configuration freemarkerConfig = NoticeViewerConfig.getFreemarkerConfig();
-    final Template template = freemarkerConfig.getTemplate(templatePath);
-
-    template.process(model, out);
+    getTemplate(templatePath).process(model, out);
 
     logger.debug("Finished processing Freemarker template [{}]", templatePath);
     logger.trace("Generated output:\n{}", out);
