@@ -1,10 +1,14 @@
-
+<#--
+    Available variables:
+    - expression: The expression to use for rendering
+    - labelSuffix: Suffix for labels
+-->
 <span class="dynamic-label">
-	<xsl:variable name="labels${variableCounter}" as="xs:string*">
+	<xsl:variable name="labels${labelSuffix}" as="xs:string*">
 		<xsl:for-each select="${expression}">
-			<xsl:variable name="label${variableCounter}" select="."/>
-			<xsl:value-of select="($labels//entry[@key=$label${variableCounter}]/text(), concat('{', $label${variableCounter}, '}'))[1]"/>
+			<xsl:variable name="label${labelSuffix}" select="."/>
+			<xsl:value-of select="($labels//entry[@key=$label${labelSuffix}]/text(), concat('{', $label${labelSuffix}, '}'))[1]"/>
 		</xsl:for-each>
 	</xsl:variable>
-	<xsl:value-of select="string-join($labels${variableCounter}, ', ')"/>
+	<xsl:value-of select="string-join($labels${labelSuffix}, ', ')"/>
 </span>

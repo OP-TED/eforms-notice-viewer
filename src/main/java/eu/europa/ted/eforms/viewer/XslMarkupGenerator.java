@@ -93,7 +93,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_EXPRESSION,
-        Pair.of("valueReference", valueReference.script));
+        Pair.of("expression", valueReference.script));
   }
 
   @Override
@@ -107,12 +107,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderLabelFromExpression(final Expression expression) {
     logger.trace("Rendering label from expression [{}]", expression);
 
-    variableCounter++;
-
     return generateMarkup(
         FreemarkerTemplate.LABEL_FROM_EXPRESSION,
         Pair.of("expression", expression.script),
-        Pair.of("variableCounter", variableCounter));
+        Pair.of("labelSuffix", ++variableCounter));
   }
 
   @Override
