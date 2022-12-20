@@ -10,6 +10,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.Optional;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -306,24 +307,39 @@ public class NoticeViewer {
 
     logger.debug("View path: {}", viewPath);
 
-    Validate.isTrue(viewPath.toFile().exists(), "No such file: " + viewId);
+    Validate.isTrue(Files.exists(viewPath), "No such file: " + viewId);
 
-    try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
-      final String translation = EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
-          sdkVersion, viewInputStream);
-      Files.createDirectories(OUTPUT_FOLDER_XSL);
+    final String nameByConvention = viewId + ".xsl";
+    final Path filePath = OUTPUT_FOLDER_XSL.resolve(nameByConvention);
 
-      final String nameByConvention = viewId + ".xsl";
-      final Path filePath = OUTPUT_FOLDER_XSL.resolve(nameByConvention);
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
-        writer.write(translation);
+    if (!Files.exists(filePath)) {
+      try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
+        final String translation = Cache.getString(
+            () -> {
+              try {
+                return EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
+                    sdkVersion,
+                    viewInputStream);
+              } catch (InstantiationException | IOException e) {
+                throw new RuntimeException(
+                    MessageFormat.format(
+                        "Failed to build XSL for view ID [{0}] and SDK version[{1}]",
+                        viewId, sdkVersion, e));
+              }
+            },
+            sdkRootPath.toString(), sdkVersion);
+
+        Files.createDirectories(OUTPUT_FOLDER_XSL);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+          writer.write(translation);
+        }
+
+        logger.debug("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
+            sdkVersion, filePath);
       }
-
-      logger.debug("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
-          sdkVersion, filePath);
-
-      return filePath;
     }
+
+    return filePath;
   }
 
   /**

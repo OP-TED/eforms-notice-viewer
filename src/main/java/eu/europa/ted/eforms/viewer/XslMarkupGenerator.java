@@ -1,14 +1,17 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +25,6 @@ import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
-import freemarker.template.TemplateException;
 
 @SdkComponent(versions = {"0.6", "0.7"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
@@ -48,25 +50,50 @@ public class XslMarkupGenerator implements MarkupGenerator {
   @SafeVarargs
   private static final Markup generateMarkup(final FreemarkerTemplate template,
       Pair<String, Object>... params) {
-    logger.debug("Generating markup using template [{}] with parameters: {}", template.getPath(),
-        params);
 
-    final Map<String, Object> model =
-        Arrays.asList(Optional.ofNullable(params)
-            .orElseGet(Pair::emptyArray))
-            .stream()
-            .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+    final Supplier<String> xslGenerator = () -> {
+      logger.debug("Generating markup using template [{}]", template.getPath());
+      logger.trace("Template parameters: [{}]", (Object[]) params);
 
-    try (StringWriter writer = new StringWriter()) {
-      FreemarkerHelper.processTemplate(template.getPath(), model, writer);
+      final Map<String, Object> model =
+          Arrays.asList(Optional.ofNullable(params)
+              .orElseGet(Pair::emptyArray))
+              .stream()
+              .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
-      return new Markup(writer.toString());
-    } catch (IOException | TemplateException e) {
-      throw new RuntimeException(
-          MessageFormat.format("Failed to generate markup using template [{0}]",
-              template.getPath()),
-          e);
+      try (StringWriter writer = new StringWriter()) {
+        FreemarkerHelper.processTemplate(template.getPath(), model, writer);
+
+        return writer.toString();
+      } catch (Exception e) {
+        throw new RuntimeException(
+            MessageFormat.format("Failed to generate markup using template [{0}]",
+                template.getPath()),
+            e);
+      }
+    };
+
+    String xsl = null;
+
+    if (ArrayUtils.isNotEmpty(params)) {
+      List<String> keyParts = new ArrayList<>();
+
+      Arrays.stream(params).forEach((Object param) -> {
+        if (param instanceof Collection) {
+          keyParts.addAll(((Collection<?>) param).stream()
+              .map((Object o) -> o instanceof Markup ? ((Markup) o).script : o.toString())
+              .collect(Collectors.toList()));
+        } else {
+          keyParts.add(param.toString());
+        }
+      });
+
+      xsl = Cache.getString(xslGenerator, keyParts.toArray(String[]::new));
+    } else {
+      xsl = xslGenerator.get();
     }
+
+    return new Markup(xsl);
   }
 
   @Override

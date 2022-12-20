@@ -1,0 +1,24 @@
+# DEFAULT CACHE REGION
+
+jcs.default=DC
+jcs.default.cacheattributes=org.apache.commons.jcs3.engine.CompositeCacheAttributes
+jcs.default.cacheattributes.MaxObjects=1000
+jcs.default.cacheattributes.MemoryCacheName=org.apache.commons.jcs3.engine.memory.lru.LRUMemoryCache
+
+# PRE-DEFINED CACHE REGIONS
+
+jcs.region.nvCache=DC
+jcs.region.nvCache.cacheattributes=org.apache.commons.jcs3.engine.CompositeCacheAttributes
+jcs.region.nvCache.cacheattributes.DiskUsagePattern=UPDATE
+jcs.region.nvCache.cacheattributes.MemoryCacheName=org.apache.commons.jcs3.engine.memory.lru.LRUMemoryCache
+jcs.region.nvCache.cacheattributes.MaxSpoolPerRun=500
+jcs.region.nvCache.elementattributes=org.apache.commons.jcs3.engine.ElementAttributes
+jcs.region.nvCache.elementattributes.IsEternal=true
+
+
+# AVAILABLE AUXILIARY CACHES
+
+jcs.auxiliary.DC=org.apache.commons.jcs3.auxiliary.disk.indexed.IndexedDiskCacheFactory
+jcs.auxiliary.DC.attributes=org.apache.commons.jcs3.auxiliary.disk.indexed.IndexedDiskCacheAttributes
+jcs.auxiliary.DC.attributes.DiskPath=${java.io.tmpdir}/jcs_swap
+jcs.auxiliary.DC.attributes.maxKeySize=100000
