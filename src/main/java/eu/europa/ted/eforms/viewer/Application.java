@@ -1,10 +1,9 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.util.Arrays;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
+import eu.europa.ted.eforms.viewer.helpers.LoggingHelper;
 import picocli.CommandLine;
 import picocli.CommandLine.IExecutionExceptionHandler;
 import picocli.CommandLine.ParseResult;
@@ -16,7 +15,7 @@ public class Application {
   private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
   public static void main(final String... args) {
-    installJulToSlf4jBridge();
+    LoggingHelper.installJulToSlf4jBridge();
 
     CommandLine cli = new CommandLine(new CliCommand());
     cli.setExecutionExceptionHandler(new IExecutionExceptionHandler() {
@@ -34,11 +33,5 @@ public class Application {
 
     int exitCode = cli.execute(args);
     System.exit(exitCode);
-  }
-
-  private static void installJulToSlf4jBridge() {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-    java.util.logging.Logger.getLogger("").setLevel(Level.FINEST); // Root logger, for example.
   }
 }
