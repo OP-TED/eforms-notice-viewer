@@ -50,7 +50,7 @@ class CliCommand implements Callable<Integer> {
 
   @Option(names = {"-f", "--force"},
       description = "Force re-building of XSL by clearing any cached content.")
-  private boolean force;
+  private boolean forceBuild;
 
   @Option(names = {"-t", "--templatesRoot"}, description = "Templates root folder.")
   void setTemplatesRoot(String templatesRoot) {
@@ -84,14 +84,10 @@ class CliCommand implements Callable<Integer> {
     // Initialise Freemarker templates so that the templates folder will be populated
     NoticeViewerConfig.getFreemarkerConfig();
 
-    if (force) {
-      Cache.clear();
-    }
-
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
             sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
-            force);
+            forceBuild);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

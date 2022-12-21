@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Optional;
+import java.util.function.Supplier;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,6 +38,7 @@ import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
+import eu.europa.ted.eforms.viewer.helpers.CacheHelper;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.efx.EfxTranslator;
@@ -56,7 +58,7 @@ public class NoticeViewer {
    *        type
    * @param profileXslt If set to true, XSLT profiling will be enabled
    * @param sdkRootPath Path of the root SDK folder
-   * @param force Forces the re-creation of XSL files
+   * @param forceBuild Forces the re-creation of XSL files
    * @return The path of the generated HTML file
    *
    * @throws IOException If an error occurs during input or output
@@ -66,7 +68,7 @@ public class NoticeViewer {
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
-      boolean force)
+      boolean forceBuild)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -93,7 +95,7 @@ public class NoticeViewer {
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
     logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
-    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, force);
+    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, forceBuild);
     final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
         viewId, profileXslt, sdkRootPath);
     // Ensure the HTML can be parsed.
@@ -288,6 +290,24 @@ public class NoticeViewer {
     }
   }
 
+  private static Supplier<String> templateTranslator(final Path sdkRootPath,
+      final String sdkVersion,
+      final InputStream viewInputStream, final String viewId) {
+    return () -> {
+      try {
+        return EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
+            sdkVersion,
+            viewInputStream);
+      } catch (InstantiationException | IOException e) {
+        throw new RuntimeException(
+            MessageFormat.format(
+                "Failed to build XSL for view ID [{0}] and SDK version[{1}]",
+                viewId, sdkVersion),
+            e);
+      }
+    };
+  }
+
   /**
    * Takes the EFX view template as a viewId string and outputs the XSL.
    *
@@ -295,13 +315,13 @@ public class NoticeViewer {
    *        from SDK by using naming conventions
    * @param sdkVersion The version of the desired SDK
    * @param sdkRootPath Path of the root SDK folder
-   * @param force Forces the re-creation of XSL files
+   * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
    * @throws InstantiationException
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath,
-      boolean force)
+      boolean forceBuild)
       throws IOException, InstantiationException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
@@ -314,23 +334,19 @@ public class NoticeViewer {
     final Path filePath =
         Path.of(NoticeViewerConstants.OUTPUT_FOLDER_XSL.toString(), sdkVersion, viewId + ".xsl");
 
-    if (!Files.exists(filePath) || force) {
+    if (!Files.exists(filePath) || forceBuild) {
       try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
-        final String translation = Cache.getString(
-            () -> {
-              try {
-                return EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
-                    sdkVersion,
-                    viewInputStream);
-              } catch (InstantiationException | IOException e) {
-                throw new RuntimeException(
-                    MessageFormat.format(
-                        "Failed to build XSL for view ID [{0}] and SDK version[{1}]",
-                        viewId, sdkVersion),
-                    e);
-              }
-            },
-            sdkRootPath.toString(), sdkVersion, viewId);
+        Supplier<String> translator =
+            templateTranslator(sdkRootPath, sdkVersion, viewInputStream, viewId);
+
+        if (forceBuild) {
+          CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
+              new String[] {sdkRootPath.toString(), sdkVersion, viewId});
+        }
+
+        final String translation =
+            CacheHelper.get(translator, NoticeViewerConstants.NV_CACHE_REGION,
+                new String[] {sdkRootPath.toString(), sdkVersion, viewId});
 
         Files.createDirectories(filePath.getParent());
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
