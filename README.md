@@ -59,6 +59,7 @@ Execute the binary `eforms-notice-viewer-<version>-app.jar` as follows:
 
 The available OPTIONS are:
 
+- `-f` or `--force`: Forces re-building of XSL by clearing any cached content.
 - `-h` or `--help`: Shows a help message and exits.
 - `-i` or `--viewId`: Identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
 - `-p` or `--profileXslt`: Enables XSLT profiling.
@@ -89,10 +90,11 @@ While running, log output is generated in the console as well as under a folder 
 
 ### Templates for markup generation
 
-The generated markup is compiled using Freemarker templates.
+The generated XSL markup is compiled using Freemarker templates.
 
 These templates are bundled with the distributed JAR file and extracted to a folder named "templates" under the same folder where the application is started from.
 
 The extracted templates under this folder can be altered in order to customize the generated markup.
 
-**NOTE:** The folder's path can be changed by using the option "-t".
+**NOTE 1:** The folder's path can be changed by using the option "-t".
+**NOTE 2:** Any change to the templates will require the usage of the option "-f", which removes the cached XSL and causes it to be rebuilt.
