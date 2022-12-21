@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -66,6 +67,11 @@ class NoticeViewerTest {
 
   private static Stream<Arguments> provideArgsEfxToXsl() {
     return Arrays.asList(SOURCE_SDK_VERSIONS).stream().map((String s) -> Arguments.of(s));
+  }
+
+  @BeforeAll
+  public static void setUp() {
+    System.setProperty(NoticeViewerConstants.TEMPLATES_ROOT_DIR_PROPERTY, "target/templates");
   }
 
   @ParameterizedTest

@@ -1,6 +1,7 @@
 package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -46,6 +47,11 @@ class CliCommand implements Callable<Integer> {
   @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling.")
   private boolean profileXslt;
 
+  @Option(names = {"-t", "--templatesRoot"}, description = "Templates root folder.")
+  void setTemplatesRoot(String templatesRoot) {
+    System.setProperty(NoticeViewerConstants.TEMPLATES_ROOT_DIR_PROPERTY, templatesRoot);
+  }
+
   @Parameters(index = "0", description = "Two letter language code.")
   public void setLanguage(String language) {
     if (StringUtils.isBlank(language) || language.length() != 2) {
@@ -64,10 +70,12 @@ class CliCommand implements Callable<Integer> {
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
    * @throws InstantiationException 
+   * @throws URISyntaxException 
    */
   @Override
   public Integer call()
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      URISyntaxException {
     final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlPath,
         Optional.ofNullable(viewId), profileXslt,
         sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT);

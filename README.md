@@ -55,11 +55,21 @@ mvn clean install -U
 
 Execute the binary `eforms-notice-viewer-<version>-app.jar` as follows:
 
-    java -jar eforms-notice-viewer-<version>-app.jar <language> <xml file> [<view id>]
+    java -jar eforms-notice-viewer-<version>-app.jar [OPTIONS] <language> <xml file>
+
+The available OPTIONS are:
+
+- `-h` or `--help`: Shows a help message and exits.
+- `-i` or `--viewId`: Identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
+- `-p` or `--profileXslt`: Enables XSLT profiling.
+- `-r` or `--sdkRoot`: SDK resources root folder.
+- `-t` or `--templatesRoot`: Templates root folder.
+- `-V` or `--version`: Prints version information and exits.
+
+The required parameters are:
 
 - `<language>`: two letter code for the desired language of the output (en, fr, etc.)
 - `<xml file>`: path to the XML notice to view
-- `<view id>`: identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
 
 ### Example
 
@@ -72,7 +82,17 @@ java -jar eforms-notice-viewer-<version>-app.jar en eforms-sdk/1/0/examples/noti
 To generate an HTML for the summary view of the file `cn_24_minimal.xml` in `en` (English):
 
 ```
-java -jar eforms-notice-viewer-<version>-app.jar en eforms-sdk/1.0/examples/notices/cn_24_minimal.xml summary
+java -jar eforms-notice-viewer-<version>-app.jar -i summary en eforms-sdk/1.0/examples/notices/cn_24_minimal.xml
 ```
 
 While running, log output is generated in the console as well as under a folder named `logs`, giving information on the location of the generated XSL, HTML, and any problem encountered.
+
+### Templates for markup generation
+
+The generated markup is compiled using Freemarker templates.
+
+These templates are bundled with the distributed JAR file and extracted to a folder named "templates" under the same folder where the application is started from.
+
+The extracted templates under this folder can be altered in order to customize the generated markup.
+
+**NOTE:** The folder's path can be changed by using the option "-t".
