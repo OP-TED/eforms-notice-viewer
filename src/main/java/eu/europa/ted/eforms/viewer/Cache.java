@@ -48,7 +48,7 @@ public class Cache {
 
   public static String computeKey(String... strings) {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
-    String key = DigestUtils.md5Hex((StringUtils.join(strings)));
+    String key = DigestUtils.md5Hex((StringUtils.join(strings, "###")));
 
     logger.trace("Computed key for [{}]: {}", strings, key);
 
