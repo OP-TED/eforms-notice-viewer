@@ -54,4 +54,10 @@ public class Cache {
 
     return key;
   }
+
+  public static void clear() {
+    logger.debug("Clearing cache");
+
+    nvCache.clear();
+  }
 }

@@ -46,9 +46,6 @@ import net.sf.saxon.trace.TimingTraceListener;
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
 
-  private static final Path OUTPUT_FOLDER_HTML = Path.of("target", "output-html");
-  private static final Path OUTPUT_FOLDER_XSL = Path.of("target", "output-xsl");
-
   private NoticeViewer() {}
 
   /**
@@ -59,6 +56,7 @@ public class NoticeViewer {
    *        type
    * @param profileXslt If set to true, XSLT profiling will be enabled
    * @param sdkRootPath Path of the root SDK folder
+   * @param force Forces the re-creation of XSL files
    * @return The path of the generated HTML file
    *
    * @throws IOException If an error occurs during input or output
@@ -67,7 +65,8 @@ public class NoticeViewer {
    * @throws InstantiationException
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
-      final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath)
+      final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
+      boolean force)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -94,7 +93,7 @@ public class NoticeViewer {
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
     logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
-    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath);
+    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, force);
     final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
         viewId, profileXslt, sdkRootPath);
     // Ensure the HTML can be parsed.
@@ -215,7 +214,8 @@ public class NoticeViewer {
     factory.setURIResolver(new CustomUriResolver(sdkVersion, sdkRootPath));
 
     if (profileXslt) {
-      final Path xsltProfilePath = OUTPUT_FOLDER_HTML.resolve(viewId + "-xslt_profile.html");
+      final Path xsltProfilePath =
+          NoticeViewerConstants.OUTPUT_FOLDER_HTML.resolve(viewId + "-xslt_profile.html");
       logger.info("XSLT profiling is enabled. The result can be found at: {}", xsltProfilePath);
 
       factory.setAttribute(FeatureKeys.TRACE_LISTENER_CLASS, TimingTraceListener.class.getName());
@@ -253,9 +253,9 @@ public class NoticeViewer {
     final Source xmlInput = new StreamSource(noticeXmlPath.toFile());
 
     // HTML as output of the transformation.
-    Files.createDirectories(OUTPUT_FOLDER_HTML);
+    Files.createDirectories(NoticeViewerConstants.OUTPUT_FOLDER_HTML);
 
-    final Path htmlPath = OUTPUT_FOLDER_HTML.resolve(viewId + ".html");
+    final Path htmlPath = NoticeViewerConstants.OUTPUT_FOLDER_HTML.resolve(viewId + ".html");
     final StreamResult outputTarget = new StreamResult(htmlPath.toFile());
     try (InputStream inputStream = Files.newInputStream(xslPath)) {
       final Source xslSource = new StreamSource(inputStream);
@@ -295,11 +295,13 @@ public class NoticeViewer {
    *        from SDK by using naming conventions
    * @param sdkVersion The version of the desired SDK
    * @param sdkRootPath Path of the root SDK folder
+   * @param force Forces the re-creation of XSL files
    * @return Path to the built file
    * @throws IOException If an error occurred while writing the file
    * @throws InstantiationException
    */
-  public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath)
+  public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath,
+      boolean force)
       throws IOException, InstantiationException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
@@ -309,10 +311,10 @@ public class NoticeViewer {
 
     Validate.isTrue(Files.exists(viewPath), "No such file: " + viewId);
 
-    final String nameByConvention = viewId + ".xsl";
-    final Path filePath = OUTPUT_FOLDER_XSL.resolve(nameByConvention);
+    final Path filePath =
+        Path.of(NoticeViewerConstants.OUTPUT_FOLDER_XSL.toString(), sdkVersion, viewId + ".xsl");
 
-    if (!Files.exists(filePath)) {
+    if (!Files.exists(filePath) || force) {
       try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
         final String translation = Cache.getString(
             () -> {
@@ -324,12 +326,13 @@ public class NoticeViewer {
                 throw new RuntimeException(
                     MessageFormat.format(
                         "Failed to build XSL for view ID [{0}] and SDK version[{1}]",
-                        viewId, sdkVersion, e));
+                        viewId, sdkVersion),
+                    e);
               }
             },
-            sdkRootPath.toString(), sdkVersion);
+            sdkRootPath.toString(), sdkVersion, viewId);
 
-        Files.createDirectories(OUTPUT_FOLDER_XSL);
+        Files.createDirectories(filePath.getParent());
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
           writer.write(translation);
         }

@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -47,6 +48,10 @@ class CliCommand implements Callable<Integer> {
   @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling.")
   private boolean profileXslt;
 
+  @Option(names = {"-f", "--force"},
+      description = "Force re-building of XSL by clearing any cached content.")
+  private boolean force;
+
   @Option(names = {"-t", "--templatesRoot"}, description = "Templates root folder.")
   void setTemplatesRoot(String templatesRoot) {
     System.setProperty(NoticeViewerConstants.TEMPLATES_ROOT_DIR_PROPERTY, templatesRoot);
@@ -76,9 +81,17 @@ class CliCommand implements Callable<Integer> {
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       URISyntaxException {
-    final Path htmlPath = NoticeViewer.generateHtml(language, noticeXmlPath,
-        Optional.ofNullable(viewId), profileXslt,
-        sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT);
+    // Initialise Freemarker templates so that the templates folder will be populated
+    NoticeViewerConfig.getFreemarkerConfig();
+
+    if (force) {
+      Cache.clear();
+    }
+
+    final Path htmlPath =
+        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
+            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
+            force);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;
