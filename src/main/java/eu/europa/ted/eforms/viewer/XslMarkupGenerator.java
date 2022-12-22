@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -22,15 +21,12 @@ import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
-import freemarker.template.TemplateException;
 
 @SdkComponent(versions = {"0.6", "0.7"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   private static int variableCounter = 0;
-
-  public XslMarkupGenerator() {}
 
   protected String[] getAssetTypes() {
     return new String[] {"business_term", "field", "code", "decoration"};
@@ -48,7 +44,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
   @SafeVarargs
   private static final Markup generateMarkup(final FreemarkerTemplate template,
       Pair<String, Object>... params) {
-    logger.debug("Generating markup using template [{}] with parameters: {}", template.getPath(),
+
+    logger.trace("Generating markup using template [{}] with parameters: {}", template.getPath(),
         params);
 
     final Map<String, Object> model =
@@ -61,7 +58,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
       FreemarkerHelper.processTemplate(template.getPath(), model, writer);
 
       return new Markup(writer.toString());
-    } catch (IOException | TemplateException e) {
+    } catch (Exception e) {
       throw new RuntimeException(
           MessageFormat.format("Failed to generate markup using template [{0}]",
               template.getPath()),

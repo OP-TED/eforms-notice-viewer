@@ -36,11 +36,11 @@ public class FreemarkerHelper {
    */
   public static void processTemplate(final String templatePath, final Map<String, Object> model,
       final Writer out) throws TemplateException, IOException {
-    logger.debug("Processing Freemarker template [{}]", templatePath);
+    logger.trace("Processing Freemarker template [{}]", templatePath);
 
     getTemplate(templatePath).process(model, out);
 
-    logger.debug("Finished processing Freemarker template [{}]", templatePath);
+    logger.trace("Finished processing Freemarker template [{}]", templatePath);
     logger.trace("Generated output:\n{}", out);
   }
 }

@@ -29,9 +29,11 @@
     </encoder>
   </appender>
 
+  <logger name="eu.europa.ted" level="DEBUG" />
+  <logger name="org.apache.commons.jcs3" level="ERROR" />
   <logger name="org.reflections" level="ERROR" />
 
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="STDOUT" />
     <appender-ref ref="FILE" />
   </root>
