@@ -1,11 +1,12 @@
-# eForms Notice Viewer 0.6.0 - Release Notes
+# eForms Notice Viewer 0.6.1 - Release Notes
 
 _The eForms Notice Viewer is a sample command line application that demonstrates how you can use the [eForms SDK](https://github.com/OP-TED/eForms-SDK) in a metadata driven application that visualises eForms notices._
 
 ---
 ## In this release:
 
-* We moved some reusable classes from Notice Viewer to the EFX Toolkit and eForms Core libraries.
+* Introduced usage of Freemarket templates for the generation of XSL.
+* Implemented caching of the generated XSL.
 
 --- 
 
