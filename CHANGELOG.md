@@ -14,4 +14,4 @@ Documentation for this sample application is available at: https://docs.ted.euro
 
 This version depends on:
  - [EFX toolkit for Java](https://github.com/OP-TED/efx-toolkit-java) version 1.2.0.
- - [eForms Core for Java](https://github.com/OP-TED/eforms-core-java) library version 1.0.0.
+ - [eForms Core for Java](https://github.com/OP-TED/eforms-core-java) library version 1.0.1.
