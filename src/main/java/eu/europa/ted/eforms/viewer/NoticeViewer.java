@@ -349,7 +349,8 @@ public class NoticeViewer {
                 new String[] {sdkRootPath.toString(), sdkVersion, viewId});
 
         Files.createDirectories(filePath.getParent());
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile()))) {
+        try (BufferedWriter writer =
+            new BufferedWriter(new FileWriter(filePath.toFile(), StandardCharsets.UTF_8))) {
           writer.write(translation);
         }
 
