@@ -32,6 +32,17 @@
     <url>https://github.com/OP-TED/eforms-notice-viewer.git</url>
   </scm>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/OP-TED/eforms-notice-viewer</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </distributionManagement>
+
   <properties>
     <project.build.outputTimestamp>2023-01-31T18:22:58Z</project.build.outputTimestamp>
 
