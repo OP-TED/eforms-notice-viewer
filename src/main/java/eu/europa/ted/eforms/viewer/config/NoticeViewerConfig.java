@@ -45,12 +45,18 @@ public class NoticeViewerConfig {
       logger.debug("Configuring Freemarker using [{}] as the templates root directory.",
           templatesRootDirPath);
 
-      populateExternalTemplatesDir(templatesRootDirPath);
+      try {
+        populateExternalTemplatesDir(templatesRootDirPath);
+      } catch (IOException e) {
+        logger.warn("Failed to populate external templates directory [{}]", templatesRootDirPath);
+        logger.debug("The error was:", e);
+      }
 
       FileTemplateLoader fileTemplateLoader =
           new FileTemplateLoader(templatesRootDirPath.toFile());
       ClassTemplateLoader classTemplateLoader =
           new ClassTemplateLoader(NoticeViewerConfig.class, "/templates");
+
       MultiTemplateLoader multiTemplateLoader =
           new MultiTemplateLoader(new TemplateLoader[] {fileTemplateLoader, classTemplateLoader});
 
@@ -71,7 +77,7 @@ public class NoticeViewerConfig {
    * @throws IOException
    * @throws Exception
    */
-  private static void populateExternalTemplatesDir(Path targetTemplatesRootDir) {
+  private static void populateExternalTemplatesDir(Path targetTemplatesRootDir) throws IOException {
     Validate.notNull(targetTemplatesRootDir, "Undefined templates root directory");
 
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -85,19 +91,10 @@ public class NoticeViewerConfig {
             targetPath.toAbsolutePath());
 
         Path parentPath = targetPath.getParent();
-        try {
-          Files.createDirectories(parentPath);
-        } catch (IOException e) {
-          logger.warn("Failed to create parent directory for templates [{}]", parentPath);
-          logger.debug("The error was:", e);
-          return;
-        }
+        Files.createDirectories(parentPath);
 
         try (OutputStream os = Files.newOutputStream(targetPath, StandardOpenOption.CREATE)) {
           IOUtils.copy(cl.getResourceAsStream(sourcePath.toString().replace("\\", "/")), os);
-        } catch (IOException e) {
-          logger.warn("Failed to copy templates from [{}] to [{}]", sourcePath, targetPath);
-          logger.debug("The error was:", e);
         }
       }
     }
