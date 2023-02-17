@@ -1,12 +1,6 @@
-name: Publish package to GitHub Packages
+name: Build the project
 on:
   push:
-    branches:
-      - 'develop'
-      - 'main'
-
-  release:
-    types: [created]
 
   # Allows to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -23,7 +17,5 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Publish package
-        run: mvn --batch-mode deploy
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build package
+        run: mvn --batch-mode clean install
