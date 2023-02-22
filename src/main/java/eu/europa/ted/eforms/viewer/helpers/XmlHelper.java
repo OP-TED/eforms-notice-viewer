@@ -26,9 +26,8 @@ public class XmlHelper {
   }
 
   private static OutputFormat getOutputFormat(int indent, boolean skipDeclaration) {
-    OutputFormat format = new OutputFormat();
+    OutputFormat format = OutputFormat.createPrettyPrint();
     format.setIndentSize(indent);
-    format.setNewlines(true);
     format.setSuppressDeclaration(skipDeclaration);
 
     return format;
