@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -47,8 +48,8 @@ public class NoticeViewerConfig {
       logger.debug("Configuring Freemarker using [{}] as the templates root directory.",
           templatesRootDirPath);
 
-      List<TemplateLoader> templateLoaders =
-          Arrays.asList(new ClassTemplateLoader(NoticeViewerConfig.class, "/templates"));
+      List<TemplateLoader> templateLoaders = new ArrayList<>(
+          Arrays.asList(new ClassTemplateLoader(NoticeViewerConfig.class, "/templates")));
 
       try {
         populateExternalTemplatesDir(templatesRootDirPath);
