@@ -114,7 +114,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderFreeText(final String freeText) {
     logger.trace("Rendering free text [{}]", freeText);
 
-    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText));
+    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText.replace(" ","&#8200;")));
   }
 
   @Override

@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -45,14 +47,19 @@ public class NoticeViewerConfig {
       logger.debug("Configuring Freemarker using [{}] as the templates root directory.",
           templatesRootDirPath);
 
-      populateExternalTemplatesDir(templatesRootDirPath);
+      List<TemplateLoader> templateLoaders =
+          Arrays.asList(new ClassTemplateLoader(NoticeViewerConfig.class, "/templates"));
 
-      FileTemplateLoader fileTemplateLoader =
-          new FileTemplateLoader(templatesRootDirPath.toFile());
-      ClassTemplateLoader classTemplateLoader =
-          new ClassTemplateLoader(NoticeViewerConfig.class, "/templates");
+      try {
+        populateExternalTemplatesDir(templatesRootDirPath);
+        templateLoaders.add(new FileTemplateLoader(templatesRootDirPath.toFile()));
+      } catch (IOException e) {
+        logger.warn("Failed to populate external templates directory [{}]", templatesRootDirPath);
+        logger.debug("The error was:", e);
+      }
+
       MultiTemplateLoader multiTemplateLoader =
-          new MultiTemplateLoader(new TemplateLoader[] {fileTemplateLoader, classTemplateLoader});
+          new MultiTemplateLoader(templateLoaders.toArray(TemplateLoader[]::new));
 
       freemarkerConfig = new Configuration(Configuration.VERSION_2_3_31);
       freemarkerConfig.setTemplateLoader(multiTemplateLoader);
@@ -71,7 +78,7 @@ public class NoticeViewerConfig {
    * @throws IOException
    * @throws Exception
    */
-  private static void populateExternalTemplatesDir(Path targetTemplatesRootDir) {
+  private static void populateExternalTemplatesDir(Path targetTemplatesRootDir) throws IOException {
     Validate.notNull(targetTemplatesRootDir, "Undefined templates root directory");
 
     ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -85,19 +92,10 @@ public class NoticeViewerConfig {
             targetPath.toAbsolutePath());
 
         Path parentPath = targetPath.getParent();
-        try {
-          Files.createDirectories(parentPath);
-        } catch (IOException e) {
-          logger.warn("Failed to create parent directory for templates [{}]", parentPath);
-          logger.debug("The error was:", e);
-          return;
-        }
+        Files.createDirectories(parentPath);
 
         try (OutputStream os = Files.newOutputStream(targetPath, StandardOpenOption.CREATE)) {
           IOUtils.copy(cl.getResourceAsStream(sourcePath.toString().replace("\\", "/")), os);
-        } catch (IOException e) {
-          logger.warn("Failed to copy templates from [{}] to [{}]", sourcePath, targetPath);
-          logger.debug("The error was:", e);
         }
       }
     }
