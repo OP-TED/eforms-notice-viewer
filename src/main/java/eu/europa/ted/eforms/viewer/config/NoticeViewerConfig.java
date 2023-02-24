@@ -5,6 +5,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
@@ -45,20 +47,19 @@ public class NoticeViewerConfig {
       logger.debug("Configuring Freemarker using [{}] as the templates root directory.",
           templatesRootDirPath);
 
+      List<TemplateLoader> templateLoaders =
+          Arrays.asList(new ClassTemplateLoader(NoticeViewerConfig.class, "/templates"));
+
       try {
         populateExternalTemplatesDir(templatesRootDirPath);
+        templateLoaders.add(new FileTemplateLoader(templatesRootDirPath.toFile()));
       } catch (IOException e) {
         logger.warn("Failed to populate external templates directory [{}]", templatesRootDirPath);
         logger.debug("The error was:", e);
       }
 
-      FileTemplateLoader fileTemplateLoader =
-          new FileTemplateLoader(templatesRootDirPath.toFile());
-      ClassTemplateLoader classTemplateLoader =
-          new ClassTemplateLoader(NoticeViewerConfig.class, "/templates");
-
       MultiTemplateLoader multiTemplateLoader =
-          new MultiTemplateLoader(new TemplateLoader[] {fileTemplateLoader, classTemplateLoader});
+          new MultiTemplateLoader(templateLoaders.toArray(TemplateLoader[]::new));
 
       freemarkerConfig = new Configuration(Configuration.VERSION_2_3_31);
       freemarkerConfig.setTemplateLoader(multiTemplateLoader);
