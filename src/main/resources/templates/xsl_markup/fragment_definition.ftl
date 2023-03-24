@@ -5,7 +5,12 @@
     - number: Outline number
 -->
 
-<xsl:template name='${name}'>
+<xsl:template name="${name}">
+	<#if parameters??>
+		<#list parameters as parameter>
+			<xsl:param name="${parameter}" />
+		</#list>
+	</#if>
 	<section title="${name}">
 		<#if number?has_content>
 		  <xsl:text>${number} </xsl:text>

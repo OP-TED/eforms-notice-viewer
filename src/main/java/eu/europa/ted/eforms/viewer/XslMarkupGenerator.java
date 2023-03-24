@@ -4,13 +4,17 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
@@ -52,6 +56,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Arrays.asList(Optional.ofNullable(params)
             .orElseGet(Pair::emptyArray))
             .stream()
+            .filter(pair -> pair.getKey() != null && pair.getValue() != null)
             .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
 
     try (StringWriter writer = new StringWriter()) {
@@ -118,25 +123,36 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(final String name, final String number,
-      final Markup content) {
-    logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number,
-        content);
+  public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
+    return this.composeFragmentDefinition(name, number, content, new LinkedHashSet<String>());
+  }
+
+  @Override
+  public Markup composeFragmentDefinition(String name, String number, Markup content, Set<String> parameters) {
+    logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
         Pair.of("content", content.script),
         Pair.of("name", name),
-        Pair.of("number", number));
+        Pair.of("number", number),
+        Pair.of("parameters", parameters));
   }
 
   @Override
   public Markup renderFragmentInvocation(final String name, final PathExpression context) {
+    return this.renderFragmentInvocation(name, context, new LinkedHashSet<Pair<String, String>>());
+  }
+
+  @Override
+  public Markup renderFragmentInvocation(final String name, final PathExpression context, final Set<Pair<String, String>> variables) {
     logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.script);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_INVOCATION,
         Pair.of("context", context.script),
-        Pair.of("name", name));
+        Pair.of("name", name),
+        Pair.of("variables", variables.stream().map(variable -> new String[] { variable.getKey(), variable.getValue() }).toArray())
+        );
   }
 }

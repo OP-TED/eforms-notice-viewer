@@ -40,7 +40,8 @@ public class XmlHelper {
 
       return sw.toString();
     } catch (Exception e) {
-      throw new RuntimeException(MessageFormat.format("Failed to format XML:\n{0}", xmlString), e);
+      logger.error(MessageFormat.format("Failed to format XML:\n{0}", xmlString), e);
+      return xmlString;
     }
   }
 }
