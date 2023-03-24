@@ -112,14 +112,14 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return generateMarkup(
         FreemarkerTemplate.LABEL_FROM_EXPRESSION,
         Pair.of("expression", expression.script),
-        Pair.of("labelSuffix", ++variableCounter));
+        Pair.of("labelSuffix", String.valueOf(++variableCounter)));
   }
 
   @Override
   public Markup renderFreeText(final String freeText) {
     logger.trace("Rendering free text [{}]", freeText);
 
-    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText));
+    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText.replace(" ","&#8200;")));
   }
 
   @Override

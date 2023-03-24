@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer.helpers;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import org.dom4j.Document;
@@ -24,24 +25,37 @@ public class XmlHelper {
     return formatXml(xmlString, DEFAULT_INDENT, skipDeclaration);
   }
 
+  private static OutputFormat getOutputFormat(int indent, boolean skipDeclaration) {
+    OutputFormat format = OutputFormat.createPrettyPrint();
+    format.setIndentSize(indent);
+    format.setSuppressDeclaration(skipDeclaration);
+
+    return format;
+  }
+
   public static String formatXml(String xmlString, int indent, boolean skipDeclaration) {
     logger.debug("Formatting XML");
     logger.trace("XML Input:\n{}", xmlString);
 
-    OutputFormat format = OutputFormat.createPrettyPrint();
-    format.setIndentSize(indent);
-    format.setSuppressDeclaration(skipDeclaration);
-    format.setEncoding("UTF-8");
-
+    XMLWriter xmlWriter = null;
     try (StringWriter sw = new StringWriter()) {
       Document document = DocumentHelper.parseText(xmlString);
 
-      new XMLWriter(sw, format).write(document);
+      xmlWriter = new XMLWriter(sw, getOutputFormat(indent, skipDeclaration));
+      xmlWriter.write(document);
 
       return sw.toString();
     } catch (Exception e) {
       logger.error(MessageFormat.format("Failed to format XML:\n{0}", xmlString), e);
       return xmlString;
+    } finally {
+      if (xmlWriter != null) {
+        try {
+          xmlWriter.close();
+        } catch (IOException e) {
+          logger.debug("Error closing XML writer", e);
+        }
+      }
     }
   }
 }

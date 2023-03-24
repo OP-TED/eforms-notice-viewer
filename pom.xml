@@ -3,7 +3,7 @@
 
   <groupId>eu.europa.ted.eforms</groupId>
   <artifactId>eforms-notice-viewer</artifactId>
-  <version>0.6.1-SNAPSHOT</version>
+  <version>0.7.1-SNAPSHOT</version>
 
   <name>eForms Notice Viewer</name>
   <description>eForms Notice Viewer sample application.</description>
@@ -32,16 +32,30 @@
     <url>https://github.com/OP-TED/eforms-notice-viewer.git</url>
   </scm>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>11</java.version>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/OP-TED/eforms-notice-viewer</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </distributionManagement>
 
+  <properties>
+    <project.build.outputTimestamp>2023-01-31T18:22:58Z</project.build.outputTimestamp>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <!-- Java compiler -->
+    <java.version>11</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Versions - eForms -->
     <version.efx-toolkit>2.0.0-SNAPSHOT</version.efx-toolkit>
-    <version.eforms-core>1.0.0</version.eforms-core>
+    <version.eforms-core>1.0.1</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.9.3</version.antlr4>
@@ -245,17 +259,14 @@
     <dependency>
       <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>
       <artifactId>freemarker</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
