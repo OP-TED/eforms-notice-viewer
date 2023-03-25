@@ -18,6 +18,7 @@
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
   <xsl:param name="language" />
   <xsl:variable name="labels" select="(${translations})"/>
+  <xsl:decimal-format decimal-separator="," grouping-separator=" " />
   <xsl:template match="/">
     <html>
       <head>
