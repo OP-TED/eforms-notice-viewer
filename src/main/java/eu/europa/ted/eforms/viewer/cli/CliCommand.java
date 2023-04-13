@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
@@ -30,7 +29,7 @@ import picocli.CommandLine.Spec;
 
 @Command(name = "", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
     versionProvider = CliCommand.ManifestVersionProvider.class)
-class CliCommand implements Callable<Integer> {
+public class CliCommand implements Callable<Integer> {
   private static final Logger logger = LoggerFactory.getLogger(CliCommand.class);
 
   @Spec
@@ -88,7 +87,8 @@ class CliCommand implements Callable<Integer> {
 
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
-            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
+            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot)
+                : NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR,
             forceBuild);
     logger.info("Created HTML file: {}", htmlPath);
 
