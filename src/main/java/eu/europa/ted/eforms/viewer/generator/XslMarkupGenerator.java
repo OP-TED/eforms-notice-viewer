@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.generator;
 
 import java.io.StringWriter;
 import java.text.MessageFormat;
@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
-import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
-import eu.europa.ted.eforms.viewer.helpers.XmlHelper;
+import eu.europa.ted.eforms.viewer.util.FreemarkerHelper;
+import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;

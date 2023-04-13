@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.cli;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.viewer.NoticeViewer;
+import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
