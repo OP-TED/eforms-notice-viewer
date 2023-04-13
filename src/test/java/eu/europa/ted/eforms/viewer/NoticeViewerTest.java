@@ -31,12 +31,12 @@ class NoticeViewerTest {
   private static final String[] SOURCE_LANGUAGES = new String[] {"en", "el"};
 
   private static final String[] SOURCE_NOTICE_XML_FILENAMES1 =
-      new String[] {"X01_EEIG", "X02_registration", "pin-buyer_24_minimal"};
+      new String[] {"16_cn_24_minimal-test"};
 
   private static final String[] SOURCE_NOTICE_XML_FILENAMES2 =
-      new String[] {"X01_EEIG", "X02_registration"};
+      new String[] {"16_cn_24_minimal-test"};
 
-  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"0.7", "1.0"};
+  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.6"};
 
   private static final Path SDK_RESOURCES_ROOT =
       Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
@@ -61,6 +61,7 @@ class NoticeViewerTest {
 
   private static Stream<Arguments> provideArgsEfxToHtmlFromString() {
     List<Arguments> arguments = new ArrayList<>();
+
     for (String language : SOURCE_LANGUAGES) {
       for (String noticeXmlFilename : SOURCE_NOTICE_XML_FILENAMES2) {
         for (String sdkVersion : SOURCE_SDK_VERSIONS) {
@@ -69,6 +70,7 @@ class NoticeViewerTest {
         }
       }
     }
+
     return Stream.of(arguments.toArray(new Arguments[0]));
   }
 
