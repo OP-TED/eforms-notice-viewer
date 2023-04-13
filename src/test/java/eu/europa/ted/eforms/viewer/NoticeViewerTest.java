@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
 
-@SuppressWarnings("static-method")
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
