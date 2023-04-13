@@ -1,12 +1,13 @@
 package eu.europa.ted.eforms.viewer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -98,9 +99,17 @@ class NoticeViewerTest {
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
     final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true);
+
     logger.info("TEST: Wrote file: {}", xsl);
-    assertTrue(xsl.toFile().exists());
-    // The test would have failed if there were errors, this is what the check is really about.
+
+    assertTrue(Files.isRegularFile(xsl));
+
+    // labels are numbered randomly, so we remove those numbers before the comparison
+    assertEquals(
+        Files.readString(Path.of("src", "test", "resources", "xsl", sdkVersion,
+            MessageFormat.format("{0}.xsl", viewId))),
+        Files.readString(xsl).replaceAll("\\$labels?.*?,", "\\$label,")
+            .replaceAll("(name=\"labels?).*?(\")", "$1$2"));
   }
 
   private Path getNoticeXmlPath(final String noticeXmlName, String sdkVersion) {
@@ -117,10 +126,10 @@ class NoticeViewerTest {
         NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_RESOURCES_ROOT,
             true);
     logger.info("TEST: Wrote html file: {}", path);
-    final File htmlFile = path.toFile();
-    assertTrue(htmlFile.exists());
-    // The test would have failed if there were errors, this is what the check
-    // is really about.
+
+    assertTrue(Files.isRegularFile(path));
+    assertEquals(Files.readString(Path.of("src", "test", "resources", "html", sdkVersion,
+        MessageFormat.format("{0}-{1}.html", language, noticeXmlName))), Files.readString(path));
   }
 
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
@@ -133,9 +142,10 @@ class NoticeViewerTest {
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId), false, SDK_RESOURCES_ROOT);
+
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
-    assertTrue(StringUtils.isNotBlank(html));
-    // The test would have failed if there were errors, this is what the check
-    // is really about.
+
+    assertEquals(Files.readString(Path.of("src", "test", "resources", "html", sdkVersion,
+        MessageFormat.format("{0}-{1}-{2}.html", language, viewId, noticeXmlName))), html);
   }
 }
