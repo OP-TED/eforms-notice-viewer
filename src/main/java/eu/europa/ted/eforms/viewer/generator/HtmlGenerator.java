@@ -69,7 +69,8 @@ public class HtmlGenerator {
 
       // HTML as output of the transformation.
       Files.createDirectories(NoticeViewerConstants.OUTPUT_FOLDER_HTML);
-      final Path htmlPath = NoticeViewerConstants.OUTPUT_FOLDER_HTML.resolve(viewId + ".html");
+      final Path htmlPath = NoticeViewerConstants.OUTPUT_FOLDER_HTML
+          .resolve(MessageFormat.format("{0}-{1}.html", viewId, language));
       final StreamResult outputTarget = new StreamResult(htmlPath.toFile());
 
       applyXslTransformation(language, viewId, xmlSource, xslSource, outputTarget);
@@ -137,7 +138,8 @@ public class HtmlGenerator {
       Files.createDirectories(NoticeViewerConstants.OUTPUT_FOLDER_HTML);
 
       final Path xsltProfilePath =
-          NoticeViewerConstants.OUTPUT_FOLDER_HTML.resolve(viewId + "-xslt_profile.html");
+          NoticeViewerConstants.OUTPUT_FOLDER_HTML
+              .resolve(MessageFormat.format("{0}-{1}-xslt_profile.html", viewId, language));
       logger.info("XSLT profiling is enabled. The result can be found at: {}", xsltProfilePath);
 
       factory.setAttribute(FeatureKeys.TRACE_LISTENER_CLASS, TimingTraceListener.class.getName());
