@@ -28,17 +28,12 @@ import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.util.CacheHelper;
 import eu.europa.ted.eforms.viewer.util.xml.CustomUriResolver;
-import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.EfxTranslator;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
@@ -68,31 +63,26 @@ public class NoticeViewer {
       final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
       boolean forceBuild)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+    Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
+    Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
+
     logger.debug("noticeXmlPath={}", noticeXmlPath);
-    final Element root = XmlHelper.getXmlRoot(noticeXmlPath);
-    // Find the corresponding notice sub type inside the XML.
-    final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
-    if (noticeSubTypeFromXmlOpt.isEmpty()) {
-      throw new RuntimeException(
-          String.format("SubTypeCode not found in notice xml: %s", noticeXmlPath));
-    }
-    // Find the eForms SDK version inside the XML.
-    final Optional<String> eformsSdkVersionOpt = getEformsSdkVersion(root);
-    if (eformsSdkVersionOpt.isEmpty()) {
-      throw new RuntimeException(
-          String.format("eForms SDK version not found in notice xml: %s", noticeXmlPath));
-    }
+
+    final NoticeDocument notice = new NoticeDocument(noticeXmlPath);
+
+    final String eformsSdkVersion = notice.getEformsSdkVersion();
+
     // Build XSL from EFX.
-    final String noticeSubType = noticeSubTypeFromXmlOpt.get();
-    final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
-    final String eformsSdkVersion = eformsSdkVersionOpt.get();
-    logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
-        eformsSdkVersion);
+    final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
+
+    logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
     final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, forceBuild);
     final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
         viewId, profileXslt, sdkRootPath);
+
     // Ensure the HTML can be parsed.
     Jsoup.parse(htmlPath.toFile(), StandardCharsets.UTF_8.toString());
+
     return htmlPath;
   }
 
@@ -116,12 +106,15 @@ public class NoticeViewer {
       final boolean profileXslt, final Path sdkRootPath)
       throws IOException, SAXException, ParserConfigurationException {
     logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
+
     Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
+
     try (
         final ByteArrayInputStream noticeXmlInputStream =
             new ByteArrayInputStream(noticeXmlContent.trim().getBytes(charset));
         final ByteArrayInputStream xslInputStream =
             new ByteArrayInputStream(xsl.getBytes(charset));) {
+
       return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt,
           profileXslt, sdkRootPath);
     }
@@ -150,26 +143,14 @@ public class NoticeViewer {
 
       try (final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(baos.toByteArray());
           final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(baos.toByteArray());) {
-        final Element root = XmlHelper.getXmlRoot(noticeXmlIsClone1);
+        final NoticeDocument notice = new NoticeDocument(noticeXmlIsClone1);
 
-        // Find the corresponding notice sub type inside the XML.
-        final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
-        if (noticeSubTypeFromXmlOpt.isEmpty()) {
-          throw new RuntimeException("SubTypeCode not found in notice xml");
-        }
-
-        // Find the eForms SDK version inside the XML.
-        final Optional<String> eformsSdkVersionOpt = getEformsSdkVersion(root);
-        if (eformsSdkVersionOpt.isEmpty()) {
-          throw new RuntimeException("eForms SDK version not found in notice xml");
-        }
+        final String eformsSdkVersion = notice.getEformsSdkVersion();
 
         // Build XSL from EFX.
-        final String noticeSubType = noticeSubTypeFromXmlOpt.get();
-        final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : noticeSubType;
-        final String eformsSdkVersion = eformsSdkVersionOpt.get();
-        logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
-            eformsSdkVersion);
+        final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
+
+        logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
           final StreamResult htmlResult = new StreamResult(outputStream);
@@ -348,36 +329,6 @@ public class NoticeViewer {
     }
 
     return filePath;
-  }
-
-  /**
-   * @param root The root element of the XML document
-   * @return The eforms SDK version as found in the notice xml
-   */
-  public static Optional<String> getEformsSdkVersion(final Element root) {
-    final NodeList nodeList = root.getElementsByTagName("cbc:CustomizationID");
-    // We assume that length equals 1 exactly. Anything else is considered
-    // empty.
-    return nodeList.getLength() == 1
-        ? Optional
-            .of(StringUtils.removeStart(nodeList.item(0).getTextContent().strip(), "eforms-sdk-"))
-        : Optional.empty();
-  }
-
-  /**
-   * @param root The root element of the XML document
-   * @return The notice sub type as found in the notice xml
-   */
-  public static Optional<String> getNoticeSubType(final Element root) {
-    final NodeList subTypeCodes = root.getElementsByTagName("cbc:SubTypeCode");
-    for (int i = 0; i < subTypeCodes.getLength(); i++) {
-      final Node item = subTypeCodes.item(i);
-      final NamedNodeMap attributes = item.getAttributes();
-      if (attributes != null) {
-        return Optional.of(item.getTextContent().strip());
-      }
-    }
-    return Optional.empty();
   }
 
   /**
