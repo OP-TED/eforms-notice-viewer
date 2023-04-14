@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -80,7 +81,8 @@ class NoticeViewerTest {
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtml")
   void testEfxToHtml(String language, String noticeXmlFilename, String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     testGenerateHtmlFromFile(language, noticeXmlFilename, sdkVersion);
   }
 
@@ -116,7 +118,8 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromFile(final String language, final String noticeXmlName,
       final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.

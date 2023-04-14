@@ -11,6 +11,7 @@ import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,13 +76,14 @@ public class CliCommand implements Callable<Integer> {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
-   * @throws InstantiationException 
-   * @throws URISyntaxException 
+   * @throws InstantiationException
+   * @throws URISyntaxException
+   * @throws TransformerException
    */
   @Override
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
-      URISyntaxException {
+      URISyntaxException, TransformerException {
     // Initialise Freemarker templates so that the templates folder will be populated
     NoticeViewerConfig.getFreemarkerConfig();
 
