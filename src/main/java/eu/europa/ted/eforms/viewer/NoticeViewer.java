@@ -1,18 +1,14 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.MessageFormat;
 import java.util.Optional;
-import java.util.function.Supplier;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
@@ -29,12 +25,8 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
-import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
-import eu.europa.ted.eforms.viewer.util.CacheHelper;
+import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.xml.CustomUriResolver;
-import eu.europa.ted.efx.EfxTranslator;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
@@ -76,7 +68,9 @@ public class NoticeViewer {
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
 
     logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
-    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, forceBuild);
+
+    final Path xslPath =
+        new XslGenerator(eformsSdkVersion, sdkRootPath).generate(viewId, forceBuild);
     final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
         viewId, profileXslt, sdkRootPath);
 
@@ -257,92 +251,5 @@ public class NoticeViewer {
     } catch (TransformerFactoryConfigurationError | TransformerException e) {
       throw new RuntimeException(e.toString(), e);
     }
-  }
-
-  private static Supplier<String> templateTranslator(final Path sdkRootPath,
-      final String sdkVersion,
-      final InputStream viewInputStream, final String viewId) {
-    return () -> {
-      try {
-        return EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
-            sdkVersion,
-            viewInputStream);
-      } catch (InstantiationException | IOException e) {
-        throw new RuntimeException(
-            MessageFormat.format(
-                "Failed to build XSL for view ID [{0}] and SDK version[{1}]",
-                viewId, sdkVersion),
-            e);
-      }
-    };
-  }
-
-  /**
-   * Takes the EFX view template as a viewId string and outputs the XSL.
-   *
-   * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
-   *        from SDK by using naming conventions
-   * @param sdkVersion The version of the desired SDK
-   * @param sdkRootPath Path of the root SDK folder
-   * @param forceBuild Forces the re-creation of XSL files
-   * @return Path to the built file
-   * @throws IOException If an error occurred while writing the file
-   * @throws InstantiationException
-   */
-  public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath,
-      boolean forceBuild)
-      throws IOException, InstantiationException {
-    logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
-
-    final Path viewPath = getPathToEfxAsStr(viewId, sdkVersion, sdkRootPath);
-
-    logger.debug("View path: {}", viewPath);
-
-    Validate.isTrue(Files.exists(viewPath), "No such file: " + viewId);
-
-    final Path filePath =
-        Path.of(NoticeViewerConstants.OUTPUT_FOLDER_XSL.toString(), sdkVersion, viewId + ".xsl");
-
-    if (!Files.exists(filePath) || forceBuild) {
-      try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
-        Supplier<String> translator =
-            templateTranslator(sdkRootPath, sdkVersion, viewInputStream, viewId);
-
-        if (forceBuild) {
-          CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
-              new String[] {sdkRootPath.toString(), sdkVersion, viewId});
-        }
-
-        final String translation =
-            CacheHelper.get(translator, NoticeViewerConstants.NV_CACHE_REGION,
-                new String[] {sdkRootPath.toString(), sdkVersion, viewId});
-
-        Files.createDirectories(filePath.getParent());
-        try (BufferedWriter writer =
-            new BufferedWriter(new FileWriter(filePath.toFile(), StandardCharsets.UTF_8))) {
-          writer.write(translation);
-        }
-
-        logger.debug("Successfully created XSL for view ID [{}] and SDK version [{}]: {}", viewId,
-            sdkVersion, filePath);
-      }
-    }
-
-    return filePath;
-  }
-
-  /**
-   * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
-   *        something else for custom views
-   * @param sdkVersion The SDK version to load the path from
-   * @param sdkRootPath Path of the root SDK folder
-   * @throws IOException
-   */
-  public static Path getPathToEfxAsStr(final String viewId, final String sdkVersion,
-      Path sdkRootPath) throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, sdkRootPath);
-
-    return SdkResourceLoader.getResourceAsPath(sdkVersion, SdkConstants.SdkResource.VIEW_TEMPLATES,
-        viewId + ".efx", sdkRootPath);
   }
 }

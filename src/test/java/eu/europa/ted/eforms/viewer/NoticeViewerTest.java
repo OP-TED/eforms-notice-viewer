@@ -22,6 +22,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
 
 class NoticeViewerTest {
@@ -95,7 +96,7 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToXsl")
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
-    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_ROOT_DIR, true);
+    final Path xsl = new XslGenerator(sdkVersion, SDK_ROOT_DIR).generate(viewId, true);
 
     logger.info("TEST: Wrote file: {}", xsl);
 
@@ -133,9 +134,9 @@ class NoticeViewerTest {
       final String viewId, final String sdkVersion)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
-    Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
+    final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
-    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_ROOT_DIR, true);
+    final Path xslPath = new XslGenerator(sdkVersion, SDK_ROOT_DIR).generate(viewId, true);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId), false, SDK_ROOT_DIR);
