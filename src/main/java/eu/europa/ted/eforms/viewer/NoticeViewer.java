@@ -14,7 +14,6 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.function.Supplier;
 import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -29,7 +28,6 @@ import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -40,7 +38,7 @@ import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.util.CacheHelper;
 import eu.europa.ted.eforms.viewer.util.xml.CustomUriResolver;
-import eu.europa.ted.eforms.viewer.util.xml.SafeDocumentBuilder;
+import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.EfxTranslator;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
@@ -71,12 +69,7 @@ public class NoticeViewer {
       boolean forceBuild)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
-    Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
-    Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
-    final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
-    final Document doc = db.parse(noticeXmlPath.toFile());
-    doc.getDocumentElement().normalize();
-    final Element root = doc.getDocumentElement();
+    final Element root = XmlHelper.getXmlRoot(noticeXmlPath);
     // Find the corresponding notice sub type inside the XML.
     final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
     if (noticeSubTypeFromXmlOpt.isEmpty()) {
@@ -157,12 +150,7 @@ public class NoticeViewer {
 
       try (final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(baos.toByteArray());
           final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(baos.toByteArray());) {
-        final DocumentBuilder db = SafeDocumentBuilder.buildSafeDocumentBuilderStrict();
-        final Document doc = db.parse(noticeXmlIsClone1);
-
-        doc.getDocumentElement().normalize();
-
-        final Element root = doc.getDocumentElement();
+        final Element root = XmlHelper.getXmlRoot(noticeXmlIsClone1);
 
         // Find the corresponding notice sub type inside the XML.
         final Optional<String> noticeSubTypeFromXmlOpt = getNoticeSubType(root);
