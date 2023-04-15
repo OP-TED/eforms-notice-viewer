@@ -127,7 +127,6 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return this.composeFragmentDefinition(name, number, content, new LinkedHashSet<String>());
   }
 
-  @Override
   public Markup composeFragmentDefinition(String name, String number, Markup content, Set<String> parameters) {
     logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
 
@@ -144,7 +143,6 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return this.renderFragmentInvocation(name, context, new LinkedHashSet<Pair<String, String>>());
   }
 
-  @Override
   public Markup renderFragmentInvocation(final String name, final PathExpression context, final Set<Pair<String, String>> variables) {
     logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.script);
 
