@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -45,7 +46,7 @@ public class NoticeViewer {
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
-      boolean forceBuild)
+      boolean forceBuild, TranslatorOptions options)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       TransformerException {
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -60,7 +61,7 @@ public class NoticeViewer {
     logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
     final Path xslPath =
-        new XslGenerator(eformsSdkVersion, sdkRootPath).generate(viewId, forceBuild);
+        new XslGenerator(eformsSdkVersion, sdkRootPath, options).generate(viewId, forceBuild);
 
     final Path htmlPath = new HtmlGenerator(eformsSdkVersion, sdkRootPath, profileXslt)
         .generateFile(language, viewId, noticeXmlPath, xslPath);

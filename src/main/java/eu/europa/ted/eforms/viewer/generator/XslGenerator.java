@@ -19,18 +19,22 @@ import eu.europa.ted.eforms.viewer.DependencyFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.util.CacheHelper;
 import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class XslGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslGenerator.class);
 
   private final String sdkVersion;
   private final Path sdkRoot;
+  private final TranslatorOptions translatorOptions;
 
-  public XslGenerator(final String sdkVersion, final Path sdkRoot) throws IOException {
+  public XslGenerator(final String sdkVersion, final Path sdkRoot,
+      final TranslatorOptions translatorOptions) throws IOException {
     SdkDownloader.downloadSdk(sdkVersion, sdkRoot);
 
     this.sdkVersion = sdkVersion;
     this.sdkRoot = sdkRoot;
+    this.translatorOptions = translatorOptions;
   }
 
   /**
@@ -100,7 +104,7 @@ public class XslGenerator {
     return () -> {
       try {
         return EfxTranslator.translateTemplate(new DependencyFactory(sdkRoot), sdkVersion,
-            viewInputStream);
+            viewInputStream, translatorOptions);
       } catch (InstantiationException | IOException e) {
         throw new RuntimeException(
             MessageFormat.format(

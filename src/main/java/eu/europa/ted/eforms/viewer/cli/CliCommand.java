@@ -92,7 +92,7 @@ public class CliCommand implements Callable<Integer> {
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
             sdkResourcesRoot != null ? Path.of(sdkResourcesRoot)
                 : NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR,
-            forceBuild);
+            forceBuild, EfxTranslatorOptions.DEFAULT);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

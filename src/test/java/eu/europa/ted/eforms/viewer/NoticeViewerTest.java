@@ -24,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
+import eu.europa.ted.efx.EfxTranslatorOptions;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
+import eu.europa.ted.efx.model.DecimalFormat;
 
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
@@ -40,7 +43,8 @@ class NoticeViewerTest {
 
   private static final Path SDK_ROOT_DIR = NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR;
 
-  private static final TranslatorOptions TRANSLATOR_OPTIONS = new EfxTranslatorOptions(DecimalFormat.EFX_DEFAULT);
+  private static final TranslatorOptions TRANSLATOR_OPTIONS =
+      new EfxTranslatorOptions(DecimalFormat.EFX_DEFAULT);
 
   @BeforeAll
   public static void setUp() {
@@ -99,7 +103,8 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToXsl")
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
-    final Path xsl = new XslGenerator(sdkVersion, SDK_ROOT_DIR).generate(viewId, true);
+    final Path xsl =
+        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
 
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
@@ -117,9 +122,8 @@ class NoticeViewerTest {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
-    final Path path =
-        NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_ROOT_DIR,
-            true);
+    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false,
+        SDK_ROOT_DIR, true, TRANSLATOR_OPTIONS);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -133,7 +137,8 @@ class NoticeViewerTest {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
     final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
-    final Path xslPath = new XslGenerator(sdkVersion, SDK_ROOT_DIR).generate(viewId, true);
+    final Path xslPath =
+        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId), false, SDK_ROOT_DIR);
