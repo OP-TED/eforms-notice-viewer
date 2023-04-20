@@ -4,23 +4,20 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
 import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
 import eu.europa.ted.eforms.viewer.helpers.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
@@ -31,6 +28,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   private static int variableCounter = 0;
+
+  private TranslatorOptions options;
+
+  public XslMarkupGenerator(TranslatorOptions options) {
+    this.options = options;
+  }
 
   protected String[] getAssetTypes() {
     return new String[] {"business_term", "field", "code", "decoration"};
@@ -83,7 +86,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
-        Pair.of("templates", markupsListToStringList(templates)));
+        Pair.of("templates", markupsListToStringList(templates)),
+        Pair.of("decimalSeparator", options.getDecimalFormat().getDecimalSeparator()),
+        Pair.of("groupingSeparator", options.getDecimalFormat().getGroupingSeparator()));
 
     return new Markup(XmlHelper.formatXml(unformattedMarkup.script, false));
   }
@@ -122,34 +127,25 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
-    return this.composeFragmentDefinition(name, number, content, new LinkedHashSet<String>());
-  }
-
-  public Markup composeFragmentDefinition(String name, String number, Markup content, Set<String> parameters) {
-    logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
+  public Markup composeFragmentDefinition(final String name, final String number,
+      final Markup content) {
+    logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number,
+        content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
         Pair.of("content", content.script),
         Pair.of("name", name),
-        Pair.of("number", number),
-        Pair.of("parameters", parameters));
+        Pair.of("number", number));
   }
 
   @Override
   public Markup renderFragmentInvocation(final String name, final PathExpression context) {
-    return this.renderFragmentInvocation(name, context, new LinkedHashSet<Pair<String, String>>());
-  }
-
-  public Markup renderFragmentInvocation(final String name, final PathExpression context, final Set<Pair<String, String>> variables) {
     logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.script);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_INVOCATION,
         Pair.of("context", context.script),
-        Pair.of("name", name),
-        Pair.of("variables", variables.stream().map(variable -> new String[] { variable.getKey(), variable.getValue() }).toArray())
-        );
+        Pair.of("name", name));
   }
 }

@@ -42,6 +42,7 @@ import eu.europa.ted.eforms.viewer.helpers.CacheHelper;
 import eu.europa.ted.eforms.viewer.helpers.CustomUriResolver;
 import eu.europa.ted.eforms.viewer.helpers.SafeDocumentBuilder;
 import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
@@ -68,7 +69,7 @@ public class NoticeViewer {
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
       final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
-      boolean forceBuild)
+      boolean forceBuild, TranslatorOptions options)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
@@ -95,7 +96,7 @@ public class NoticeViewer {
     final String eformsSdkVersion = eformsSdkVersionOpt.get();
     logger.debug("noticeSubType={}, viewId={}, eformsSdkVersion={}", noticeSubType, viewId,
         eformsSdkVersion);
-    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, forceBuild);
+    final Path xslPath = buildXsl(viewId, eformsSdkVersion, sdkRootPath, forceBuild, options);
     final Path htmlPath = applyXslTransform(language, eformsSdkVersion, noticeXmlPath, xslPath,
         viewId, profileXslt, sdkRootPath);
     // Ensure the HTML can be parsed.
@@ -292,12 +293,12 @@ public class NoticeViewer {
 
   private static Supplier<String> templateTranslator(final Path sdkRootPath,
       final String sdkVersion,
-      final InputStream viewInputStream, final String viewId) {
+      final InputStream viewInputStream, final String viewId, TranslatorOptions options) {
     return () -> {
       try {
         return EfxTranslator.translateTemplate(new DependencyFactory(sdkRootPath),
             sdkVersion,
-            viewInputStream);
+            viewInputStream, options);
       } catch (InstantiationException | IOException e) {
         throw new RuntimeException(
             MessageFormat.format(
@@ -321,7 +322,7 @@ public class NoticeViewer {
    * @throws InstantiationException
    */
   public static final Path buildXsl(final String viewId, final String sdkVersion, Path sdkRootPath,
-      boolean forceBuild)
+      boolean forceBuild, TranslatorOptions options)
       throws IOException, InstantiationException {
     logger.debug("Creating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
@@ -337,7 +338,7 @@ public class NoticeViewer {
     if (!Files.exists(filePath) || forceBuild) {
       try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
         Supplier<String> translator =
-            templateTranslator(sdkRootPath, sdkVersion, viewInputStream, viewId);
+            templateTranslator(sdkRootPath, sdkVersion, viewInputStream, viewId, options);
 
         if (forceBuild) {
           CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
