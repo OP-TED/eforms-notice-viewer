@@ -34,8 +34,8 @@ public class HtmlGenerator {
 
   private final String sdkVersion;
   private final Path sdkRoot;
-  private Charset charset;
-  private boolean profileXslt;
+  private final Charset charset;
+  private final boolean profileXslt;
 
   public HtmlGenerator(final String sdkVersion, final Path sdkRoot) {
     this(sdkVersion, sdkRoot, DEFAULT_CHARSET, false);
@@ -79,8 +79,8 @@ public class HtmlGenerator {
     }
   }
 
-  public String generateString(final String language, String viewId, final InputStream xmlInput,
-      final InputStream xslInput) throws IOException {
+  public String generateString(final String language, final String viewId,
+      final InputStream xmlInput, final InputStream xslInput) throws IOException {
     Validate.notNull(xmlInput, "Undefined XML input");
     Validate.notNull(xslInput, "Undefined XSL input");
 
@@ -161,8 +161,9 @@ public class HtmlGenerator {
     return transformer;
   }
 
-  private void applyXslTransformation(String language, String viewId, Source xmlSource,
-      Source xslSource, StreamResult output) throws IOException, TransformerException {
+  private void applyXslTransformation(final String language, final String viewId,
+      final Source xmlSource, final Source xslSource, final StreamResult output)
+      throws IOException, TransformerException {
     Validate.notBlank(language, "Undefined language");
     Validate.notBlank(viewId, "Undefined viewId");
     Validate.notNull(xmlSource, "Undefined XML source");
