@@ -34,7 +34,7 @@
 
   <distributionManagement>
     <repository>
-      <id>op-ted-github_notice-viewer</id>
+      <id>github</id>
       <name>GitHub Packages</name>
       <url>https://maven.pkg.github.com/OP-TED/eforms-notice-viewer</url>
       <snapshots>
