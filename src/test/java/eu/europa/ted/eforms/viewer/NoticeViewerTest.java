@@ -44,6 +44,8 @@ class NoticeViewerTest {
   private static final Path SDK_RESOURCES_ROOT =
       Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
 
+  private static final TranslatorOptions TRANSLATOR_OPTIONS = new EfxTranslatorOptions(DecimalFormat.EFX_DEFAULT);
+
   @BeforeAll
   public static void setUp() {
     System.setProperty(NoticeViewerConstants.TEMPLATES_ROOT_DIR_PROPERTY, "target/templates");

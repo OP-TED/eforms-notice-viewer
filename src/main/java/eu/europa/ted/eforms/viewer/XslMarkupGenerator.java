@@ -29,6 +29,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   private static int variableCounter = 0;
 
+  private TranslatorOptions options;
+
+  public XslMarkupGenerator(TranslatorOptions options) {
+    this.options = options;
+  }
+
   protected String[] getAssetTypes() {
     return new String[] {"business_term", "field", "code", "decoration"};
   }
