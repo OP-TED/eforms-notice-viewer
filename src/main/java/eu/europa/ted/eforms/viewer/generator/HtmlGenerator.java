@@ -47,9 +47,12 @@ public class HtmlGenerator {
 
   public HtmlGenerator(final String sdkVersion, final Path sdkRoot, Charset charset,
       boolean profileXslt) {
+    Validate.isTrue(Files.isDirectory(sdkRoot),
+        MessageFormat.format("SDK root directory not found: {0}", sdkRoot));
+
     this.sdkVersion = sdkVersion;
     this.sdkRoot = sdkRoot;
-    this.charset = charset;
+    this.charset = charset != null ? charset : DEFAULT_CHARSET;
     this.profileXslt = profileXslt;
   }
 

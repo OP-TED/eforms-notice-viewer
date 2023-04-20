@@ -54,10 +54,7 @@ public class NoticeViewer {
     logger.debug("noticeXmlPath={}", noticeXmlPath);
 
     final NoticeDocument notice = new NoticeDocument(noticeXmlPath);
-
     final String eformsSdkVersion = notice.getEformsSdkVersion();
-
-    // Build XSL from EFX.
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
 
     logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
@@ -93,9 +90,9 @@ public class NoticeViewer {
       final String xsl, final Charset charset, final Optional<String> viewIdOpt,
       final boolean profileXslt, final Path sdkRootPath)
       throws IOException, SAXException, ParserConfigurationException {
-    logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
+    Validate.notBlank(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
-    Validate.notNull(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
+    logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
 
     try (
         final ByteArrayInputStream noticeXmlInputStream =
@@ -126,6 +123,9 @@ public class NoticeViewer {
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
       final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt,
       final Path sdkRootPath) throws IOException, ParserConfigurationException, SAXException {
+    Validate.notNull(noticeXmlContent, "Notice XML content is null");
+    Validate.notNull(xslIs, "XSL input is null");
+
     try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
       noticeXmlContent.transferTo(baos);
       final byte[] xmlContentBytes = baos.toByteArray();
@@ -133,10 +133,7 @@ public class NoticeViewer {
       try (final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(xmlContentBytes);
           final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(xmlContentBytes);) {
         final NoticeDocument notice = new NoticeDocument(noticeXmlIsClone1);
-
         final String eformsSdkVersion = notice.getEformsSdkVersion();
-
-        // Build XSL from EFX.
         final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
 
         logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
