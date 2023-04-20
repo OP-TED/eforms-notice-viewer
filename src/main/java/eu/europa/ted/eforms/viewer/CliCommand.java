@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
+import eu.europa.ted.efx.EfxTranslatorOptions;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -87,7 +88,7 @@ class CliCommand implements Callable<Integer> {
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
             sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
-            forceBuild);
+            forceBuild, EfxTranslatorOptions.DEFAULT);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

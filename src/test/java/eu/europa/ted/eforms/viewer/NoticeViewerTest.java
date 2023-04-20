@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.viewer.helpers.LoggingHelper;
+import eu.europa.ted.efx.EfxTranslatorOptions;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
+import eu.europa.ted.efx.model.DecimalFormat;
 
 @SuppressWarnings("static-method")
 class NoticeViewerTest {
@@ -95,7 +98,7 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToXsl")
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
-    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true);
+    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true, TRANSLATOR_OPTIONS);
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
     // The test would have failed if there were errors, this is what the check is really about.
@@ -113,7 +116,7 @@ class NoticeViewerTest {
                                                          // passing any in cli.
     final Path path =
         NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_RESOURCES_ROOT,
-            true);
+            true, TRANSLATOR_OPTIONS);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -127,7 +130,7 @@ class NoticeViewerTest {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
-    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true);
+    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true, TRANSLATOR_OPTIONS);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
         charsetUtf8, Optional.of(viewId), false, SDK_RESOURCES_ROOT);
