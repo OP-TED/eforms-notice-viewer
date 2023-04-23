@@ -10,17 +10,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
 import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
 import eu.europa.ted.eforms.viewer.helpers.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
@@ -31,6 +30,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   private static int variableCounter = 0;
+
+  private TranslatorOptions options;
+
+  public XslMarkupGenerator(TranslatorOptions options) {
+    this.options = options;
+  }
 
   protected String[] getAssetTypes() {
     return new String[] {"business_term", "field", "code", "decoration"};
@@ -84,7 +89,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
-        Pair.of("templates", markupsListToStringList(templates)));
+        Pair.of("templates", markupsListToStringList(templates)),
+        Pair.of("decimalSeparator", options.getDecimalFormat().getDecimalSeparator()),
+        Pair.of("groupingSeparator", options.getDecimalFormat().getGroupingSeparator()));
 
     return new Markup(XmlHelper.formatXml(unformattedMarkup.script, false));
   }

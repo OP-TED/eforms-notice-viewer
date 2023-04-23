@@ -8,6 +8,7 @@ import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.interfaces.ScriptGenerator;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
   private Path sdkRootPath;
@@ -29,18 +30,18 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public ScriptGenerator createScriptGenerator(String sdkVersion) {
+  public ScriptGenerator createScriptGenerator(String sdkVersion, TranslatorOptions options) {
     try {
-      return ComponentFactory.getScriptGenerator(sdkVersion);
+      return ComponentFactory.getScriptGenerator(sdkVersion, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
   @Override
-  public MarkupGenerator createMarkupGenerator(String sdkVersion) {
+  public MarkupGenerator createMarkupGenerator(String sdkVersion, TranslatorOptions options) {
     try {
-      return ComponentFactory.getMarkupGenerator(sdkVersion);
+      return ComponentFactory.getMarkupGenerator(sdkVersion, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
