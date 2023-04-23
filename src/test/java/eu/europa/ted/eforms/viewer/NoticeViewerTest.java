@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,28 +22,26 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.viewer.helpers.LoggingHelper;
+import eu.europa.ted.eforms.viewer.generator.XslGenerator;
+import eu.europa.ted.eforms.viewer.util.LoggingHelper;
 import eu.europa.ted.efx.EfxTranslatorOptions;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.DecimalFormat;
 
-@SuppressWarnings("static-method")
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
 
   private static final String[] SOURCE_LANGUAGES = new String[] {"en", "el"};
 
   private static final String[] SOURCE_NOTICE_XML_FILENAMES1 =
-      new String[] {"X01_EEIG", "X02_registration", "pin-buyer_24_minimal"};
+      new String[] {"16_cn_24_minimal-test"};
 
   private static final String[] SOURCE_NOTICE_XML_FILENAMES2 =
-      new String[] {"X01_EEIG", "X02_registration"};
+      new String[] {"16_cn_24_minimal-test"};
 
-  private static final String[] SOURCE_SDK_VERSIONS = new String[] {/*"0.7", "1.0",*/ "2.0"};
+  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.0"};
 
-  private static final Path SDK_RESOURCES_ROOT =
-      Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
+  private static final Path SDK_ROOT_DIR = NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR;
 
   private static final TranslatorOptions TRANSLATOR_OPTIONS = new EfxTranslatorOptions(DecimalFormat.EFX_DEFAULT);
 
@@ -66,6 +65,7 @@ class NoticeViewerTest {
 
   private static Stream<Arguments> provideArgsEfxToHtmlFromString() {
     List<Arguments> arguments = new ArrayList<>();
+
     for (String language : SOURCE_LANGUAGES) {
       for (String noticeXmlFilename : SOURCE_NOTICE_XML_FILENAMES2) {
         for (String sdkVersion : SOURCE_SDK_VERSIONS) {
@@ -74,6 +74,7 @@ class NoticeViewerTest {
         }
       }
     }
+
     return Stream.of(arguments.toArray(new Arguments[0]));
   }
 
@@ -84,7 +85,8 @@ class NoticeViewerTest {
   @ParameterizedTest
   @MethodSource("provideArgsEfxToHtml")
   void testEfxToHtml(String language, String noticeXmlFilename, String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     testGenerateHtmlFromFile(language, noticeXmlFilename, sdkVersion);
   }
 
@@ -100,7 +102,9 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToXsl")
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
-    final Path xsl = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true, TRANSLATOR_OPTIONS);
+    final Path xsl =
+        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
+
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
     // The test would have failed if there were errors, this is what the check is really about.
@@ -112,13 +116,13 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromFile(final String language, final String noticeXmlName,
       final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
-    final Path path =
-        NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false, SDK_RESOURCES_ROOT,
-            true, TRANSLATOR_OPTIONS);
+    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false,
+        SDK_ROOT_DIR, true, TRANSLATOR_OPTIONS);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -130,12 +134,14 @@ class NoticeViewerTest {
       final String viewId, final String sdkVersion)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
     final Charset charsetUtf8 = StandardCharsets.UTF_8;
-    Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
+    final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
-    final Path xslPath = NoticeViewer.buildXsl(viewId, sdkVersion, SDK_RESOURCES_ROOT, true, TRANSLATOR_OPTIONS);
+    final Path xslPath =
+        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
     final String xslContent = Files.readString(xslPath, charsetUtf8);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        charsetUtf8, Optional.of(viewId), false, SDK_RESOURCES_ROOT);
+        charsetUtf8, Optional.of(viewId), false, SDK_ROOT_DIR);
+
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));
     // The test would have failed if there were errors, this is what the check
