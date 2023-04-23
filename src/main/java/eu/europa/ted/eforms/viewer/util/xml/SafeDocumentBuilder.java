@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.util.xml;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;

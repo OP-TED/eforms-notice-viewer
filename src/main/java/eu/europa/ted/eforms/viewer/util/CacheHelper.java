@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.util;
 
 import java.util.function.Supplier;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -52,6 +52,8 @@ public class CacheHelper {
       return result;
     }
 
+    logger.debug("Object not found in cache for key [{}]. Generating a new one...", key);
+
     result = valueGenerator.get();
     cache.put(key, result);
 
@@ -63,7 +65,7 @@ public class CacheHelper {
   }
 
   public static <T> void put(final String cacheRegion, final T value, final String key) {
-    logger.debug("Adding ojbect into cache region [{}] under key [{}]", cacheRegion, key);
+    logger.debug("Adding object into cache region [{}] under key [{}]", cacheRegion, key);
     logger.trace("Object value: {}", value);
 
     JCS.getInstance(cacheRegion).put(key, value);
