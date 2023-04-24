@@ -19,7 +19,6 @@ public class SdkSymbolResolverTest {
   private static final Path SDK_RESOURCES_ROOT =
       Path.of("target", SdkConstants.DEFAULT_SDK_ROOT.toString());
 
-  @SuppressWarnings("static-method")
   @Test
   public void test() throws InstantiationException, IOException {
     final Path sdkRootPath = SDK_RESOURCES_ROOT;

@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.util;
 
 import java.io.IOException;
 import java.io.Writer;

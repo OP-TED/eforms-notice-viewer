@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.util;
 
 import java.util.logging.Level;
 import org.slf4j.bridge.SLF4JBridgeHandler;

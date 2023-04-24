@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.cli;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -11,12 +11,15 @@ import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.viewer.NoticeViewer;
+import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
+import eu.europa.ted.efx.EfxTranslatorOptions;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -28,7 +31,7 @@ import picocli.CommandLine.Spec;
 
 @Command(name = "", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
     versionProvider = CliCommand.ManifestVersionProvider.class)
-class CliCommand implements Callable<Integer> {
+public class CliCommand implements Callable<Integer> {
   private static final Logger logger = LoggerFactory.getLogger(CliCommand.class);
 
   @Spec
@@ -74,20 +77,22 @@ class CliCommand implements Callable<Integer> {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
-   * @throws InstantiationException 
-   * @throws URISyntaxException 
+   * @throws InstantiationException
+   * @throws URISyntaxException
+   * @throws TransformerException
    */
   @Override
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
-      URISyntaxException {
+      URISyntaxException, TransformerException {
     // Initialise Freemarker templates so that the templates folder will be populated
     NoticeViewerConfig.getFreemarkerConfig();
 
     final Path htmlPath =
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
-            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
-            forceBuild);
+            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot)
+                : NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR,
+            forceBuild, EfxTranslatorOptions.DEFAULT);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;
