@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.DependencyFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
@@ -29,9 +28,7 @@ public class XslGenerator {
   private final TranslatorOptions translatorOptions;
 
   public XslGenerator(final String sdkVersion, final Path sdkRoot,
-      final TranslatorOptions translatorOptions) throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, sdkRoot);
-
+      final TranslatorOptions translatorOptions) {
     this.sdkVersion = sdkVersion;
     this.sdkRoot = sdkRoot;
     this.translatorOptions = translatorOptions;
@@ -44,11 +41,10 @@ public class XslGenerator {
    *        from SDK by using naming conventions
    * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the generated file
+   * @throws FileNotFoundException
    * @throws IOException If an error occurred while writing the file
-   * @throws InstantiationException
    */
-  public Path generate(final String viewId, final boolean forceBuild)
-      throws IOException, InstantiationException {
+  public Path generate(final String viewId, final boolean forceBuild) throws IOException {
     logger.debug("Generating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
     final Path viewPath = getEfxPath(viewId);
@@ -92,9 +88,8 @@ public class XslGenerator {
   /**
    * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
    *        something else for custom views
-   * @throws IOException
    */
-  private Path getEfxPath(final String viewId) throws IOException {
+  private Path getEfxPath(final String viewId) {
     return SdkResourceLoader.getResourceAsPath(sdkVersion, SdkConstants.SdkResource.VIEW_TEMPLATES,
         viewId + ".efx", sdkRoot);
   }
