@@ -73,7 +73,7 @@ public class NoticeViewer {
               .create(new DependencyFactory(sdkRoot))
               .withTranslatorOptions(translatorOptions)
               .build()
-              .generate(eformsSdkVersion, viewId, efxInput, forceBuild);
+              .generateFile(eformsSdkVersion, viewId, efxInput, forceBuild);
 
       final Path htmlPath = HtmlGenerator.Builder
           .create()
