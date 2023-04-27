@@ -13,11 +13,11 @@ import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 
-public final class CustomUriResolver implements URIResolver {
+public final class TranslationUriResolver implements URIResolver {
   private String sdkVersion;
   private Path sdkRootPath;
 
-  public CustomUriResolver(String sdkVersion, Path sdkRootPath) {
+  public TranslationUriResolver(String sdkVersion, Path sdkRootPath) {
     this.sdkVersion = sdkVersion;
     this.sdkRootPath = sdkRootPath;
   }

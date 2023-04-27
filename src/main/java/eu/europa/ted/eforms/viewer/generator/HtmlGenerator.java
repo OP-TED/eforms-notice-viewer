@@ -23,7 +23,7 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
-import eu.europa.ted.eforms.viewer.util.xml.CustomUriResolver;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
@@ -126,7 +126,7 @@ public class HtmlGenerator {
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
 
     // Currently this is what allows to load the labels (i18n).
-    factory.setURIResolver(new CustomUriResolver(sdkVersion, sdkRoot));
+    factory.setURIResolver(new TranslationUriResolver(sdkVersion, sdkRoot));
 
     logger.debug("Successfully created XSL transformer factory for SDK version [{}]", sdkVersion);
 
