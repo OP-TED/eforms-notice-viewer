@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -17,6 +16,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
@@ -30,30 +30,27 @@ import net.sf.saxon.trace.TimingTraceListener;
 public class HtmlGenerator {
   private static final Logger logger = LoggerFactory.getLogger(HtmlGenerator.class);
 
-  private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-
   private final String sdkVersion;
   private final Path sdkRoot;
   private final Charset charset;
   private final boolean profileXslt;
 
-  public HtmlGenerator(final String sdkVersion, final Path sdkRoot) {
-    this(sdkVersion, sdkRoot, DEFAULT_CHARSET, false);
-  }
-
-  public HtmlGenerator(final String sdkVersion, final Path sdkRoot, final boolean profileXslt) {
-    this(sdkVersion, sdkRoot, DEFAULT_CHARSET, profileXslt);
-  }
-
   public HtmlGenerator(final String sdkVersion, final Path sdkRoot, Charset charset,
       boolean profileXslt) {
+    Validate.notBlank(sdkVersion, "Undefined SDK version");
+
+    Validate.notNull(sdkRoot, "Undefined SDK root");
     Validate.isTrue(Files.isDirectory(sdkRoot),
         MessageFormat.format("SDK root directory not found: {0}", sdkRoot));
 
     this.sdkVersion = sdkVersion;
     this.sdkRoot = sdkRoot;
-    this.charset = charset != null ? charset : DEFAULT_CHARSET;
+    this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
     this.profileXslt = profileXslt;
+  }
+
+  private HtmlGenerator(Builder builder) {
+    this(builder.sdkVersion, builder.sdkRoot, builder.charset, builder.profileXslt);
   }
 
   public Path generateFile(final String language, final String viewId, final Path noticeXmlPath,
@@ -184,5 +181,38 @@ public class HtmlGenerator {
     logger.debug(
         "Finished applying XSL transformation for language [{}] and SDK version [{}] with: XML source={}, XSL source={}",
         language, sdkVersion, xmlSource.getSystemId(), xslSource.getSystemId());
+  }
+
+  public static final class Builder {
+    // required parameters
+    private final String sdkVersion;
+    private final Path sdkRoot;
+
+    // optional parameters
+    private Charset charset;
+    private boolean profileXslt;
+
+    public Builder(final String sdkVersion, final Path sdkRoot) {
+      this.sdkVersion = sdkVersion;
+      this.sdkRoot = sdkRoot;
+    }
+
+    public static Builder create(final String sdkVersion, final Path sdkRoot) {
+      return new Builder(sdkVersion, sdkRoot);
+    }
+
+    public Builder withCharset(final Charset charset) {
+      this.charset = charset;
+      return this;
+    }
+
+    public Builder withProfileXslt(final boolean profileXslt) {
+      this.profileXslt = profileXslt;
+      return this;
+    }
+
+    public HtmlGenerator build() {
+      return new HtmlGenerator(this);
+    }
   }
 }

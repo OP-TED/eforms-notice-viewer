@@ -67,7 +67,10 @@ public class NoticeViewer {
             .build()
             .generate(eformsSdkVersion, viewId, forceBuild);
 
-    final Path htmlPath = new HtmlGenerator(eformsSdkVersion, sdkRoot, profileXslt)
+    final Path htmlPath = HtmlGenerator.Builder
+        .create(eformsSdkVersion, sdkRoot)
+        .withProfileXslt(profileXslt)
+        .build()
         .generateFile(language, viewId, noticeXmlPath, xslPath);
 
     // Ensure the HTML can be parsed.
@@ -144,7 +147,11 @@ public class NoticeViewer {
         logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-          return new HtmlGenerator(eformsSdkVersion, sdkRoot, charset, profileXslt)
+          return HtmlGenerator.Builder
+              .create(eformsSdkVersion, sdkRoot)
+              .withCharset(charset)
+              .withProfileXslt(profileXslt)
+              .build()
               .generateString(language, viewId, new StreamSource(noticeXmlIsClone2),
                   new StreamSource(xslIs));
         }
