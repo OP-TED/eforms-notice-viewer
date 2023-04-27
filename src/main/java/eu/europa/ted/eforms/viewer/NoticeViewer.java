@@ -2,11 +2,13 @@ package eu.europa.ted.eforms.viewer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -17,6 +19,8 @@ import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
@@ -55,29 +59,34 @@ public class NoticeViewer {
 
     final NoticeDocument notice = new NoticeDocument(noticeXmlPath);
     final String eformsSdkVersion = notice.getEformsSdkVersion();
+    Validate.notBlank(eformsSdkVersion, "Undefined SDK version");
+
     final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
 
-    logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
+    logger.debug("View ID: {}, SDK version: {}", viewId, eformsSdkVersion);
 
-    final Path xslPath =
-        XslGenerator.Builder
-            .create()
-            .withSdkRoot(sdkRoot)
-            .withTranslatorOptions(translatorOptions)
-            .build()
-            .generate(eformsSdkVersion, viewId, forceBuild);
+    final Path efxPath = getEfxPath(eformsSdkVersion, viewId, sdkRoot);
 
-    final Path htmlPath = HtmlGenerator.Builder
-        .create()
-        .withProfileXslt(profileXslt)
-        .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
-        .build()
-        .generateFile(language, viewId, noticeXmlPath, xslPath);
+    try (InputStream efxInput = Files.newInputStream(efxPath)) {
+      final Path xslPath =
+          XslGenerator.Builder
+              .create(new DependencyFactory(sdkRoot))
+              .withTranslatorOptions(translatorOptions)
+              .build()
+              .generate(eformsSdkVersion, viewId, efxInput, forceBuild);
 
-    // Ensure the HTML can be parsed.
-    Jsoup.parse(htmlPath.toFile(), NoticeViewerConstants.DEFAULT_CHARSET.toString());
+      final Path htmlPath = HtmlGenerator.Builder
+          .create()
+          .withProfileXslt(profileXslt)
+          .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
+          .build()
+          .generateFile(language, viewId, noticeXmlPath, xslPath);
 
-    return htmlPath;
+      // Ensure the HTML can be parsed.
+      Jsoup.parse(htmlPath.toFile(), NoticeViewerConstants.DEFAULT_CHARSET.toString());
+
+      return htmlPath;
+    }
   }
 
   /**
@@ -159,5 +168,28 @@ public class NoticeViewer {
         }
       }
     }
+  }
+
+  /**
+   * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
+   *        something else for custom views
+   * @throws FileNotFoundException
+   */
+  public static Path getEfxPath(final String sdkVersion, final String viewId, final Path sdkRoot)
+      throws FileNotFoundException {
+    Path efxPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
+        SdkConstants.SdkResource.VIEW_TEMPLATES, MessageFormat.format("{0}.efx", viewId), sdkRoot);
+
+    Validate.notNull(efxPath,
+        "Failed to create EFX path for view ID [{}], SDK version [{}] and SDK root directory [{}]",
+        viewId, sdkVersion, sdkRoot);
+
+    if (!Files.isRegularFile(efxPath)) {
+      throw new FileNotFoundException(efxPath.toString());
+    }
+
+    logger.debug("EFX path for view ID {} and SDK {}: {}", viewId, sdkVersion, efxPath);
+
+    return efxPath;
   }
 }

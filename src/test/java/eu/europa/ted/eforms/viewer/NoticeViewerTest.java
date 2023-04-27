@@ -97,11 +97,11 @@ class NoticeViewerTest {
     final String viewId = "X02";
     final Path xsl =
         XslGenerator.Builder
-            .create()
-            .withSdkRoot(SDK_ROOT_DIR)
+            .create(new DependencyFactory(SDK_ROOT_DIR))
             .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
-            .generate(sdkVersion, viewId, true);
+            .generate(sdkVersion, viewId, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
+                true);
 
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
@@ -137,11 +137,11 @@ class NoticeViewerTest {
         Files.readString(noticeXmlPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final Path xslPath =
         XslGenerator.Builder
-            .create()
-            .withSdkRoot(SDK_ROOT_DIR)
+            .create(new DependencyFactory(SDK_ROOT_DIR))
             .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
-            .generate(sdkVersion, viewId, true);
+            .generate(sdkVersion, viewId,
+                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR), true);
 
     final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
