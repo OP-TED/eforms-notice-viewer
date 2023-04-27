@@ -15,7 +15,7 @@ public class NoticeViewerConstants {
   private NoticeViewerConstants() {}
 
   public static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-  public static final TranslatorOptions DEFAULT_TRANSLATION_OPTIONS = EfxTranslatorOptions.DEFAULT;
+  public static final TranslatorOptions DEFAULT_TRANSLATOR_OPTIONS = EfxTranslatorOptions.DEFAULT;
 
   public static final Path DEFAULT_SDK_ROOT_DIR =
       Path.of(System.getProperty("user.home"), SdkConstants.DEFAULT_SDK_ROOT.toString());

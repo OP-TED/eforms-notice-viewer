@@ -3,8 +3,6 @@ package eu.europa.ted.eforms.viewer;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -101,7 +99,7 @@ class NoticeViewerTest {
         XslGenerator.Builder
             .create()
             .withSdkRoot(SDK_ROOT_DIR)
-            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATION_OPTIONS)
+            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
             .generate(sdkVersion, viewId, true);
 
@@ -122,7 +120,7 @@ class NoticeViewerTest {
     final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
                                                          // passing any in cli.
     final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false,
-        SDK_ROOT_DIR, true, NoticeViewerConstants.DEFAULT_TRANSLATION_OPTIONS);
+        SDK_ROOT_DIR, true, NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -133,20 +131,21 @@ class NoticeViewerTest {
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
       final String viewId, final String sdkVersion)
       throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    final Charset charsetUtf8 = StandardCharsets.UTF_8;
+
     final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
-    final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
+    final String noticeXmlContent =
+        Files.readString(noticeXmlPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final Path xslPath =
         XslGenerator.Builder
             .create()
             .withSdkRoot(SDK_ROOT_DIR)
-            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATION_OPTIONS)
+            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
             .generate(sdkVersion, viewId, true);
 
-    final String xslContent = Files.readString(xslPath, charsetUtf8);
+    final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        charsetUtf8, Optional.of(viewId), false, SDK_ROOT_DIR);
+        NoticeViewerConstants.DEFAULT_CHARSET, Optional.of(viewId), false, SDK_ROOT_DIR);
 
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));

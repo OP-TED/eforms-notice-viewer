@@ -19,7 +19,6 @@ import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
-import eu.europa.ted.efx.EfxTranslatorOptions;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -92,7 +91,7 @@ public class CliCommand implements Callable<Integer> {
         NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
             sdkResourcesRoot != null ? Path.of(sdkResourcesRoot)
                 : NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR,
-            forceBuild, EfxTranslatorOptions.DEFAULT);
+            forceBuild, NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -30,7 +29,7 @@ public class XslGenerator {
   public XslGenerator(final Path sdkRoot, final TranslatorOptions translatorOptions) {
     this.sdkRoot = sdkRoot;
     this.translatorOptions = ObjectUtils.defaultIfNull(translatorOptions,
-        NoticeViewerConstants.DEFAULT_TRANSLATION_OPTIONS);
+        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
   }
 
   private XslGenerator(final Builder builder) {
@@ -77,7 +76,7 @@ public class XslGenerator {
 
         Files.createDirectories(xslFile.getParent());
         try (BufferedWriter writer =
-            new BufferedWriter(new FileWriter(xslFile.toFile(), StandardCharsets.UTF_8))) {
+            new BufferedWriter(new FileWriter(xslFile.toFile(), NoticeViewerConstants.DEFAULT_CHARSET))) {
           writer.write(translation);
         }
 
