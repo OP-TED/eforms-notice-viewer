@@ -34,7 +34,7 @@ public class NoticeViewer {
    *        notice summary. It could fail if this custom view is not compatible with the notice sub
    *        type
    * @param profileXslt If set to true, XSLT profiling will be enabled
-   * @param sdkRootPath Path of the root SDK folder
+   * @param sdkRoot Path of the root SDK folder
    * @param forceBuild Forces the re-creation of XSL files
    * @return The path of the generated HTML file
    *
@@ -45,10 +45,9 @@ public class NoticeViewer {
    * @throws TransformerException
    */
   public static Path generateHtml(final String language, final Path noticeXmlPath,
-      final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRootPath,
-      boolean forceBuild, TranslatorOptions options)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
-      TransformerException {
+      final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRoot,
+      boolean forceBuild, TranslatorOptions translatorOptions)
+      throws IOException, SAXException, ParserConfigurationException, TransformerException {
     Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
     Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
 
@@ -61,9 +60,14 @@ public class NoticeViewer {
     logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
     final Path xslPath =
-        new XslGenerator(eformsSdkVersion, sdkRootPath, options).generate(viewId, forceBuild);
+        XslGenerator.Builder
+            .create()
+            .withSdkRoot(sdkRoot)
+            .withTranslatorOptions(translatorOptions)
+            .build()
+            .generate(eformsSdkVersion, viewId, forceBuild);
 
-    final Path htmlPath = new HtmlGenerator(eformsSdkVersion, sdkRootPath, profileXslt)
+    final Path htmlPath = new HtmlGenerator(eformsSdkVersion, sdkRoot, profileXslt)
         .generateFile(language, viewId, noticeXmlPath, xslPath);
 
     // Ensure the HTML can be parsed.
@@ -89,7 +93,7 @@ public class NoticeViewer {
    */
   public static String generateHtml(final String language, final String noticeXmlContent,
       final String xsl, final Charset charset, final Optional<String> viewIdOpt,
-      final boolean profileXslt, final Path sdkRootPath)
+      final boolean profileXslt, final Path sdkRoot)
       throws IOException, SAXException, ParserConfigurationException {
     Validate.notBlank(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
@@ -102,7 +106,7 @@ public class NoticeViewer {
             new ByteArrayInputStream(xsl.getBytes(charset));) {
 
       return generateHtml(language, noticeXmlInputStream, xslInputStream, charset, viewIdOpt,
-          profileXslt, sdkRootPath);
+          profileXslt, sdkRoot);
     }
   }
 
@@ -123,7 +127,7 @@ public class NoticeViewer {
   public static String generateHtml(final String language,
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
       final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt,
-      final Path sdkRootPath) throws IOException, ParserConfigurationException, SAXException {
+      final Path sdkRoot) throws IOException, ParserConfigurationException, SAXException {
     Validate.notNull(noticeXmlContent, "Notice XML content is null");
     Validate.notNull(xslIs, "XSL input is null");
 
@@ -140,7 +144,7 @@ public class NoticeViewer {
         logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
         try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-          return new HtmlGenerator(eformsSdkVersion, sdkRootPath, charset, profileXslt)
+          return new HtmlGenerator(eformsSdkVersion, sdkRoot, charset, profileXslt)
               .generateString(language, viewId, new StreamSource(noticeXmlIsClone2),
                   new StreamSource(xslIs));
         }

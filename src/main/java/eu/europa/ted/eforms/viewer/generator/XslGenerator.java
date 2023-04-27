@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.function.Supplier;
+import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.SdkConstants;
@@ -23,15 +24,17 @@ import eu.europa.ted.efx.interfaces.TranslatorOptions;
 public class XslGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslGenerator.class);
 
-  private final String sdkVersion;
   private final Path sdkRoot;
   private final TranslatorOptions translatorOptions;
 
-  public XslGenerator(final String sdkVersion, final Path sdkRoot,
-      final TranslatorOptions translatorOptions) {
-    this.sdkVersion = sdkVersion;
+  public XslGenerator(final Path sdkRoot, final TranslatorOptions translatorOptions) {
     this.sdkRoot = sdkRoot;
-    this.translatorOptions = translatorOptions;
+    this.translatorOptions = ObjectUtils.defaultIfNull(translatorOptions,
+        NoticeViewerConstants.DEFAULT_TRANSLATION_OPTIONS);
+  }
+
+  private XslGenerator(final Builder builder) {
+    this(builder.sdkRoot, builder.translatorOptions);
   }
 
   /**
@@ -44,10 +47,11 @@ public class XslGenerator {
    * @throws FileNotFoundException
    * @throws IOException If an error occurred while writing the file
    */
-  public Path generate(final String viewId, final boolean forceBuild) throws IOException {
+  public Path generate(final String sdkVersion, final String viewId, final boolean forceBuild)
+      throws IOException {
     logger.debug("Generating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
-    final Path viewPath = getEfxPath(viewId);
+    final Path viewPath = getEfxPath(sdkVersion, viewId);
 
     logger.debug("View path: {}", viewPath);
 
@@ -60,7 +64,7 @@ public class XslGenerator {
 
     if (!Files.isRegularFile(xslFile) || forceBuild) {
       try (InputStream viewInputStream = Files.newInputStream(viewPath)) {
-        Supplier<String> translator = getTemplateTranslator(viewInputStream, viewId);
+        Supplier<String> translator = getTemplateTranslator(sdkVersion, viewInputStream, viewId);
 
         if (forceBuild) {
           CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
@@ -89,13 +93,13 @@ public class XslGenerator {
    * @param viewId It can correspond to a view id, as long as there is one view id per notice id, or
    *        something else for custom views
    */
-  private Path getEfxPath(final String viewId) {
+  private Path getEfxPath(final String sdkVersion, final String viewId) {
     return SdkResourceLoader.getResourceAsPath(sdkVersion, SdkConstants.SdkResource.VIEW_TEMPLATES,
         viewId + ".efx", sdkRoot);
   }
 
-  private Supplier<String> getTemplateTranslator(final InputStream viewInputStream,
-      final String viewId) {
+  private Supplier<String> getTemplateTranslator(final String sdkVersion,
+      final InputStream viewInputStream, final String viewId) {
     return () -> {
       try {
         return EfxTranslator.translateTemplate(new DependencyFactory(sdkRoot), sdkVersion,
@@ -108,5 +112,33 @@ public class XslGenerator {
             e);
       }
     };
+  }
+
+  public static final class Builder {
+    // required parameters
+
+    // optional parameters
+    private Path sdkRoot;
+    private TranslatorOptions translatorOptions;
+
+    public Builder() {}
+
+    public static Builder create() {
+      return new Builder();
+    }
+
+    public XslGenerator build() {
+      return new XslGenerator(this);
+    }
+
+    public Builder withSdkRoot(final Path sdkRoot) {
+      this.sdkRoot = sdkRoot;
+      return this;
+    }
+
+    public Builder withTranslatorOptions(TranslatorOptions translatorOptions) {
+      this.translatorOptions = translatorOptions;
+      return this;
+    }
   }
 }
