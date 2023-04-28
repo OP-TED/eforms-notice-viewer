@@ -28,6 +28,9 @@ public final class TranslationUriResolver implements URIResolver {
     this.sdkRootPath = sdkRootPath;
   }
 
+  /**
+   * This allows to load the labels.
+   */
   @Override
   public Source resolve(final String href, final String base) throws TransformerException {
     try (InputStream translationInput = SdkResourceLoader.getResourceAsStream(sdkVersion,
