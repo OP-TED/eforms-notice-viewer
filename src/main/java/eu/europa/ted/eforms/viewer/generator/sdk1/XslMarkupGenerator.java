@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer.generator.sdk1;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
@@ -36,7 +38,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   protected String[] getAssetTypes() {
-    return new String[]  {"business-term", "field", "code", "auxiliary"};
+    return new String[] {"business-term", "field", "code", "auxiliary"};
   }
 
   private final String translations = Arrays.stream(getAssetTypes())
@@ -82,7 +84,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
     logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, templates);
 
-    Markup unformattedMarkup = generateMarkup(
+    final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
@@ -90,7 +92,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("decimalSeparator", options.getDecimalFormat().getDecimalSeparator()),
         Pair.of("groupingSeparator", options.getDecimalFormat().getGroupingSeparator()));
 
-    return new Markup(XmlHelper.formatXml(unformattedMarkup.script, false));
+    try {
+      final String formattedScript = XmlHelper.formatXml(unformattedMarkup.script, false);
+      return new Markup(formattedScript);
+    } catch (DocumentException | IOException e) {
+      throw new RuntimeException("Failed to format file output", e);
+    }
   }
 
   @Override
@@ -123,7 +130,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderFreeText(final String freeText) {
     logger.trace("Rendering free text [{}]", freeText);
 
-    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText.replace(" ","&#8200;")));
+    return generateMarkup(FreemarkerTemplate.FREE_TEXT,
+        Pair.of("freeText", freeText.replace(" ", "&#8200;")));
   }
 
   @Override

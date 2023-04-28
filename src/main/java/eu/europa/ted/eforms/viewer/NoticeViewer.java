@@ -12,7 +12,7 @@ import java.text.MessageFormat;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.jsoup.Jsoup;
@@ -52,8 +52,10 @@ public class NoticeViewer {
       final Optional<String> viewIdOpt, final boolean profileXslt, final Path sdkRoot,
       boolean forceBuild, TranslatorOptions translatorOptions)
       throws IOException, SAXException, ParserConfigurationException, TransformerException {
-    Validate.notNull(noticeXmlPath, "Invalid path to notice: " + noticeXmlPath);
-    Validate.isTrue(Files.isRegularFile(noticeXmlPath), "No such file: " + noticeXmlPath);
+    Validate.notNull(noticeXmlPath, "Invalid path to notice: %s", noticeXmlPath);
+    if (!Files.isRegularFile(noticeXmlPath)) {
+      throw new FileNotFoundException(noticeXmlPath.toString());
+    }
 
     logger.debug("noticeXmlPath={}", noticeXmlPath);
 
@@ -68,6 +70,8 @@ public class NoticeViewer {
     final Path efxPath = getEfxPath(eformsSdkVersion, viewId, sdkRoot);
 
     try (InputStream efxInput = Files.newInputStream(efxPath)) {
+      final String xmlContents = Files.readString(noticeXmlPath);
+
       final Path xslPath =
           XslGenerator.Builder
               .create(new DependencyFactory(sdkRoot))
@@ -75,12 +79,17 @@ public class NoticeViewer {
               .build()
               .generateFile(eformsSdkVersion, viewId, efxInput, forceBuild);
 
-      final Path htmlPath = HtmlGenerator.Builder
+      final String xslContents = Files.readString(xslPath);
+
+      final Path htmlPath = NoticeViewerConstants.OUTPUT_FOLDER_HTML
+          .resolve(MessageFormat.format("{0}-{1}.html", viewId, language));
+
+      HtmlGenerator.Builder
           .create()
           .withProfileXslt(profileXslt)
           .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
           .build()
-          .generateFile(language, viewId, noticeXmlPath, xslPath);
+          .generateFile(language, viewId, xmlContents, xslContents, htmlPath);
 
       // Ensure the HTML can be parsed.
       Jsoup.parse(htmlPath.toFile(), NoticeViewerConstants.DEFAULT_CHARSET.toString());
@@ -103,11 +112,12 @@ public class NoticeViewer {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
+   * @throws TransformerException
    */
   public static String generateHtml(final String language, final String noticeXmlContent,
       final String xsl, final Charset charset, final Optional<String> viewIdOpt,
       final boolean profileXslt, final Path sdkRoot)
-      throws IOException, SAXException, ParserConfigurationException {
+      throws IOException, SAXException, ParserConfigurationException, TransformerException {
     Validate.notBlank(noticeXmlContent, "Invalid notice content: " + noticeXmlContent);
 
     logger.debug("noticeXmlContent={} ...", StringUtils.left(noticeXmlContent, 50));
@@ -136,37 +146,32 @@ public class NoticeViewer {
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse related errors
+   * @throws TransformerException
    */
   public static String generateHtml(final String language,
       final ByteArrayInputStream noticeXmlContent, final ByteArrayInputStream xslIs,
       final Charset charset, final Optional<String> viewIdOpt, final boolean profileXslt,
-      final Path sdkRoot) throws IOException, ParserConfigurationException, SAXException {
+      final Path sdkRoot)
+      throws IOException, ParserConfigurationException, SAXException, TransformerException {
     Validate.notNull(noticeXmlContent, "Notice XML content is null");
     Validate.notNull(xslIs, "XSL input is null");
 
-    try (final ByteArrayOutputStream baos = new ByteArrayOutputStream();) {
-      noticeXmlContent.transferTo(baos);
-      final byte[] xmlContentBytes = baos.toByteArray();
+    final String xmlContents = IOUtils.toString(noticeXmlContent, charset);
+    final String xslContents = IOUtils.toString(xslIs, charset);
+    final NoticeDocument notice = new NoticeDocument(xmlContents);
+    final String eformsSdkVersion = notice.getEformsSdkVersion();
+    final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
 
-      try (final InputStream noticeXmlIsClone1 = new ByteArrayInputStream(xmlContentBytes);
-          final InputStream noticeXmlIsClone2 = new ByteArrayInputStream(xmlContentBytes);) {
-        final NoticeDocument notice = new NoticeDocument(noticeXmlIsClone1);
-        final String eformsSdkVersion = notice.getEformsSdkVersion();
-        final String viewId = viewIdOpt.isPresent() ? viewIdOpt.get() : notice.getNoticeSubType();
+    logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
 
-        logger.debug("viewId={}, eformsSdkVersion={}", viewId, eformsSdkVersion);
-
-        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-          return HtmlGenerator.Builder
-              .create()
-              .withCharset(charset)
-              .withProfileXslt(profileXslt)
-              .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
-              .build()
-              .generateString(language, viewId, new StreamSource(noticeXmlIsClone2),
-                  new StreamSource(xslIs));
-        }
-      }
+    try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      return HtmlGenerator.Builder
+          .create()
+          .withCharset(charset)
+          .withProfileXslt(profileXslt)
+          .withUriResolver(new TranslationUriResolver(eformsSdkVersion, sdkRoot))
+          .build()
+          .generateString(language, viewId, xmlContents, xslContents);
     }
   }
 

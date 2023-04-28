@@ -87,7 +87,8 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToHtmlFromString")
   void testEfxToHtmlFromString(String language, String noticeXmlFilename, String viewId,
       String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     testGenerateHtmlFromString(language, noticeXmlFilename, viewId, sdkVersion);
   }
 
@@ -100,7 +101,8 @@ class NoticeViewerTest {
             .create(new DependencyFactory(SDK_ROOT_DIR))
             .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
-            .generateFile(sdkVersion, viewId, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
+            .generateFile(sdkVersion, viewId,
+                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
                 true);
 
     logger.info("TEST: Wrote file: {}", xsl);
@@ -130,7 +132,8 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
       final String viewId, final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
 
     final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
     final String noticeXmlContent =

@@ -24,6 +24,11 @@ public class NoticeViewerConstants {
   public static final String TEMPLATES_ROOT_DIR_PROPERTY = "templates.root.dir";
   public static final String NV_CACHE_REGION = "nvCache";
 
-  public static final Path OUTPUT_FOLDER_HTML = Path.of("target", "output-html");
-  public static final Path OUTPUT_FOLDER_XSL = Path.of("target", "output-xsl");
+  public static final Path OUTPUT_FOLDER_BUILD = Path.of("build");
+  public static final Path OUTPUT_FOLDER_HTML =
+      Path.of(OUTPUT_FOLDER_BUILD.toString(), "output-html");
+  public static final Path OUTPUT_FOLDER_XSL =
+      Path.of(OUTPUT_FOLDER_BUILD.toString(), "output-xsl");
+  public static final Path OUTPUT_FOLDER_PROFILER =
+      Path.of(OUTPUT_FOLDER_BUILD.toString(), "profiler");
 }
