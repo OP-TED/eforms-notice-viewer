@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -22,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
@@ -119,10 +119,17 @@ class NoticeViewerTest {
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       TransformerException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
-    final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
-                                                         // passing any in cli.
-    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false,
-        SDK_ROOT_DIR, true, NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
+    final String viewId = null; // Equivalent to not
+                                // passing any in cli.
+    final Path path = NoticeViewer.Builder
+        .create(new DependencyFactory(SDK_ROOT_DIR))
+        .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+        .withProfileXslt(false)
+        .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
+        .build()
+        .generateHtmlFile(language, viewId, new NoticeDocument(noticeXmlPath), null, SDK_ROOT_DIR,
+            true);
+
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -147,8 +154,13 @@ class NoticeViewerTest {
                 NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR), true);
 
     final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
-    final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        NoticeViewerConstants.DEFAULT_CHARSET, Optional.of(viewId), false, SDK_ROOT_DIR);
+    final String html = NoticeViewer.Builder
+        .create(new DependencyFactory(SDK_ROOT_DIR))
+        .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+        .withProfileXslt(false)
+        .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
+        .build()
+        .generateHtmlString(language, viewId, new NoticeDocument(noticeXmlContent), xslContent);
 
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));

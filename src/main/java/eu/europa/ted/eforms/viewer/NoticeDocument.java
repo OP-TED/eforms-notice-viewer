@@ -32,8 +32,17 @@ public class NoticeDocument {
 
   public NoticeDocument(InputStream noticeXmlInput, Charset charset)
       throws ParserConfigurationException, SAXException, IOException {
-    this(IOUtils.toString(noticeXmlInput,
-        ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET)));
+    this(IOUtils.toString(noticeXmlInput, charset));
+  }
+
+  public NoticeDocument(Path noticeXmlPath)
+      throws ParserConfigurationException, SAXException, IOException {
+    this(noticeXmlPath, null);
+  }
+
+  public NoticeDocument(final Path noticeXmlPath, Charset charset)
+      throws ParserConfigurationException, SAXException, IOException {
+    this(readXmlContents(noticeXmlPath, charset), charset);
   }
 
   public NoticeDocument(String noticeXmlContents)
@@ -44,19 +53,16 @@ public class NoticeDocument {
   public NoticeDocument(final String noticeXmlContents, Charset charset)
       throws ParserConfigurationException, SAXException, IOException {
     Validate.notBlank(noticeXmlContents, "Invalid Notice XML contents");
+    this.xmlContents = noticeXmlContents;
 
     charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
+
     this.root = XmlHelper.getXmlRoot(noticeXmlContents, charset);
-    this.xmlContents = noticeXmlContents;
+    Validate.notNull(this.root, "No XML root found");
   }
 
-  public NoticeDocument(Path noticeXmlPath)
-      throws ParserConfigurationException, SAXException, IOException {
-    this(noticeXmlPath, null);
-  }
-
-  public NoticeDocument(final Path noticeXmlPath, Charset charset)
-      throws ParserConfigurationException, SAXException, IOException {
+  private static String readXmlContents(final Path noticeXmlPath, Charset charset)
+      throws IOException {
     Validate.notNull(noticeXmlPath, "Undefined Notice XML file path");
 
     if (!Files.isRegularFile(noticeXmlPath)) {
@@ -65,8 +71,7 @@ public class NoticeDocument {
 
     charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
 
-    this.root = XmlHelper.getXmlRoot(noticeXmlPath);
-    this.xmlContents = Files.readString(noticeXmlPath, charset);
+    return Files.readString(noticeXmlPath, charset);
   }
 
   /**

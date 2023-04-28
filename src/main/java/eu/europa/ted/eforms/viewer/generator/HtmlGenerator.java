@@ -1,6 +1,7 @@
 package eu.europa.ted.eforms.viewer.generator;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -56,6 +57,33 @@ public class HtmlGenerator {
    *
    * @param language The language to use as a two letter code
    * @param viewId The view ID corresponding to the XSL template.
+   * @param xmlPath The path of the notice XML file
+   * @param xslContents The contents of the XSL template
+   * @param outputFile The target output file
+   * @return The path of the output file
+   * @throws TransformerException when the XSL transformation fails
+   * @throws IOException when the XML/XSL contents cannot be loaded or the output file cannot be
+   *         written to
+   */
+  public Path generateFile(final String language, final String viewId, final Path xmlPath,
+      final String xslContents, final Path outputFile) throws IOException, TransformerException {
+    Validate.notNull(xmlPath, "Undefined XML file path");
+    if (!Files.isRegularFile(xmlPath)) {
+      throw new FileNotFoundException(xmlPath.toString());
+    }
+
+    logger.info("Loading notice XML from file [{}]", xmlPath);
+    final String xmlContents = Files.readString(xmlPath, charset);
+
+    return generateFile(language, viewId, xmlContents, xslContents, outputFile);
+  }
+
+  /**
+   * Generates HTML using a notice XML string as input and a XSL template. It writes the results to
+   * a file.
+   *
+   * @param language The language to use as a two letter code
+   * @param viewId The view ID corresponding to the XSL template.
    * @param xmlContents The contents of the notice XML
    * @param xslContents The contents of the XSL template
    * @param outputFile The target output file
@@ -80,13 +108,41 @@ public class HtmlGenerator {
 
     applyXslTransformation(language, viewId, xmlContents, xslContents, output);
 
-    logger.info("Wrote HTML for view ID [{}] to file [{}]", viewId, htmlPath);
+    logger.debug("Wrote HTML for view ID [{}] to file [{}]", viewId, htmlPath);
 
     return htmlPath;
   }
 
   /**
-   * Generates HTML and returns the contents as a string.
+   * Generates HTML using a notice XML file as input and a XSL template. It returns the contents as
+   * a string.
+   *
+   * @param language The language to use as a two letter code
+   * @param viewId The view ID corresponding to the XSL template.
+   * @param xmlPath The path of the notice XML file
+   * @param xslContents The contents of the XSL template
+   * @return
+   * @throws FileNotFoundException when the XML file cannot found
+   * @throws TransformerException when the XSL transformation fails
+   * @throws IOException when the XML/XSL contents cannot be loaded
+   */
+  public String generateString(final String language, final String viewId, final Path xmlPath,
+      final String xslContents) throws TransformerException, IOException {
+    Validate.notNull(xmlPath, "Undefined XML file path");
+    if (!Files.isRegularFile(xmlPath)) {
+      throw new FileNotFoundException(xmlPath.toString());
+    }
+
+    logger.info("Loading notice XML from file [{}]", xmlPath);
+
+    final String xmlContents = Files.readString(xmlPath, charset);
+
+    return generateString(language, viewId, xmlContents, xslContents);
+  }
+
+  /**
+   * Generates HTML using a notice XML string as input and a XSL template. It returns the contents
+   * as a string.
    *
    * @param language The language to use as a two letter code
    * @param viewId The view ID corresponding to the XSL template.
@@ -102,17 +158,23 @@ public class HtmlGenerator {
     Validate.notBlank(xmlContents, MSG_INVALID_XML_CONTENTS);
     Validate.notBlank(xslContents, MSG_INVALID_XSL_CONTENTS);
 
+    logger.debug("Generating HTML as string for language [{}] and view ID [{}]", language, viewId);
+
     try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       final StreamResult output = new StreamResult(outputStream);
 
       applyXslTransformation(language, viewId, xmlContents, xslContents, output);
 
-      final String htmlText = outputStream.toString(charset);
+      final String html = outputStream.toString(charset);
 
       // Ensure the HTML can be parsed.
-      Jsoup.parse(htmlText);
+      Jsoup.parse(html);
 
-      return htmlText;
+      logger.info("Finished generating HTML as string for language [{}] and view ID [{}]", language,
+          viewId);
+      logger.trace("Generated HTML:\n{}", html);
+
+      return html;
     }
   }
 
@@ -142,14 +204,14 @@ public class HtmlGenerator {
       final Transformer transformer = getTransformer(language, viewId, xslContents);
       final Source xmlSource = new StreamSource(xmlInput);
 
-      logger.info("Applying XSL transformation for language [{}] and view ID [{}]", language,
+      logger.debug("Applying XSL transformation for language [{}] and view ID [{}]", language,
           viewId);
-      logger.trace("XML input:\n{}", xmlContents);
-      logger.trace("XSL input:\n{}", xslContents);
+      logger.trace("XML contents:\n{}", xmlContents);
+      logger.trace("XSL contents:\n{}", xslContents);
 
       transformer.transform(xmlSource, output);
 
-      logger.info("XSL transformation succeeded for language [{}] and view ID [{}]", language,
+      logger.debug("XSL transformation succeeded for language [{}] and view ID [{}]", language,
           viewId);
     }
   }
@@ -246,7 +308,7 @@ public class HtmlGenerator {
 
     /**
      * @param charset The character set to be used for the HTML output and for reading the XSL
-     *        template
+     *        template and the notice XML
      * @return A {@link Builder} instance
      */
     public Builder withCharset(final Charset charset) {
