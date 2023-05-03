@@ -21,11 +21,11 @@ import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
  */
 public final class TranslationUriResolver implements URIResolver {
   private String sdkVersion;
-  private Path sdkRootPath;
+  private Path sdkRoot;
 
-  public TranslationUriResolver(String sdkVersion, Path sdkRootPath) {
+  public TranslationUriResolver(String sdkVersion, Path sdkRoot) {
     this.sdkVersion = sdkVersion;
-    this.sdkRootPath = sdkRootPath;
+    this.sdkRoot = sdkRoot;
   }
 
   /**
@@ -34,10 +34,10 @@ public final class TranslationUriResolver implements URIResolver {
   @Override
   public Source resolve(final String href, final String base) throws TransformerException {
     try (InputStream translationInput = SdkResourceLoader.getResourceAsStream(sdkVersion,
-        SdkConstants.SdkResource.TRANSLATIONS, href, sdkRootPath)) {
+        SdkConstants.SdkResource.TRANSLATIONS, href, sdkRoot)) {
       if (translationInput == null) {
         throw new IllegalArgumentException(
-            String.format("Input stream is null for href=%s, base=%s", href, base));
+            String.format("Input stream is null for href=%s", href));
       }
 
       // DOM parser based.
