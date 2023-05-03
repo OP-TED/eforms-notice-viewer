@@ -1,6 +1,5 @@
 package eu.europa.ted.eforms.viewer;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -15,8 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
-import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
-import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
+import eu.europa.ted.eforms.sdk.SdkVersion;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
@@ -183,33 +181,23 @@ public class NoticeViewer {
 
   /**
    * Resolves the path of the EFX template for a view.
-   * <p>
-   * This triggers a SDK download as the creation of the symbol resolver (where this normally
-   * occurs) has not happened yet.
    *
-   * @param sdkVersion The target SDK version
+   * @param sdkVersionStr The target SDK version
    * @param viewId The view ID to use for finding the EFX template file
    * @param sdkRoot Path of the root SDK folder
    * @return The path of the EFX template
-   * @throws FileNotFoundException when downloading of the SDK fails
-   * @throws IOException
    */
-  public static Path getEfxPath(final String sdkVersion, final String viewId, final Path sdkRoot)
-      throws IOException {
-    SdkDownloader.downloadSdk(sdkVersion, sdkRoot);
+  public static Path getEfxPath(final String sdkVersionStr, final String viewId, Path sdkRoot) {
+    Validate.notBlank(viewId, "Undefined view ID");
 
-    Path efxPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
-        SdkConstants.SdkResource.VIEW_TEMPLATES, MessageFormat.format("{0}.efx", viewId), sdkRoot);
+    final SdkVersion sdkVersion = new SdkVersion(sdkVersionStr);
+    final String sdkDir = sdkVersion.toStringWithoutPatch();
+    final String resourcePath = SdkConstants.SdkResource.VIEW_TEMPLATES.getPath().toString();
+    final String filename = MessageFormat.format("{0}.efx", viewId);
+    sdkRoot = ObjectUtils.defaultIfNull(sdkRoot, NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR);
 
-    Validate.notNull(efxPath,
-        "Failed to create EFX path for view ID [{}], SDK version [{}] and SDK root directory [{}]",
-        viewId, sdkVersion, sdkRoot);
-
-    if (!Files.isRegularFile(efxPath)) {
-      throw new FileNotFoundException(efxPath.toString());
-    }
-
-    logger.debug("EFX path for view ID {} and SDK {}: {}", viewId, sdkVersion, efxPath);
+    Path efxPath = Path.of(sdkRoot.toString(), sdkDir, resourcePath, filename).toAbsolutePath();
+    logger.debug("EFX path for view ID {} and SDK {}: {}", viewId, sdkVersionStr, efxPath);
 
     return efxPath;
   }
