@@ -88,7 +88,7 @@ public class CliCommand implements Callable<Integer> {
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       URISyntaxException, TransformerException {
-    Validate.notNull(noticeXmlPath, "Undefine notice XML path");
+    Validate.notNull(noticeXmlPath, "Undefined notice XML path");
     if (!Files.isRegularFile(noticeXmlPath)) {
       throw new FileNotFoundException(noticeXmlPath.toString());
     }

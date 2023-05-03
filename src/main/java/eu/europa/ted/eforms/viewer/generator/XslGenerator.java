@@ -67,7 +67,7 @@ public class XslGenerator {
   public Path generateFile(final String sdkVersion, final String viewId, final Path efxTemplate,
       final boolean forceBuild) throws IOException {
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
-    Validate.notNull(viewId, MSG_UNDEFINED_VIEW_ID);
+    Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
     Validate.notNull(efxTemplate, "Undefined path to EFX template");
 
     if (!Files.isRegularFile(efxTemplate)) {
@@ -135,7 +135,7 @@ public class XslGenerator {
   public String generateString(final String sdkVersion, final String viewId, final Path efxTemplate,
       final boolean forceBuild) throws IOException {
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
-    Validate.notNull(viewId, MSG_UNDEFINED_VIEW_ID);
+    Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
     Validate.notNull(efxTemplate, "Undefined EFX template path");
 
     if (!Files.isRegularFile(efxTemplate)) {
