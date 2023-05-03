@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
@@ -187,15 +188,21 @@ public class NoticeViewer {
 
   /**
    * Resolves the path of the EFX template for a view.
+   * <p>
+   * This triggers a SDK download as the creation of the symbol resolver (where this normally
+   * occurs) has not happened yet.
    *
    * @param sdkVersion The target SDK version
    * @param viewId The view ID to use for finding the EFX template file
    * @param sdkRoot Path of the root SDK folder
    * @return The path of the EFX template
-   * @throws FileNotFoundException when the resolved EFX path does not point to an existing file
+   * @throws FileNotFoundException when downloading of the SDK fails
+   * @throws IOException
    */
   public static Path getEfxPath(final String sdkVersion, final String viewId, final Path sdkRoot)
-      throws FileNotFoundException {
+      throws IOException {
+    SdkDownloader.downloadSdk(sdkVersion, sdkRoot);
+
     Path efxPath = SdkResourceLoader.getResourceAsPath(sdkVersion,
         SdkConstants.SdkResource.VIEW_TEMPLATES, MessageFormat.format("{0}.efx", viewId), sdkRoot);
 
