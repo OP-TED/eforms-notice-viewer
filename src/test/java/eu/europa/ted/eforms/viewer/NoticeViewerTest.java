@@ -3,14 +3,11 @@ package eu.europa.ted.eforms.viewer;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -24,9 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
-import eu.europa.ted.efx.EfxTranslatorOptions;
-import eu.europa.ted.efx.interfaces.TranslatorOptions;
-import eu.europa.ted.efx.model.DecimalFormat;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 
 class NoticeViewerTest {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerTest.class);
@@ -42,9 +37,6 @@ class NoticeViewerTest {
   private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.0"};
 
   private static final Path SDK_ROOT_DIR = NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR;
-
-  private static final TranslatorOptions TRANSLATOR_OPTIONS =
-      new EfxTranslatorOptions(DecimalFormat.EFX_DEFAULT);
 
   @BeforeAll
   public static void setUp() {
@@ -95,7 +87,8 @@ class NoticeViewerTest {
   @MethodSource("provideArgsEfxToHtmlFromString")
   void testEfxToHtmlFromString(String language, String noticeXmlFilename, String viewId,
       String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
     testGenerateHtmlFromString(language, noticeXmlFilename, viewId, sdkVersion);
   }
 
@@ -104,7 +97,13 @@ class NoticeViewerTest {
   void testEfxToXsl(String sdkVersion) throws IOException, InstantiationException {
     final String viewId = "X02";
     final Path xsl =
-        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
+        XslGenerator.Builder
+            .create(new DependencyFactory(SDK_ROOT_DIR))
+            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+            .build()
+            .generateFile(sdkVersion, viewId,
+                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
+                true);
 
     logger.info("TEST: Wrote file: {}", xsl);
     assertTrue(xsl.toFile().exists());
@@ -120,10 +119,17 @@ class NoticeViewerTest {
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       TransformerException {
     Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
-    final Optional<String> viewIdOpt = Optional.empty(); // Equivalent to not
-                                                         // passing any in cli.
-    final Path path = NoticeViewer.generateHtml(language, noticeXmlPath, viewIdOpt, false,
-        SDK_ROOT_DIR, true, TRANSLATOR_OPTIONS);
+    final String viewId = null; // Equivalent to not
+                                // passing any in cli.
+    final Path path = NoticeViewer.Builder
+        .create()
+        .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+        .withProfileXslt(false)
+        .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
+        .build()
+        .generateHtmlFile(language, viewId, new NoticeDocument(noticeXmlPath), null, SDK_ROOT_DIR,
+            true);
+
     logger.info("TEST: Wrote html file: {}", path);
     final File htmlFile = path.toFile();
     assertTrue(htmlFile.exists());
@@ -133,15 +139,28 @@ class NoticeViewerTest {
 
   private void testGenerateHtmlFromString(final String language, final String noticeXmlName,
       final String viewId, final String sdkVersion)
-      throws IOException, SAXException, ParserConfigurationException, InstantiationException {
-    final Charset charsetUtf8 = StandardCharsets.UTF_8;
+      throws IOException, SAXException, ParserConfigurationException, InstantiationException,
+      TransformerException {
+
     final Path noticeXmlPath = getNoticeXmlPath(noticeXmlName, sdkVersion);
-    final String noticeXmlContent = Files.readString(noticeXmlPath, charsetUtf8);
+    final String noticeXmlContent =
+        Files.readString(noticeXmlPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final Path xslPath =
-        new XslGenerator(sdkVersion, SDK_ROOT_DIR, TRANSLATOR_OPTIONS).generate(viewId, true);
-    final String xslContent = Files.readString(xslPath, charsetUtf8);
-    final String html = NoticeViewer.generateHtml(language, noticeXmlContent, xslContent,
-        charsetUtf8, Optional.of(viewId), false, SDK_ROOT_DIR);
+        XslGenerator.Builder
+            .create(new DependencyFactory(SDK_ROOT_DIR))
+            .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+            .build()
+            .generateFile(sdkVersion, viewId,
+                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR), true);
+
+    final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
+    final String html = NoticeViewer.Builder
+        .create()
+        .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
+        .withProfileXslt(false)
+        .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
+        .build()
+        .generateHtmlString(language, viewId, new NoticeDocument(noticeXmlContent), xslContent);
 
     logger.info("TEST: Wrote html {} ...", StringUtils.left(html, 50));
     assertTrue(StringUtils.isNotBlank(html));

@@ -1,8 +1,10 @@
 package eu.europa.ted.eforms.viewer.cli;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -13,13 +15,14 @@ import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.viewer.NoticeDocument;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
-import eu.europa.ted.efx.EfxTranslatorOptions;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -85,14 +88,28 @@ public class CliCommand implements Callable<Integer> {
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
       URISyntaxException, TransformerException {
+    Validate.notNull(noticeXmlPath, "Undefined notice XML path");
+    if (!Files.isRegularFile(noticeXmlPath)) {
+      throw new FileNotFoundException(noticeXmlPath.toString());
+    }
+
+    final String xmlContents = Files.readString(noticeXmlPath);
+
     // Initialise Freemarker templates so that the templates folder will be populated
     NoticeViewerConfig.getFreemarkerConfig();
 
+    final Path sdkRoot = Optional.ofNullable(sdkResourcesRoot)
+        .map(Path::of)
+        .orElse(NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR);
+
     final Path htmlPath =
-        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
-            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot)
-                : NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR,
-            forceBuild, EfxTranslatorOptions.DEFAULT);
+        NoticeViewer.Builder
+            .create()
+            .withProfileXslt(profileXslt)
+            .build()
+            .generateHtmlFile(language, viewId, new NoticeDocument(xmlContents), null, sdkRoot,
+                forceBuild);
+
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

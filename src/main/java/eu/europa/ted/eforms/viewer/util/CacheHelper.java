@@ -12,14 +12,19 @@ import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.efx.model.Markup;
 
 /**
- *Class for managing the caching of objects.
- *
+ * Utility class with methods for managing the caching of objects.
  */
 public class CacheHelper {
   private static final Logger logger = LoggerFactory.getLogger(CacheHelper.class);
 
   private CacheHelper() {}
 
+  /**
+   * Caches {@link Markup} instances
+   *
+   * @param key The cache key
+   * @param markup The {@link Markup} instance to cache
+   */
   public static void cacheXslMarkup(String key, Markup markup) {
     if (markup != null) {
       logger.debug("Caching XSL markup with key[{}]", key);
@@ -31,6 +36,16 @@ public class CacheHelper {
     }
   }
 
+  /**
+   * Retrieves an object from a cache region.
+   *
+   * @param <T> The type of the retrieved object
+   * @param valueGenerator The function which computes the object's value if it is not found in the
+   *        cache
+   * @param cacheRegion The cache region to look into
+   * @param keyParts An array containing the cache key's parts
+   * @return An object of the expected type
+   */
   public static <T> T get(final Supplier<T> valueGenerator, final String cacheRegion,
       final String[] keyParts) {
     return get(valueGenerator, cacheRegion, computeKey(keyParts));
@@ -60,10 +75,26 @@ public class CacheHelper {
     return result;
   }
 
+  /**
+   * Caches an object.
+   *
+   * @param <T> The type of the object to cache
+   * @param cacheRegion The cache region where the object will be inserted
+   * @param value The value of the object to cache
+   * @param keyParts An array containing the cache key's parts
+   */
   public static <T> void put(final String cacheRegion, final T value, final String[] keyParts) {
     put(cacheRegion, value, computeKey(keyParts));
   }
 
+  /**
+   * Caches an object.
+   *
+   * @param <T> The type of the object to cache
+   * @param cacheRegion The cache region where the object will be inserted
+   * @param value The value of the object to cache
+   * @param key The string to be used as the cache key
+   */
   public static <T> void put(final String cacheRegion, final T value, final String key) {
     logger.debug("Adding object into cache region [{}] under key [{}]", cacheRegion, key);
     logger.trace("Object value: {}", value);
@@ -71,6 +102,12 @@ public class CacheHelper {
     JCS.getInstance(cacheRegion).put(key, value);
   }
 
+  /**
+   * Computes a cache key hash from an array of strings
+   *
+   * @param strings The strings to generate the hash from
+   * @return A string representing a cache key
+   */
   public static String computeKey(String... strings) {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
     String key = DigestUtils.md5Hex((StringUtils.join(strings, "###")));
@@ -80,6 +117,11 @@ public class CacheHelper {
     return key;
   }
 
+  /**
+   * Clears all contents of a cache region
+   *
+   * @param cacheRegion The name of the target cache region
+   */
   public static void clearCacheRegion(String cacheRegion) {
     logger.debug("Clearing cache region [{}]", cacheRegion);
 
