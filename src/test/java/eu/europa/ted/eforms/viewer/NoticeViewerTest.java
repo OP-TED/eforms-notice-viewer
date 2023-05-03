@@ -122,7 +122,7 @@ class NoticeViewerTest {
     final String viewId = null; // Equivalent to not
                                 // passing any in cli.
     final Path path = NoticeViewer.Builder
-        .create(new DependencyFactory(SDK_ROOT_DIR))
+        .create()
         .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
         .withProfileXslt(false)
         .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
@@ -155,7 +155,7 @@ class NoticeViewerTest {
 
     final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final String html = NoticeViewer.Builder
-        .create(new DependencyFactory(SDK_ROOT_DIR))
+        .create()
         .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
         .withProfileXslt(false)
         .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))

@@ -19,7 +19,6 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.DependencyFactory;
 import eu.europa.ted.eforms.viewer.NoticeDocument;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
@@ -105,7 +104,7 @@ public class CliCommand implements Callable<Integer> {
 
     final Path htmlPath =
         NoticeViewer.Builder
-            .create(new DependencyFactory(sdkRoot))
+            .create()
             .withProfileXslt(profileXslt)
             .build()
             .generateHtmlFile(language, viewId, new NoticeDocument(xmlContents), null, sdkRoot,

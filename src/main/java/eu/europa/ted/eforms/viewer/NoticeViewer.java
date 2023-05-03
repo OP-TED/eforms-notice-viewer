@@ -19,7 +19,6 @@ import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
 import eu.europa.ted.eforms.sdk.resource.SdkResourceLoader;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
-import eu.europa.ted.efx.EfxTranslator;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class NoticeViewer {
@@ -27,23 +26,22 @@ public class NoticeViewer {
 
   private static final String MSG_UNDEFINED_NOTICE_DOCUMENT = "Undefined notice document";
 
-  private XslGenerator xslGenerator;
-  private HtmlGenerator htmlGenerator;
+  private final TranslatorOptions translatorOptions;
+  private final Charset charset;
+  private final boolean profileXslt;
+  private final URIResolver uriResolver;
 
-  private NoticeViewer(final DependencyFactory dependencyFactory,
-      final TranslatorOptions translatorOptions, final Charset charset, final boolean profileXslt,
-      final URIResolver uriResolver) {
-    this.xslGenerator =
-        XslGenerator.Builder.create(dependencyFactory)
-            .withTranslatorOptions(translatorOptions)
-            .build();
+  private NoticeViewer(final TranslatorOptions translatorOptions, final Charset charset,
+      final boolean profileXslt, final URIResolver uriResolver) {
+    this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
+    this.profileXslt = profileXslt;
+    this.translatorOptions = ObjectUtils.defaultIfNull(translatorOptions,
+        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
+    this.uriResolver = uriResolver;
+  }
 
-    this.htmlGenerator = HtmlGenerator.Builder
-        .create()
-        .withCharset(charset)
-        .withProfileXslt(profileXslt)
-        .withUriResolver(uriResolver)
-        .build();
+  private NoticeViewer(Builder builder) {
+    this(builder.translatorOptions, builder.charset, builder.profileXslt, builder.uriResolver);
   }
 
   /**
@@ -82,7 +80,8 @@ public class NoticeViewer {
     final Path efxPath = getEfxPath(sdkVersion, viewId, sdkRoot);
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
-    final String xslContents = xslGenerator.generateString(sdkVersion, viewId, efxPath, forceBuild);
+    final String xslContents =
+        createXslGenerator(sdkRoot).generateString(sdkVersion, viewId, efxPath, forceBuild);
 
     return generateHtmlFile(language, viewId, notice, xslContents, outputFile);
   }
@@ -112,8 +111,8 @@ public class NoticeViewer {
 
     Files.createDirectories(outputFile.getParent());
 
-    return htmlGenerator.generateFile(language, viewId, notice.getXmlContents(), xslContents,
-        outputFile);
+    return createHtmlGenerator().generateFile(language, viewId, notice.getXmlContents(),
+        xslContents, outputFile);
   }
 
   /**
@@ -150,7 +149,8 @@ public class NoticeViewer {
     final Path efxPath = getEfxPath(sdkVersion, viewId, sdkRoot);
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
-    final String xslContents = xslGenerator.generateString(sdkVersion, viewId, efxPath, forceBuild);
+    final String xslContents =
+        createXslGenerator(sdkRoot).generateString(sdkVersion, viewId, efxPath, forceBuild);
 
     return generateHtmlString(language, viewId, notice, xslContents);
   }
@@ -173,17 +173,12 @@ public class NoticeViewer {
 
     logger.info("Generating HTML for language [{}] and view ID [{}]", language, viewId);
 
-    final String html =
-        htmlGenerator.generateString(language, viewId, notice.getXmlContents(), xslContents);
+    final String html = createHtmlGenerator().generateString(language, viewId,
+        notice.getXmlContents(), xslContents);
 
     logger.info("Finished generating HTML for language [{}] and view ID [{}]", language, viewId);
 
     return html;
-  }
-
-  private NoticeViewer(Builder builder) {
-    this(builder.dependencyFactory, builder.translatorOptions, builder.charset, builder.profileXslt,
-        builder.uriResolver);
   }
 
   /**
@@ -219,12 +214,27 @@ public class NoticeViewer {
     return efxPath;
   }
 
+  private XslGenerator createXslGenerator(final Path sdkRoot) {
+    return XslGenerator.Builder
+        .create(new DependencyFactory(sdkRoot))
+        .withTranslatorOptions(translatorOptions)
+        .build();
+  }
+
+  private HtmlGenerator createHtmlGenerator() {
+    return HtmlGenerator.Builder
+        .create()
+        .withCharset(charset)
+        .withProfileXslt(profileXslt)
+        .withUriResolver(uriResolver)
+        .build();
+  }
+
   /**
    * Builder class for {@link NoticeViewer} instances
    */
   public static final class Builder {
     // required parameters
-    private final DependencyFactory dependencyFactory;
 
     // optional parameters
     private Charset charset;
@@ -232,16 +242,8 @@ public class NoticeViewer {
     private TranslatorOptions translatorOptions;
     private URIResolver uriResolver;
 
-    /**
-     * @param dependencyFactory The dependency factory to provide to
-     *        {@link EfxTranslator#translateExpression} method
-     */
-    public Builder(final DependencyFactory dependencyFactory) {
-      this.dependencyFactory = dependencyFactory;
-    }
-
-    public static Builder create(final DependencyFactory dependencyFactory) {
-      return new Builder(dependencyFactory);
+    public static Builder create() {
+      return new Builder();
     }
 
     /**
