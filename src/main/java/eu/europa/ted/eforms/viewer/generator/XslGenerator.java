@@ -1,10 +1,8 @@
 package eu.europa.ted.eforms.viewer.generator;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -25,8 +23,6 @@ import eu.europa.ted.efx.interfaces.TranslatorOptions;
 public class XslGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslGenerator.class);
 
-  private static final String MSG_UNDEFINED_EFX_TEMPLATE_INPUT =
-      "Undefined input stream for EFX template";
   private static final String MSG_UNDEFINED_SDK_VERSION = "Undefined SDK version";
   private static final String MSG_UNDEFINED_VIEW_ID = "Undefined view ID";
 
@@ -53,45 +49,18 @@ public class XslGenerator {
   }
 
   /**
-   * Loads the EFX view template from a file and outputs the XSL to a file.
-   *
-   * @param sdkVersion The target SDK version.
-   * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
-   *        from SDK by using naming conventions
-   * @param efxTemplate Path to the EFX template file
-   * @param forceBuild Forces the re-creation of XSL files
-   * @return Path to the generated file
-   * @throws FileNotFoundException when the EFX template file cannot be found
-   * @throws IOException If an error occurred while writing the file
-   */
-  public Path generateFile(final String sdkVersion, final String viewId, final Path efxTemplate,
-      final boolean forceBuild) throws IOException {
-    Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
-    Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
-    Validate.notNull(efxTemplate, "Undefined path to EFX template");
-
-    if (!Files.isRegularFile(efxTemplate)) {
-      throw new FileNotFoundException(efxTemplate.toString());
-    }
-
-    try (final InputStream efxTemplateInputStream = Files.newInputStream(efxTemplate)) {
-      return generateFile(sdkVersion, viewId, efxTemplateInputStream, forceBuild);
-    }
-  }
-
-  /**
    * Loads the EFX view template contents from an input stream and outputs the XSL to a file.
    *
    * @param sdkVersion The target SDK version.
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
-   * @param efxTemplateInputStream An InputStream containing the EFX template to be translated.
+   * @param efxTemplate Path of the EFX template file to be used.
    * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the generated file
    * @throws IOException If an error occurred while writing the file
    */
   public Path generateFile(final String sdkVersion, final String viewId,
-      final InputStream efxTemplateInputStream, final boolean forceBuild) throws IOException {
+      final Path efxTemplate, final boolean forceBuild) throws IOException {
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
     Validate.notNull(viewId, MSG_UNDEFINED_VIEW_ID);
 
@@ -103,8 +72,7 @@ public class XslGenerator {
     if (Files.isRegularFile(xslFile) && !forceBuild) {
       logger.warn("XSL file [{}] already exists and will not be re-created", xslFile);
     } else {
-      final String translation =
-          generateString(sdkVersion, viewId, efxTemplateInputStream, forceBuild);
+      final String translation = generateString(sdkVersion, viewId, efxTemplate, forceBuild);
 
       Files.createDirectories(xslFile.getParent());
       try (BufferedWriter writer =
@@ -121,51 +89,23 @@ public class XslGenerator {
   }
 
   /**
-   * Loads the EFX view template contents from a file and outputs the XSL as a string.
-   *
-   * @param sdkVersion The target SDK version.
-   * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
-   *        from SDK by using naming conventions
-   * @param efxTemplate Path of the EFX template file to be used.
-   * @param forceBuild If true, it forces the re-creation of XSL (re-creates cache entries)
-   * @return The generated XSL as a string
-   * @throws FileNotFoundException when the EFX template file cannot be found
-   * @throws IOException If an error occurred while writing the file
-   */
-  public String generateString(final String sdkVersion, final String viewId, final Path efxTemplate,
-      final boolean forceBuild) throws IOException {
-    Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
-    Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
-    Validate.notNull(efxTemplate, "Undefined EFX template path");
-
-    if (!Files.isRegularFile(efxTemplate)) {
-      throw new FileNotFoundException(efxTemplate.toString());
-    }
-
-    try (final InputStream efxTemplateInputStream = Files.newInputStream(efxTemplate)) {
-      return generateString(sdkVersion, viewId, efxTemplateInputStream, forceBuild);
-    }
-  }
-
-  /**
    * Loads the EFX view template contents from an input stream and outputs the XSL as a string.
    *
    * @param sdkVersion The target SDK version.
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
-   * @param efxTemplateInputStream An InputStream containing the EFX template to be used.
+   * @param efxTemplate Path of the EFX template file
    * @param forceBuild If true, it forces the re-creation of XSL (re-creates cache entries)
    * @return The generated XSL as a string
    */
-  public String generateString(final String sdkVersion, final String viewId,
-      final InputStream efxTemplateInputStream, final boolean forceBuild) {
+  public String generateString(final String sdkVersion, final String viewId, final Path efxTemplate,
+      final boolean forceBuild) {
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
     Validate.notNull(viewId, MSG_UNDEFINED_VIEW_ID);
 
     logger.debug("Generating XSL for view ID [{}] and SDK version [{}]", viewId, sdkVersion);
 
-    Supplier<String> translator =
-        getTemplateTranslator(sdkVersion, efxTemplateInputStream, viewId);
+    Supplier<String> translator = getTemplateTranslator(sdkVersion, efxTemplate, viewId);
 
     if (forceBuild) {
       CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
@@ -185,19 +125,17 @@ public class XslGenerator {
    * A callback method for performing the translation.
    *
    * @param sdkVersion The target SDK version
-   * @param efxTemplateInputStream An InputStream containing the EFX template to be used.
+   * @param efxTemplate Path of the EFX template file to be used
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
    * @return A callback method as a {@link Supplier}
    */
-  private Supplier<String> getTemplateTranslator(final String sdkVersion,
-      final InputStream efxTemplateInputStream, final String viewId) {
-    Validate.notNull(efxTemplateInputStream, MSG_UNDEFINED_EFX_TEMPLATE_INPUT);
-
+  private Supplier<String> getTemplateTranslator(final String sdkVersion, final Path efxTemplate,
+      final String viewId) {
     return () -> {
       try {
-        return EfxTranslator.translateTemplate(dependencyFactory, sdkVersion,
-            efxTemplateInputStream, translatorOptions);
+        return EfxTranslator.translateTemplate(dependencyFactory, sdkVersion, efxTemplate,
+            translatorOptions);
       } catch (InstantiationException | IOException e) {
         throw new RuntimeException(MessageFormat.format(
             "Failed to build XSL for view ID [{0}] and SDK version[{1}]", viewId, sdkVersion), e);
