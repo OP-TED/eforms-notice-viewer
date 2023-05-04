@@ -7,6 +7,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class for the creation of {@link DocumentBuilder} instances for XML parsing
+ */
 public class SafeDocumentBuilder {
   private static final Logger logger = LoggerFactory.getLogger(SafeDocumentBuilder.class);
 
@@ -14,16 +17,43 @@ public class SafeDocumentBuilder {
     throw new AssertionError("Utility class.");
   }
 
+  /**
+   * Creates a {@link DocumentBuilder} using XXE prevention techniques.
+   * <p>
+   * It allows DOCTYPE declaratios.
+   *
+   * @return A {@link DocumentBuilder} instance
+   * @throws ParserConfigurationException when the builder is configured with a feature that is
+   *         unsupported by the XML processor
+   */
   public static DocumentBuilder buildSafeDocumentBuilderAllowDoctype()
       throws ParserConfigurationException {
     return buildSafeDocumentBuilder(false);
   }
 
+  /**
+   * Creates a {@link DocumentBuilder} using XXE prevention techniques.
+   * <p>
+   * It raises a fatal error when a DOCTYPE declaration is found.
+   *
+   * @return A {@link DocumentBuilder} instance
+   * @throws ParserConfigurationException when the builder is configured with a feature that is
+   *         unsupported by the XML processor
+   */
   public static DocumentBuilder buildSafeDocumentBuilderStrict()
       throws ParserConfigurationException {
     return buildSafeDocumentBuilder(true);
   }
 
+  /**
+   * Creates a {@link DocumentBuilder} using XXE prevention techniques.
+   * 
+   * @param disallowDoctypeDecl If set, a fatal error will be raised when a DOCTYPE declaration is
+   *        found
+   * @return A {@link DocumentBuilder} instance
+   * @throws ParserConfigurationException when the builder is configured with a feature that is
+   *         unsupported by the XML processor
+   */
   private static DocumentBuilder buildSafeDocumentBuilder(final boolean disallowDoctypeDecl)
       throws ParserConfigurationException {
     // https://cheatsheetseries.owasp.org/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.html#java

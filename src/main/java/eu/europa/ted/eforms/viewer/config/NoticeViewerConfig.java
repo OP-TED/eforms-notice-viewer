@@ -21,6 +21,9 @@ import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.template.Configuration;
 
+/**
+ * Class providing configuration for Freemarker
+ */
 public class NoticeViewerConfig {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewerConfig.class);
 
@@ -31,8 +34,10 @@ public class NoticeViewerConfig {
   /**
    * Create a Freemarker configuration for locating templates for loading. The templates are first
    * looked up on the filesystem. If not found, then they are loaded from the templates folder
-   * bundled with the application. The templates root directory can be configured using the system
-   * property {@value NoticeViewerConstants#TEMPLATES_ROOT_DIR_PROPERTY}
+   * bundled with the application.
+   * <p>
+   * The templates root directory can be configured using the system property
+   * {@value NoticeViewerConstants#TEMPLATES_ROOT_DIR_PROPERTY}
    *
    * @return A Freemarker configuration object.
    * @throws IOException

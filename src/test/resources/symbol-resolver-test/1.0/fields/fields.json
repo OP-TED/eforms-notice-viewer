@@ -1,0 +1,54 @@
+{
+  "ublVersion" : "2.3",
+  "sdkVersion" : "eforms-sdk-1.0.0",
+  "metadataDatabase" : {
+    "version" : "1.0.0",
+    "createdOn" : "2022-08-05T10:24:40"
+  },
+  "xmlStructure" : [],
+  "fields" : [{
+    "id" : "BT-10-Procedure-Buyer",
+    "parentNodeId" : "ND-ContractingParty",
+    "name" : "Activity Authority",
+    "btId" : "BT-10",
+    "xpathAbsolute" : "/*/cac:ContractingParty/cac:ContractingActivity/cbc:ActivityTypeCode[@listName='authority-activity']",
+    "xpathRelative" : "cac:ContractingActivity/cbc:ActivityTypeCode[@listName='authority-activity']",
+    "type" : "code",
+    "legalType" : "CODE",
+    "repeatable" : {
+      "value" : false,
+      "severity" : "ERROR"
+    },
+    "forbidden" : {
+      "value" : false,
+      "severity" : "ERROR",
+      "constraints" : [ {
+        "noticeTypes" : [ "22", "38", "39", "40", "X01", "X02" ],
+        "value" : true,
+        "severity" : "ERROR"
+      }, {
+        "noticeTypes" : [ "2", "3", "5", "6", "8", "9", "11", "12", "13", "14", "15", "17", "18", "19", "20", "21", "24", "25", "26", "27", "28", "30", "31", "32", "33", "34", "35", "37", "T01", "T02" ],
+        "condition" : "{ND-ContractingParty} ${not(BT-11-Procedure-Buyer in ('body-pl','body-pl-cga','body-pl-la','body-pl-ra','cga','def-cont','eu-ins-bod-ag','eu-int-org','grp-p-aut','int-org','la','org-sub','org-sub-cga','org-sub-la','org-sub-ra','ra','rl-aut'))}",
+        "value" : true,
+        "severity" : "ERROR"
+      } ]
+    },
+    "mandatory" : {
+      "value" : false,
+      "severity" : "ERROR",
+      "constraints" : [ {
+        "noticeTypes" : [ "1", "2", "4", "5", "7", "8", "10", "11", "14", "15", "16", "17", "19", "23", "24", "29", "30", "32", "35", "36", "37", "CEI" ],
+        "value" : true,
+        "severity" : "ERROR"
+      } ]
+    },
+    "codeList" : {
+      "value" : {
+        "id" : "authority-activity",
+        "type" : "flat",
+        "parentId" : "main-activity"
+      },
+      "severity" : "ERROR"
+    }
+  }]
+}
