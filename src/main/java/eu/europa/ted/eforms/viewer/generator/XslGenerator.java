@@ -125,7 +125,7 @@ public class XslGenerator {
    * A callback method for performing the translation.
    *
    * @param sdkVersion The target SDK version
-   * @param efxTemplate Path of the EFX template file to be used
+   * @param efxTemplate The EFX template file (path to the file or its contents as a string)
    * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
    *        from SDK by using naming conventions
    * @return A callback method as a {@link Supplier}
