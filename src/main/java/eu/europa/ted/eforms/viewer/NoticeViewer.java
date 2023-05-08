@@ -79,7 +79,7 @@ public class NoticeViewer {
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
     final String xslContents =
-        createXslGenerator(sdkRoot).generateString(sdkVersion, viewId, efxPath, forceBuild);
+        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath, forceBuild);
 
     return generateHtmlFile(language, viewId, notice, xslContents, outputFile);
   }
@@ -148,7 +148,7 @@ public class NoticeViewer {
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
     final String xslContents =
-        createXslGenerator(sdkRoot).generateString(sdkVersion, viewId, efxPath, forceBuild);
+        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath, forceBuild);
 
     return generateHtmlString(language, viewId, notice, xslContents);
   }
