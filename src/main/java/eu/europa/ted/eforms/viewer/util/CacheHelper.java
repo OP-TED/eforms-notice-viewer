@@ -1,7 +1,8 @@
 package eu.europa.ted.eforms.viewer.util;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.jcs3.JCS;
 import org.apache.commons.jcs3.access.CacheAccess;
 import org.apache.commons.lang3.StringUtils;
@@ -51,9 +52,18 @@ public class CacheHelper {
     return get(valueGenerator, cacheRegion, computeKey(keyParts));
   }
 
+  /**
+   * Retrieves an object from a cache region.
+   *
+   * @param <T> The type of the retrieved object
+   * @param valueGenerator The function which computes the object's value if it is not found in the
+   *        cache
+   * @param cacheRegion The cache region to look into
+   * @param key The string to be used as the cache key
+   * @return An object of the expected type
+   */
   public static <T> T get(final Supplier<T> valueGenerator, final String cacheRegion,
       final String key) {
-
     logger.debug("Getting value from cache region [{}] for key: {}", cacheRegion, key);
 
     final CacheAccess<String, T> cache = JCS.getInstance(cacheRegion);
@@ -110,11 +120,18 @@ public class CacheHelper {
    */
   public static String computeKey(String... strings) {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
-    String key = DigestUtils.md5Hex((StringUtils.join(strings, "###")));
 
-    logger.trace("Computed key for [{}]: {}", strings, key);
+    try {
+      String key = new String(
+          MessageDigest.getInstance("SHA-512")
+              .digest((StringUtils.join(strings, "###").getBytes())));
 
-    return key;
+      logger.trace("Computed key for [{}]: {}", strings, key);
+
+      return key;
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("Failed to compute cache key", e);
+    }
   }
 
   /**
