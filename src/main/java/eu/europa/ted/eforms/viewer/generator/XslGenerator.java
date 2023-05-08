@@ -11,10 +11,10 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.europa.ted.eforms.viewer.DependencyFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.util.CacheHelper;
 import eu.europa.ted.efx.EfxTranslator;
+import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 /**
@@ -26,16 +26,16 @@ public class XslGenerator {
   private static final String MSG_UNDEFINED_SDK_VERSION = "Undefined SDK version";
   private static final String MSG_UNDEFINED_VIEW_ID = "Undefined view ID";
 
-  private final DependencyFactory dependencyFactory;
+  private final TranslatorDependencyFactory dependencyFactory;
   private final TranslatorOptions translatorOptions;
 
   /**
    * @param dependencyFactory The dependency factory to provide to
-   *        {@link EfxTranslator#translateExpression} method
+   *        {@link EfxTranslator#translateTemplate} method
    * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
    *        translation
    */
-  public XslGenerator(final DependencyFactory dependencyFactory,
+  public XslGenerator(final TranslatorDependencyFactory dependencyFactory,
       final TranslatorOptions translatorOptions) {
     Validate.notNull(dependencyFactory, "Undefined dependency factory");
 
@@ -148,24 +148,24 @@ public class XslGenerator {
    */
   public static final class Builder {
     // required parameters
-    private final DependencyFactory dependencyFactory;
+    private final TranslatorDependencyFactory dependencyFactory;
 
     // optional parameters
     private TranslatorOptions translatorOptions;
 
     /**
      * @param dependencyFactory The dependency factory to provide to
-     *        {@link EfxTranslator#translateExpression} method
+     *        {@link EfxTranslator#translateTemplate} method
      */
-    public Builder(final DependencyFactory dependencyFactory) {
+    public Builder(final TranslatorDependencyFactory dependencyFactory) {
       this.dependencyFactory = dependencyFactory;
     }
 
     /**
      * @param dependencyFactory The dependency factory to provide to
-     *        {@link EfxTranslator#translateExpression} method
+     *        {@link EfxTranslator#translateTemplate} method
      */
-    public static Builder create(DependencyFactory dependencyFactory) {
+    public static Builder create(TranslatorDependencyFactory dependencyFactory) {
       return new Builder(dependencyFactory);
     }
 
