@@ -95,10 +95,10 @@ public class XslGenerator {
   private Path doGenerateFile(final String sdkVersion, final String viewId,
       final Object efxTemplate, final boolean forceBuild) throws IOException {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
-    Validate.notNull(efxTemplate, MSG_UNDEFINED_VIEW_ID);
+    Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
 
-    logger.debug("Writing XSL for SDK version [{}] to file", viewId, sdkVersion);
+    logger.debug("Writing XSL for SDK version [{}] to file", sdkVersion);
 
     final Path xslFile =
         Path.of(NoticeViewerConstants.OUTPUT_FOLDER_XSL.toString(), sdkVersion, viewId + ".xsl");
