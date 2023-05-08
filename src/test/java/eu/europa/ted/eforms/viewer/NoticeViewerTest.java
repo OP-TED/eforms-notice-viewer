@@ -101,8 +101,7 @@ class NoticeViewerTest {
             .create(new DependencyFactory(SDK_ROOT_DIR))
             .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
-            .generateFile(sdkVersion, viewId,
-                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
+            .generateFile(sdkVersion, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
                 true);
 
     logger.info("TEST: Wrote file: {}", xsl);
@@ -150,8 +149,8 @@ class NoticeViewerTest {
             .create(new DependencyFactory(SDK_ROOT_DIR))
             .withTranslatorOptions(NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS)
             .build()
-            .generateFile(sdkVersion, viewId,
-                NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR), true);
+            .generateFile(sdkVersion, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
+                true);
 
     final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final String html = NoticeViewer.Builder
