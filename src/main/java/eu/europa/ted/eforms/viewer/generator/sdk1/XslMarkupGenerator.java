@@ -138,6 +138,11 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
+  public Markup renderLineBreak() {
+    return new Markup("<br/>");
+  }
+
+  @Override
   public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
     return this.composeFragmentDefinition(name, number, content, new LinkedHashSet<String>());
   }
