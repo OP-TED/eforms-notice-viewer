@@ -14,11 +14,26 @@
   xmlns:efac="http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1"
   xmlns:efbc="http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1"
   xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
->
+  xmlns:ted="http://ted.europa.eu/efx" 
+  exclude-result-prefixes="ted">
+
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
   <xsl:param name="language" />
   <xsl:variable name="labels" select="(${translations})"/>
   <xsl:decimal-format decimal-separator="${decimalSeparator}" grouping-separator="${groupingSeparator}" />
+  
+  <xsl:function name="ted:pluralSuffix" as="xs:string">
+    <xsl:param name="n" as="xs:decimal"/>
+    <xsl:choose>
+      <xsl:when test="$n = 1 or $n = -1">
+        <xsl:sequence select="''"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="'|plural'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:function>
+
   <xsl:template match="/">
     <html>
       <head>

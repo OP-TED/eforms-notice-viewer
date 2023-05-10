@@ -23,6 +23,7 @@ import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.Expression;
+import eu.europa.ted.efx.model.Expression.NumericExpression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
@@ -114,19 +115,32 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   @Override
   public Markup renderLabelFromKey(final StringExpression key) {
+    return this.renderLabelFromKey(key, Expression.empty(NumericExpression.class));
+  }
+
+  @Override
+  public Markup renderLabelFromKey(final StringExpression key, NumericExpression quantity) {
     logger.trace("Rendering label from key [{}]", key);
 
-    return generateMarkup(FreemarkerTemplate.LABEL_FROM_KEY, Pair.of("key", key.script));
+    return generateMarkup(FreemarkerTemplate.LABEL_FROM_KEY, 
+      Pair.of("key", key.script),
+      Pair.of("quantity", quantity.script));
   }
 
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
+    return this.renderLabelFromExpression(expression, Expression.empty(NumericExpression.class));
+  }
+
+  @Override
+  public Markup renderLabelFromExpression(final Expression expression, NumericExpression quantity) {
     logger.trace("Rendering label from expression [{}]", expression);
 
     return generateMarkup(
         FreemarkerTemplate.LABEL_FROM_EXPRESSION,
         Pair.of("expression", expression.script),
-        Pair.of("labelSuffix", String.valueOf(++variableCounter)));
+        Pair.of("variableSuffix", String.valueOf(++variableCounter)),
+        Pair.of("quantity", quantity.script));
   }
 
   @Override
@@ -135,6 +149,11 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
     return generateMarkup(FreemarkerTemplate.FREE_TEXT,
         Pair.of("freeText", freeText.replace(" ", "&#8200;")));
+  }
+
+  @Override
+  public Markup renderLineBreak() {
+    return new Markup("<br/>");
   }
 
   @Override
