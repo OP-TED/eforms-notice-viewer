@@ -14,6 +14,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
@@ -83,11 +84,12 @@ public class CliCommand implements Callable<Integer> {
    * @throws InstantiationException
    * @throws URISyntaxException
    * @throws TransformerException
+   * @throws XPathExpressionException
    */
   @Override
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
-      URISyntaxException, TransformerException {
+      URISyntaxException, TransformerException, XPathExpressionException {
     Validate.notNull(noticeXmlPath, "Undefined notice XML path");
     if (!Files.isRegularFile(noticeXmlPath)) {
       throw new FileNotFoundException(noticeXmlPath.toString());
@@ -108,6 +110,7 @@ public class CliCommand implements Callable<Integer> {
             .withProfileXslt(profileXslt)
             .build()
             .generateHtmlFile(language, viewId, new NoticeDocument(xmlContents), null, sdkRoot,
+                NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat(),
                 forceBuild);
 
     logger.info("Created HTML file: {}", htmlPath);
