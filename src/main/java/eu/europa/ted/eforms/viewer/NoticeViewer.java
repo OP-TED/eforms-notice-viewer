@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -25,7 +24,6 @@ import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.efx.EfxTranslatorOptions;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.DecimalFormat;
-import eu.europa.ted.efx.util.LocaleHelper;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
@@ -226,8 +224,8 @@ public class NoticeViewer {
    * Creates a {@link TranslatorOptions} instance for a notice.
    *
    * @param notice A {@link NoticeDocument} object containing the notice's XML contents and metadata
-   * @param language The language of the primary locale. If not set, the primary locale of the
-   *        notice will be used
+   * @param language The primary language. If not set, the primary language of the notice will be
+   *        used
    * @param symbols A {@link DecimalFormat} instance defining the symbols to be used
    * @return A notice-specific {@link TranslatorOptions} instance
    * @throws XPathExpressionException when an error occurs while extracting language information
@@ -238,20 +236,20 @@ public class NoticeViewer {
       throws XPathExpressionException {
     Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
 
-    final Locale primaryLocale = Optional.ofNullable(language)
+    final String primaryLanguage = Optional.ofNullable(language)
         .filter(StringUtils::isNotBlank)
-        .map(LocaleHelper::getLocale)
-        .orElse(notice.getPrimaryLocale());
+        .orElse(notice.getPrimaryLanguage());
 
     symbols = ObjectUtils.defaultIfNull(symbols,
         NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat());
 
-    final List<Locale> otherLocales = notice.getOtherLocales();
+    final List<String> otherLanguages = notice.getOtherLanguages();
     if (StringUtils.isNotBlank(language)) {
-      otherLocales.add(0, notice.getPrimaryLocale());
+      otherLanguages.add(0, notice.getPrimaryLanguage());
     }
 
-    return new EfxTranslatorOptions(symbols, primaryLocale, otherLocales.toArray(Locale[]::new));
+    return new EfxTranslatorOptions(symbols, primaryLanguage,
+        otherLanguages.toArray(String[]::new));
   }
 
   private XslGenerator createXslGenerator(final Path sdkRoot) {

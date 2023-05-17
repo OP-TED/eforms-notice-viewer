@@ -8,7 +8,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import eu.europa.ted.efx.util.LocaleHelper;
 
 class NoticeDocumentTest {
   @Test
@@ -18,9 +17,9 @@ class NoticeDocumentTest {
         new NoticeDocument(
             Path.of("src", "test", "resources", "xml", "1.0", "cn_24_multilingual.xml"));
 
-    assertEquals(LocaleHelper.getLocale("ENG"), document.getPrimaryLocale());
+    assertEquals("ENG", document.getPrimaryLanguage());
 
-    assertEquals(Arrays.asList(LocaleHelper.getLocale("BUL"), LocaleHelper.getLocale("CES")),
-        document.getOtherLocales());
+    assertEquals(Arrays.asList("BUL", "CES"),
+        document.getOtherLanguages());
   }
 }

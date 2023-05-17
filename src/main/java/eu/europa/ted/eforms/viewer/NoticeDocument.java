@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
@@ -24,7 +23,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
-import eu.europa.ted.efx.util.LocaleHelper;
 
 /**
  * A class representing a Notice document with accessor methods for its XML contents and metadata.
@@ -132,36 +130,35 @@ public class NoticeDocument {
   }
 
   /**
-   * @return The primary locale
+   * @return The primary language
    */
-  public Locale getPrimaryLocale() {
+  public String getPrimaryLanguage() {
     return Optional
         .ofNullable(root.getElementsByTagName(TAG_PRIMARY_LANGUAGE))
         .map((NodeList nodes) -> nodes.item(0))
         .map(Node::getTextContent)
-        .map(LocaleHelper::getLocale)
         .orElse(null);
   }
 
   /**
-   * @return A list of other locales
+   * @return A list of other languages
    */
-  public List<Locale> getOtherLocales() throws XPathExpressionException {
+  public List<String> getOtherLanguages() throws XPathExpressionException {
     return Optional
         .ofNullable(xpath.evaluateExpression(XPATH_ADDITIONAL_LANGUAGE, root.getOwnerDocument(),
             XPathNodes.class))
         .map((XPathNodes nodes) -> {
-          final List<Locale> locales = new ArrayList<>();
+          final List<String> languages = new ArrayList<>();
 
           nodes.forEach((Node node) -> {
             if (StringUtils.isNotBlank(node.getTextContent())) {
-              locales.add(LocaleHelper.getLocale(node.getTextContent()));
+              languages.add(node.getTextContent());
             }
           });
 
-          return locales;
+          return languages;
         })
-        .orElseGet(ArrayList<Locale>::new);
+        .orElseGet(ArrayList<String>::new);
   }
 
   /**
