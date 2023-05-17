@@ -23,8 +23,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.util.LocaleHelper;
 import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
+import eu.europa.ted.efx.util.LocaleHelper;
 
 /**
  * A class representing a Notice document with accessor methods for its XML contents and metadata.

@@ -22,10 +22,10 @@ import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.SdkVersion;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
-import eu.europa.ted.eforms.viewer.util.LocaleHelper;
 import eu.europa.ted.efx.EfxTranslatorOptions;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.DecimalFormat;
+import eu.europa.ted.efx.util.LocaleHelper;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);

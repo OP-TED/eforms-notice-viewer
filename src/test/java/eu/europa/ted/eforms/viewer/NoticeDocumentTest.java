@@ -8,7 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.util.LocaleHelper;
+import eu.europa.ted.efx.util.LocaleHelper;
 
 class NoticeDocumentTest {
   @Test
