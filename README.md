@@ -39,6 +39,22 @@ mvn clean install -U
 
 This will force Maven to update any snapshots that are used as dependencies in the project.
 
+In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies you will need to add the following repository in the **\<repositories\>** section in your settings.xml file:
+
+[^1]: Release versions of the dependencies are provided by default in the maven central repo
+```
+<repository>
+  <id>oss-snapshots</id>
+  <name>OSS Snapshots repository</name>
+  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+  <releases>
+    <enabled>false</enabled>
+  </releases>
+  <snapshots>
+    <enabled>true</enabled>
+  </snapshots>
+</repository>
+```
 
 ## Usage    
 
