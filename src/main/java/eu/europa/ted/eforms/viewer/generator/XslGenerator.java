@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.function.Supplier;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,25 +27,19 @@ public class XslGenerator {
   private static final String MSG_UNDEFINED_VIEW_ID = "Undefined view ID";
 
   private final TranslatorDependencyFactory dependencyFactory;
-  private final TranslatorOptions translatorOptions;
 
   /**
    * @param dependencyFactory The dependency factory to provide to
    *        {@link EfxTranslator#translateTemplate} method
-   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
-   *        translation
    */
-  public XslGenerator(final TranslatorDependencyFactory dependencyFactory,
-      final TranslatorOptions translatorOptions) {
+  public XslGenerator(final TranslatorDependencyFactory dependencyFactory) {
     Validate.notNull(dependencyFactory, "Undefined dependency factory");
 
     this.dependencyFactory = dependencyFactory;
-    this.translatorOptions = ObjectUtils.defaultIfNull(translatorOptions,
-        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
   }
 
   private XslGenerator(final Builder builder) {
-    this(builder.dependencyFactory, builder.translatorOptions);
+    this(builder.dependencyFactory);
   }
 
   /**
@@ -54,17 +47,19 @@ public class XslGenerator {
    *
    * @param sdkVersion The target SDK version.
    * @param efxTemplate Path of the EFX template file
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the generated file
    * @throws IOException If an error occurred while writing the file
    */
   public Path generateFile(final String sdkVersion, final Path efxTemplate,
-      final boolean forceBuild) throws IOException {
+      final TranslatorOptions translatorOptions, final boolean forceBuild) throws IOException {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
 
     final String viewId = efxTemplate.getFileName().toString().replace(".efx", "");
 
-    return doGenerateFile(sdkVersion, viewId, efxTemplate, forceBuild);
+    return doGenerateFile(sdkVersion, viewId, efxTemplate, translatorOptions, forceBuild);
   }
 
   /**
@@ -73,13 +68,15 @@ public class XslGenerator {
    * @param sdkVersion The target SDK version.
    * @param viewId Something like "1" or "X02". It will be used to name the generated XSL file.
    * @param efxTemplate Contents of the EFX template as a string
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the generated file
    * @throws IOException If an error occurred while writing the file
    */
-  public Path generateFile(final String sdkVersion, final String viewId,
-      final String efxTemplate, final boolean forceBuild) throws IOException {
-    return doGenerateFile(sdkVersion, viewId, efxTemplate, forceBuild);
+  public Path generateFile(final String sdkVersion, final String viewId, final String efxTemplate,
+      final TranslatorOptions translatorOptions, final boolean forceBuild) throws IOException {
+    return doGenerateFile(sdkVersion, viewId, efxTemplate, translatorOptions, forceBuild);
   }
 
   /**
@@ -88,12 +85,15 @@ public class XslGenerator {
    * @param sdkVersion The target SDK version.
    * @param viewId Something like "1" or "X02". It will be used to name the generated XSL file.
    * @param efxTemplate Path of the EFX template file to be used.
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild Forces the re-creation of XSL files
    * @return Path to the generated file
    * @throws IOException If an error occurred while writing the file
    */
   private Path doGenerateFile(final String sdkVersion, final String viewId,
-      final Object efxTemplate, final boolean forceBuild) throws IOException {
+      final Object efxTemplate, final TranslatorOptions translatorOptions, final boolean forceBuild)
+      throws IOException {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
     Validate.notBlank(viewId, MSG_UNDEFINED_VIEW_ID);
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
@@ -106,7 +106,8 @@ public class XslGenerator {
     if (Files.isRegularFile(xslFile) && !forceBuild) {
       logger.warn("XSL file [{}] already exists and will not be re-created", xslFile);
     } else {
-      final String translation = doGenerateString(sdkVersion, efxTemplate, forceBuild);
+      final String translation =
+          doGenerateString(sdkVersion, efxTemplate, translatorOptions, forceBuild);
 
       Files.createDirectories(xslFile.getParent());
       try (BufferedWriter writer =
@@ -126,12 +127,14 @@ public class XslGenerator {
    *
    * @param sdkVersion The target SDK version.
    * @param efxTemplate Path of the EFX template file
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild If true, it forces the re-creation of XSL (re-creates cache entries)
    * @return The generated XSL as a string
    */
   public String generateString(final String sdkVersion, final Path efxTemplate,
-      final boolean forceBuild) {
-    return doGenerateString(sdkVersion, efxTemplate, forceBuild);
+      final TranslatorOptions translatorOptions, final boolean forceBuild) {
+    return doGenerateString(sdkVersion, efxTemplate, translatorOptions, forceBuild);
   }
 
   /**
@@ -139,12 +142,14 @@ public class XslGenerator {
    *
    * @param sdkVersion The target SDK version.
    * @param efxTemplate Contents of the EFX template as a string
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild If true, it forces the re-creation of XSL (re-creates cache entries)
    * @return The generated XSL as a string
    */
   public String generateString(final String sdkVersion, final String efxTemplate,
-      final boolean forceBuild) {
-    return doGenerateString(sdkVersion, efxTemplate, forceBuild);
+      final TranslatorOptions translatorOptions, final boolean forceBuild) {
+    return doGenerateString(sdkVersion, efxTemplate, translatorOptions, forceBuild);
   }
 
   /**
@@ -152,17 +157,19 @@ public class XslGenerator {
    *
    * @param sdkVersion The target SDK version.
    * @param efxTemplate Path of the EFX template file
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @param forceBuild If true, it forces the re-creation of XSL (re-creates cache entries)
    * @return The generated XSL as a string
    */
   private String doGenerateString(final String sdkVersion, final Object efxTemplate,
-      final boolean forceBuild) {
+      final TranslatorOptions translatorOptions, final boolean forceBuild) {
     Validate.notBlank(sdkVersion, MSG_UNDEFINED_SDK_VERSION);
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
 
     logger.debug("Generating XSL for SDK version [{}]", sdkVersion);
 
-    Supplier<String> translator = getTemplateTranslator(sdkVersion, efxTemplate);
+    Supplier<String> translator = getTemplateTranslator(sdkVersion, efxTemplate, translatorOptions);
 
     if (forceBuild) {
       CacheHelper.put(NoticeViewerConstants.NV_CACHE_REGION, translator.get(),
@@ -181,12 +188,12 @@ public class XslGenerator {
    *
    * @param sdkVersion The target SDK version
    * @param efxTemplate The EFX template file (path to the file or its contents as a string)
-   * @param viewId Something like "1" or "X02", it will try to get the corresponding view template
-   *        from SDK by using naming conventions
+   * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
+   *        translation
    * @return A callback method as a {@link Supplier}
    */
-  private Supplier<String> getTemplateTranslator(final String sdkVersion,
-      final Object efxTemplate) {
+  private Supplier<String> getTemplateTranslator(final String sdkVersion, final Object efxTemplate,
+      final TranslatorOptions translatorOptions) {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
 
     return () -> {
@@ -216,7 +223,6 @@ public class XslGenerator {
     private final TranslatorDependencyFactory dependencyFactory;
 
     // optional parameters
-    private TranslatorOptions translatorOptions;
 
     /**
      * @param dependencyFactory The dependency factory to provide to
@@ -232,16 +238,6 @@ public class XslGenerator {
      */
     public static Builder create(TranslatorDependencyFactory dependencyFactory) {
       return new Builder(dependencyFactory);
-    }
-
-    /**
-     * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
-     *        translation
-     * @return A {@link Builder} instance
-     */
-    public Builder withTranslatorOptions(TranslatorOptions translatorOptions) {
-      this.translatorOptions = translatorOptions;
-      return this;
     }
 
     /**

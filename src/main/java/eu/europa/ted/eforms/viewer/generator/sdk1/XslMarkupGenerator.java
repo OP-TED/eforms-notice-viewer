@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -31,10 +32,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   private static int variableCounter = 0;
 
-  private TranslatorOptions options;
+  private TranslatorOptions translatorOptions;
 
-  public XslMarkupGenerator(TranslatorOptions options) {
-    this.options = options;
+  public XslMarkupGenerator(TranslatorOptions translatorOptions) {
+    this.translatorOptions = Validate.notNull(translatorOptions, "Undefined translator options");
   }
 
   protected String[] getAssetTypes() {
@@ -89,8 +90,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
         Pair.of("templates", markupsListToStringList(templates)),
-        Pair.of("decimalSeparator", options.getDecimalFormat().getDecimalSeparator()),
-        Pair.of("groupingSeparator", options.getDecimalFormat().getGroupingSeparator()));
+        Pair.of("decimalSeparator", translatorOptions.getDecimalFormat().getDecimalSeparator()),
+        Pair.of("groupingSeparator", translatorOptions.getDecimalFormat().getGroupingSeparator()));
 
     try {
       final String formattedScript = XmlHelper.formatXml(unformattedMarkup.script, false);

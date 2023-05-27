@@ -5,10 +5,14 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.List;
+import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.URIResolver;
+import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,29 +21,28 @@ import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.SdkVersion;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
+import eu.europa.ted.efx.EfxTranslatorOptions;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
+import eu.europa.ted.efx.model.DecimalFormat;
 
 public class NoticeViewer {
   private static final Logger logger = LoggerFactory.getLogger(NoticeViewer.class);
 
   private static final String MSG_UNDEFINED_NOTICE_DOCUMENT = "Undefined notice document";
 
-  private final TranslatorOptions translatorOptions;
   private final Charset charset;
   private final boolean profileXslt;
   private final URIResolver uriResolver;
 
-  private NoticeViewer(final TranslatorOptions translatorOptions, final Charset charset,
-      final boolean profileXslt, final URIResolver uriResolver) {
+  private NoticeViewer(final Charset charset, final boolean profileXslt,
+      final URIResolver uriResolver) {
     this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
     this.profileXslt = profileXslt;
-    this.translatorOptions = ObjectUtils.defaultIfNull(translatorOptions,
-        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS);
     this.uriResolver = uriResolver;
   }
 
   private NoticeViewer(Builder builder) {
-    this(builder.translatorOptions, builder.charset, builder.profileXslt, builder.uriResolver);
+    this(builder.charset, builder.profileXslt, builder.uriResolver);
   }
 
   /**
@@ -50,7 +53,8 @@ public class NoticeViewer {
    * <p>
    * The SDK root directory is expected to contain a directory per minor SDK version.
    *
-   * @param language The language as a two letter code
+   * @param language The language as a two letter code. If set, it will be used as the primary
+   *        language for the translation
    * @param viewId An optional SDK view id to used for loading the corresponding EFX template.
    *        <p>
    *        This can be used to enforce a custom view like notice summary. It could fail if this
@@ -60,16 +64,21 @@ public class NoticeViewer {
    * @param notice A {@link NoticeDocument} object containing the notice's XML contents and metadata
    * @return The path of the generated HTML file
    * @param sdkRoot Path of the root SDK directory
+   * @param symbols The {@link DecimalFormat} to use for the translation
    * @param forceBuild If true, forces the re-creation of XSL (re-creates cache entries)
    * @return The path of the generated HTML file
    * @throws IOException when the XML/XSL contents cannot be loaded
    * @throws TransformerException when the XSL transformation fails
    * @throws SAXException when the notice XML cannot be parsed
    * @throws ParserConfigurationException when the XML parser is not configured properly
+   * @throws XPathExpressionException when an error occurs while extracting language information
+   *         from the notice document
    */
   public Path generateHtmlFile(final String language, String viewId, final NoticeDocument notice,
-      final Path outputFile, final Path sdkRoot, boolean forceBuild)
-      throws IOException, TransformerException, ParserConfigurationException, SAXException {
+      final Path outputFile, final Path sdkRoot, final DecimalFormat symbols,
+      boolean forceBuild)
+      throws IOException, TransformerException, ParserConfigurationException, SAXException,
+      XPathExpressionException {
     Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
 
     final String sdkVersion = notice.getEformsSdkVersion();
@@ -79,7 +88,9 @@ public class NoticeViewer {
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
     final String xslContents =
-        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath, forceBuild);
+        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath,
+            getTranslatorOptions(notice, language, symbols),
+            forceBuild);
 
     return generateHtmlFile(language, viewId, notice, xslContents, outputFile);
   }
@@ -120,7 +131,8 @@ public class NoticeViewer {
    * <p>
    * The SDK root directory is expected to contain a directory per minor SDK version.
    *
-   * @param language The language as a two letter code
+   * @param language The language as a two letter code. If set, it will be used as the primary
+   *        language for the translation
    * @param viewId An optional SDK view id to used for loading the corresponding EFX template.
    *        <p>
    *        This can be used to enforce a custom view like notice summary. It could fail if this
@@ -129,16 +141,21 @@ public class NoticeViewer {
    *        If not given, then the notice sub type ID from the notice XML will be used.
    * @param notice A {@link NoticeDocument} object containing the notice's XML contents and metadata
    * @param sdkRoot Path of the root SDK directory
+   * @param symbols The {@link DecimalFormat} to use for the translation
    * @param forceBuild If true, forces the re-creation of XSL (re-creates cache entries)
    * @return Generated HTML as {@link String}
    * @throws TransformerException when the XSL transformation fails
    * @throws IOException when the XML/XSL contents cannot be loaded
    * @throws SAXException when the notice XML cannot be parsed
    * @throws ParserConfigurationException when the XML parser is not configured properly
+   * @throws XPathExpressionException when an error occurs while extracting language information
+   *         from the notice document
    */
   public String generateHtmlString(final String language, String viewId,
-      final NoticeDocument notice, final Path sdkRoot, boolean forceBuild)
-      throws TransformerException, IOException, ParserConfigurationException, SAXException {
+      final NoticeDocument notice, final Path sdkRoot, final DecimalFormat symbols,
+      boolean forceBuild)
+      throws TransformerException, IOException, ParserConfigurationException, SAXException,
+      XPathExpressionException {
     Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
 
     final String sdkVersion = notice.getEformsSdkVersion();
@@ -148,7 +165,8 @@ public class NoticeViewer {
 
     logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
     final String xslContents =
-        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath, forceBuild);
+        createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath,
+            getTranslatorOptions(notice, language, symbols), forceBuild);
 
     return generateHtmlString(language, viewId, notice, xslContents);
   }
@@ -202,10 +220,41 @@ public class NoticeViewer {
     return efxPath;
   }
 
+  /**
+   * Creates a {@link TranslatorOptions} instance for a notice.
+   *
+   * @param notice A {@link NoticeDocument} object containing the notice's XML contents and metadata
+   * @param language The primary language. If not set, the primary language of the notice will be
+   *        used
+   * @param symbols A {@link DecimalFormat} instance defining the symbols to be used
+   * @return A notice-specific {@link TranslatorOptions} instance
+   * @throws XPathExpressionException when an error occurs while extracting language information
+   *         from the notice document
+   */
+  public static TranslatorOptions getTranslatorOptions(final NoticeDocument notice,
+      final String language, DecimalFormat symbols)
+      throws XPathExpressionException {
+    Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
+
+    final String primaryLanguage = Optional.ofNullable(language)
+        .filter(StringUtils::isNotBlank)
+        .orElse(notice.getPrimaryLanguage());
+
+    symbols = ObjectUtils.defaultIfNull(symbols,
+        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat());
+
+    final List<String> otherLanguages = notice.getOtherLanguages();
+    if (StringUtils.isNotBlank(language)) {
+      otherLanguages.add(0, notice.getPrimaryLanguage());
+    }
+
+    return new EfxTranslatorOptions(symbols, primaryLanguage,
+        otherLanguages.toArray(String[]::new));
+  }
+
   private XslGenerator createXslGenerator(final Path sdkRoot) {
     return XslGenerator.Builder
         .create(new DependencyFactory(sdkRoot))
-        .withTranslatorOptions(translatorOptions)
         .build();
   }
 
@@ -227,7 +276,6 @@ public class NoticeViewer {
     // optional parameters
     private Charset charset;
     private boolean profileXslt;
-    private TranslatorOptions translatorOptions;
     private URIResolver uriResolver;
 
     public static Builder create() {
@@ -250,16 +298,6 @@ public class NoticeViewer {
      */
     public Builder withProfileXslt(final boolean profileXslt) {
       this.profileXslt = profileXslt;
-      return this;
-    }
-
-    /**
-     * @param translatorOptions A {@link TranslatorOptions} instance with configuration for the
-     *        translation
-     * @return A {@link Builder} instance
-     */
-    public Builder withTranslatorOptions(final TranslatorOptions translatorOptions) {
-      this.translatorOptions = translatorOptions;
       return this;
     }
 
