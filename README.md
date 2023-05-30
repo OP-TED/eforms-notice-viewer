@@ -39,22 +39,31 @@ mvn clean install -U
 
 This will force Maven to update any snapshots that are used as dependencies in the project.
 
-In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies you will need to add the following repository in the **\<repositories\>** section in your settings.xml file:
+In order to be able to use snapshot versions of dependencies, the following should be added to the "profiles" section of the Maven configuration file "settings.xml" (normally under ${HOME}/.m2):
 
-[^1]: Release versions of the dependencies are provided by default in the maven central repo
 ```
-<repository>
-  <id>oss-snapshots</id>
-  <name>OSS Snapshots repository</name>
-  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-  <releases>
-    <enabled>false</enabled>
-  </releases>
-  <snapshots>
-    <enabled>true</enabled>
-  </snapshots>
-</repository>
+<profile>
+  <id>repositories</id>
+  <activation>
+    <activeByDefault>true</activeByDefault>
+  </activation>
+  <repositories>
+    <repository>
+      <id>ossrh</id>
+      <name>OSSRH Snapshots</name>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+</profile>
 ```
+
+See ".github/workflows/settings.xml".
 
 ## Usage    
 

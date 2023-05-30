@@ -24,6 +24,6 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Publish package
-        run: mvn --batch-mode -s .github/workflows/settings.xml deploy
+        run: mvn --batch-mode deploy -s .github/workflows/settings.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
