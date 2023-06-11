@@ -14,7 +14,7 @@
 		<xsl:for-each select="${expression}">
 			<#if quantity?has_content>
 				<xsl:variable name="singular${variableSuffix}" select="."/>
-				<xsl:variable name="plural${variableSuffix}" select="concat(., ted:pluralSuffix(${quantity}))"/>
+				<xsl:variable name="plural${variableSuffix}" select="concat(., ted:plural-label-suffix(${quantity}))"/>
 				<#-- This will fallback to the singual form if a pluralised label does not exist. -->
 				<#-- If the singular form label does not exist either, then the label key will be shown instead. -->
 				<xsl:value-of select="($labels//entry[@key=$plural${variableSuffix}]/text(), $labels//entry[@key=$singular${variableSuffix}]/text(), concat('{', $singular${variableSuffix}, '}'))[1]"/>

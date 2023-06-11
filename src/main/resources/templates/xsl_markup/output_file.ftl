@@ -18,20 +18,40 @@
   exclude-result-prefixes="ted">
 
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
+
+  <#-- The visualisation language is a run-time parameter passed to the the XSL transformation. -->
   <xsl:param name="language" />
-  <xsl:variable name="labels" select="(${translations})"/>
+
+  <#-- The translations compile-time parameter contains a sequence of calls to fn:doc(), which will effectivelly load all labels. -->
+  <xsl:variable name="labels" select="${translations}"/>
+
+  <#-- Number formatting settings are set by the translator at compile-time. -->
   <xsl:decimal-format decimal-separator="${decimalSeparator}" grouping-separator="${groupingSeparator}" />
   
-  <xsl:function name="ted:pluralSuffix" as="xs:string">
-    <xsl:param name="n" as="xs:decimal"/>
+  <#--
+    The plural-label-suffix function takes an quantity (a number) as a parameter, and returns a suffix that is used to retrieve 
+    the correct form (singular or plural) of the label. As the algorithm is language dependent, the function also uses the 
+    $language parameter passed to the XSL transformation.
+  -->
+  <xsl:function name="ted:plural-label-suffix" as="xs:string">
+    <xsl:param name="quantity" as="xs:decimal"/>
     <xsl:choose>
-      <xsl:when test="$n = 1 or $n = -1">
+      <xsl:when test="$quantity = 1 or $quantity = -1">
         <xsl:sequence select="''"/>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:sequence select="'|plural'"/>
+        <xsl:sequence select="'.plural'"/>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:function>
+
+  <#-- 
+    The preferred-languages function returns the list of languages that should be used to retrieve labels.
+    The first language is the one passed as a run-time parameter to the XSL transformation. 
+    The langauges of the notice being visualised are also added to the list, in the order they are defined in the notice.
+  -->
+  <xsl:function name="ted:preferred-languages" as="xs:string*">
+    <xsl:sequence select="($language)"/>
   </xsl:function>
 
   <xsl:template match="/">
@@ -53,6 +73,7 @@
     </html>
   </xsl:template>
 
+  <#-- The templates are called by the markup inserted in the body above. -->
   <#list templates as template>
     ${template}
   </#list>
