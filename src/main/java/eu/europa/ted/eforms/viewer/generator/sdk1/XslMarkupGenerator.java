@@ -45,9 +45,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return new String[] {"business-term", "field", "code", "auxiliary"};
   }
 
-  private final String translations = "(" + Arrays.stream(getAssetTypes())
-      .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
-      .collect(Collectors.joining(", ")) + ")";
+  private final String translations = Arrays.stream(getAssetTypes())
+      .map(assetType -> "fn:document(concat('" + assetType + "_' , $LANGUAGE, '.xml'))")
+      .collect(Collectors.joining(", "));
 
   private static List<String> markupsListToStringList(List<Markup> markupsList) {
     return Optional.ofNullable(markupsList).orElse(Collections.emptyList()).stream()
