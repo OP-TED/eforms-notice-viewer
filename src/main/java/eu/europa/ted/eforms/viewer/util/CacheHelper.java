@@ -123,12 +123,9 @@ public class CacheHelper {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
 
     try {
-      byte[] bar =
-          MessageDigest.getInstance("SHA-512")
-              .digest((StringUtils.join(strings, "###").getBytes()));
-
-      BigInteger big = new BigInteger(1, bar);
-      String key = big.toString(16);
+      byte[] bytes = MessageDigest.getInstance("SHA-512").digest((StringUtils.join(strings, "###").getBytes()));
+      BigInteger number = new BigInteger(1, bytes);
+      String key = StringUtils.leftPad(number.toString(16), 32, '0');
       logger.trace("Computed key for [{}]: {}", strings, key);
 
       return key;
