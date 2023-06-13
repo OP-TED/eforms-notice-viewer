@@ -43,7 +43,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   private final String translations = Arrays.stream(getAssetTypes())
-      .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
+      .map(assetType -> "fn:document(concat('" + assetType + "_' , $LANGUAGE, '.xml'))")
       .collect(Collectors.joining(", "));
 
   private static List<String> markupsListToStringList(List<Markup> markupsList) {
