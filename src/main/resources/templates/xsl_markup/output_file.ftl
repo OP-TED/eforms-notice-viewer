@@ -42,7 +42,6 @@
   -->
   <xsl:function name="ted:plural-label-suffix" as="xs:string">
     <xsl:param name="quantity" as="xs:decimal"/>
-    <xsl:param name="lang3" as="xs:string"/>
     <xsl:choose>
       <xsl:when test="$quantity = 1 or $quantity = -1">
         <xsl:sequence select="''"/>
