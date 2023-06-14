@@ -282,7 +282,7 @@ public class HtmlGenerator {
       Validate.notNull(transformer, "No transformer was created");
 
       transformer.setOutputProperty(OutputKeys.ENCODING, charset.name());
-      transformer.setParameter("language", language);
+      transformer.setParameter("LANGUAGE", language);
 
       logger.debug("Successfully created XSL transformer for language [{}] and view ID [{}]",
           language, viewId);
