@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer.util;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
@@ -122,10 +123,9 @@ public class CacheHelper {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
 
     try {
-      String key = new String(
-          MessageDigest.getInstance("SHA-512")
-              .digest((StringUtils.join(strings, "###").getBytes())));
-
+      byte[] bytes = MessageDigest.getInstance("SHA-512").digest((StringUtils.join(strings, "###").getBytes()));
+      BigInteger number = new BigInteger(1, bytes);
+      String key = StringUtils.leftPad(number.toString(16), 32, '0');
       logger.trace("Computed key for [{}]: {}", strings, key);
 
       return key;
