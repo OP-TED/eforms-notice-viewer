@@ -41,7 +41,6 @@ public class NoticeViewerConfig {
    *
    * @return A Freemarker configuration object.
    * @throws IOException
-   * @throws Exception
    */
   public static Configuration getFreemarkerConfig() throws IOException {
     if (freemarkerConfig == null) {

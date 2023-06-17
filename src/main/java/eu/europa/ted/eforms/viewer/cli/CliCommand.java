@@ -77,8 +77,6 @@ public class CliCommand implements Callable<Integer> {
   }
 
   /**
-   * @param args Command line arguments. See usage.
-   *
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
