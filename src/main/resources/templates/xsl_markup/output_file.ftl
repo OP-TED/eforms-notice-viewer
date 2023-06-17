@@ -14,8 +14,8 @@
   xmlns:efac="http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1"
   xmlns:efbc="http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1"
   xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
-  xmlns:ted="http://ted.europa.eu/efx" 
-  exclude-result-prefixes="ted">
+  xmlns:efx="http://ted.europa.eu/efx" 
+  exclude-result-prefixes="efx">
 
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
 
@@ -27,7 +27,7 @@
     The first language is the one passed as a run-time parameter to the XSL transformation. 
     The langauges of the notice being visualised are also added to the list, in the order they are defined in the notice.
   -->
-  <xsl:variable name="PREFERRED_LANGUAGES" select="(ted:three-letter-language-code($LANGUAGE), /*/cbc:NoticeLanguageCode, for $lang in /*/cac:AdditionalNoticeLanguage/cbc:ID return $lang)" as="xs:string*"/>
+  <xsl:variable name="PREFERRED_LANGUAGES" select="(efx:three-letter-language-code($LANGUAGE), /*/cbc:NoticeLanguageCode, for $lang in /*/cac:AdditionalNoticeLanguage/cbc:ID return $lang)" as="xs:string*"/>
 
   <#-- The translations compile-time parameter contains a sequence of calls to fn:doc(), which will effectivelly load all labels. -->
   <xsl:variable name="labels" select="${translations}"/>
@@ -40,7 +40,7 @@
     the correct form (singular or plural) of the label. As the algorithm is language dependent, the function also uses the 
     $LANGUAGE parameter passed to the XSL transformation.
   -->
-  <xsl:function name="ted:plural-label-suffix" as="xs:string">
+  <xsl:function name="efx:plural-label-suffix" as="xs:string">
     <xsl:param name="quantity" as="xs:decimal"/>
     <xsl:choose>
       <xsl:when test="$quantity = 1 or $quantity = -1">
@@ -52,7 +52,7 @@
     </xsl:choose>
   </xsl:function>
 
-  <xsl:function name="ted:three-letter-language-code" as="xs:string">
+  <xsl:function name="efx:three-letter-language-code" as="xs:string">
     <xsl:param name="two-letter-code" as="xs:string"/>
     <xsl:variable name="language-map">
       <languages>
@@ -83,6 +83,16 @@
       </languages>
     </xsl:variable>
     <xsl:sequence select="$language-map//language[c2=$two-letter-code]/c3/text()"/>
+  </xsl:function>
+
+  <xsl:function name="efx:preferred-language" as="xs:string*">
+    <xsl:param name="ref" as="node()*"/>
+    <xsl:sequence select="(for $language in $PREFERRED_LANGUAGES return $ref[./@languageID=$language], $ref)[1]/@languageID"/>
+  </xsl:function>
+
+  <xsl:function name="efx:preferred-language-text" as="xs:string*">
+    <xsl:param name="ref" as="node()*"/>
+    <xsl:sequence select="(for $language in $PREFERRED_LANGUAGES return $ref[./@languageID=$language], $ref)[1]/normalize-space(text())"/>
   </xsl:function>
 
   <xsl:template match="/">
