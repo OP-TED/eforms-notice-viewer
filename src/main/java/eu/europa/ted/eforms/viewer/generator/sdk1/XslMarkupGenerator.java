@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
@@ -23,11 +25,11 @@ import eu.europa.ted.eforms.viewer.util.FreemarkerHelper;
 import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
-import eu.europa.ted.efx.model.Expression;
-import eu.europa.ted.efx.model.Expression.NumericExpression;
-import eu.europa.ted.efx.model.Expression.PathExpression;
-import eu.europa.ted.efx.model.Expression.StringExpression;
-import eu.europa.ted.efx.model.Markup;
+import eu.europa.ted.efx.model.expressions.Expression;
+import eu.europa.ted.efx.model.expressions.path.PathExpression;
+import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
+import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
+import eu.europa.ted.efx.model.templates.Markup;
 
 @SdkComponent(versions = {"1", "2"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
@@ -111,12 +113,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_EXPRESSION,
-        Pair.of("expression", valueReference.script));
+        Pair.of("expression", valueReference.getScript()));
   }
 
   @Override
   public Markup renderLabelFromKey(final StringExpression key) {
-    return this.renderLabelFromKey(key, Expression.empty(NumericExpression.class));
+    return this.renderLabelFromKey(key, NumericExpression.empty());
   }
 
   @Override
@@ -124,13 +126,13 @@ public class XslMarkupGenerator implements MarkupGenerator {
     logger.trace("Rendering label from key [{}]", key);
 
     return generateMarkup(FreemarkerTemplate.LABEL_FROM_KEY, 
-      Pair.of("key", key.script),
-      Pair.of("quantity", quantity.script));
+      Pair.of("key", key.getScript()),
+      Pair.of("quantity", quantity.getScript()));
   }
 
   @Override
   public Markup renderLabelFromExpression(final Expression expression) {
-    return this.renderLabelFromExpression(expression, Expression.empty(NumericExpression.class));
+    return this.renderLabelFromExpression(expression, NumericExpression.empty());
   }
 
   @Override
@@ -139,9 +141,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
     return generateMarkup(
         FreemarkerTemplate.LABEL_FROM_EXPRESSION,
-        Pair.of("expression", expression.script),
+        Pair.of("expression", expression.getScript()),
         Pair.of("variableSuffix", String.valueOf(++variableCounter)),
-        Pair.of("quantity", quantity.script));
+        Pair.of("quantity", quantity.getScript()));
   }
 
   @Override
@@ -181,11 +183,11 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   @Override
   public Markup renderFragmentInvocation(final String name, final PathExpression context, final Set<Pair<String, String>> variables) {
-    logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.script);
+    logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.getScript());
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_INVOCATION,
-        Pair.of("context", context.script),
+        Pair.of("context", context.getScript()),
         Pair.of("name", name),
         Pair.of("variables", variables.stream().map(variable -> new String[] { variable.getKey(), variable.getValue() }).toArray())
         );

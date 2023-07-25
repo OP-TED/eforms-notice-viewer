@@ -11,7 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
-import eu.europa.ted.efx.model.Markup;
+import eu.europa.ted.efx.model.templates.Markup;
 
 /**
  * Utility class with methods for managing the caching of objects.
