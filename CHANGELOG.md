@@ -8,7 +8,9 @@ _The eForms Notice Viewer is a sample command line application that demonstrates
 - Fixed several bugs.
 - Improved unit testing.
 - Refactored the NoticeViewer class to improve code clarity.
-- Added support for improved numeric formatting provided by EFX Toolkit 1.3.0. 
+- Added support for improved numeric formatting provided by EFX Toolkit 1.3.0.
+- Added support for improved rendering of multilingual text fields provided by EFX Toolkit 1.3.0
+
 --- 
 
 Documentation for this sample application is available at: https://docs.ted.europa.eu/eforms/latest/notice-viewer
