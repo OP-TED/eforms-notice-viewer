@@ -24,6 +24,7 @@ import eu.europa.ted.eforms.viewer.NoticeDocument;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -102,12 +103,14 @@ public class CliCommand implements Callable<Integer> {
         .map(Path::of)
         .orElse(NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR);
 
+    NoticeDocument notice = new NoticeDocument(xmlContents);
     final Path htmlPath =
         NoticeViewer.Builder
             .create()
             .withProfileXslt(profileXslt)
+            .withUriResolver(new TranslationUriResolver(notice.getEformsSdkVersion(), sdkRoot))
             .build()
-            .generateHtmlFile(language, viewId, new NoticeDocument(xmlContents), null, sdkRoot,
+            .generateHtmlFile(language, viewId, notice, null, sdkRoot,
                 NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat(),
                 forceBuild);
 
