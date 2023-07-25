@@ -1,8 +1,10 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.cli;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Enumeration;
@@ -11,12 +13,18 @@ import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.sdk.SdkConstants;
+import eu.europa.ted.eforms.viewer.NoticeDocument;
+import eu.europa.ted.eforms.viewer.NoticeViewer;
+import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
+import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IVersionProvider;
@@ -28,7 +36,7 @@ import picocli.CommandLine.Spec;
 
 @Command(name = "", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
     versionProvider = CliCommand.ManifestVersionProvider.class)
-class CliCommand implements Callable<Integer> {
+public class CliCommand implements Callable<Integer> {
   private static final Logger logger = LoggerFactory.getLogger(CliCommand.class);
 
   @Spec
@@ -69,25 +77,43 @@ class CliCommand implements Callable<Integer> {
   }
 
   /**
-   * @param args Command line arguments. See usage.
-   *
    * @throws IOException If an error occurs during input or output
    * @throws ParserConfigurationException Error related to XML reader configuration
    * @throws SAXException XML parse error related
-   * @throws InstantiationException 
-   * @throws URISyntaxException 
+   * @throws InstantiationException
+   * @throws URISyntaxException
+   * @throws TransformerException
+   * @throws XPathExpressionException
    */
   @Override
   public Integer call()
       throws IOException, SAXException, ParserConfigurationException, InstantiationException,
-      URISyntaxException {
+      URISyntaxException, TransformerException, XPathExpressionException {
+    Validate.notNull(noticeXmlPath, "Undefined notice XML path");
+    if (!Files.isRegularFile(noticeXmlPath)) {
+      throw new FileNotFoundException(noticeXmlPath.toString());
+    }
+
+    final String xmlContents = Files.readString(noticeXmlPath);
+
     // Initialise Freemarker templates so that the templates folder will be populated
     NoticeViewerConfig.getFreemarkerConfig();
 
+    final Path sdkRoot = Optional.ofNullable(sdkResourcesRoot)
+        .map(Path::of)
+        .orElse(NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR);
+
+    NoticeDocument notice = new NoticeDocument(xmlContents);
     final Path htmlPath =
-        NoticeViewer.generateHtml(language, noticeXmlPath, Optional.ofNullable(viewId), profileXslt,
-            sdkResourcesRoot != null ? Path.of(sdkResourcesRoot) : SdkConstants.DEFAULT_SDK_ROOT,
-            forceBuild);
+        NoticeViewer.Builder
+            .create()
+            .withProfileXslt(profileXslt)
+            .withUriResolver(new TranslationUriResolver(notice.getEformsSdkVersion(), sdkRoot))
+            .build()
+            .generateHtmlFile(language, viewId, notice, null, sdkRoot,
+                NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat(),
+                forceBuild);
+
     logger.info("Created HTML file: {}", htmlPath);
 
     return 0;

@@ -1,4 +1,4 @@
-package eu.europa.ted.eforms.viewer.helpers;
+package eu.europa.ted.eforms.viewer.util;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -9,6 +9,9 @@ import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
+/**
+ * Utility class with methods for processing Freemarker templates.
+ */
 public class FreemarkerHelper {
   private static final Logger logger = LoggerFactory.getLogger(FreemarkerHelper.class);
 

@@ -1,5 +1,6 @@
-package eu.europa.ted.eforms.viewer;
+package eu.europa.ted.eforms.viewer.generator.sdk1;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -8,32 +9,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.tuple.Pair;
+import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.sdk.component.SdkComponent;
 import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
-import eu.europa.ted.eforms.viewer.helpers.FreemarkerHelper;
-import eu.europa.ted.eforms.viewer.helpers.XmlHelper;
+import eu.europa.ted.eforms.viewer.util.FreemarkerHelper;
+import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
+import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.Expression;
 import eu.europa.ted.efx.model.Expression.PathExpression;
 import eu.europa.ted.efx.model.Expression.StringExpression;
 import eu.europa.ted.efx.model.Markup;
 
-@SdkComponent(versions = {"0.6", "0.7"}, componentType = SdkComponentType.MARKUP_GENERATOR)
+@SdkComponent(versions = {"1"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   private static int variableCounter = 0;
 
+  private TranslatorOptions translatorOptions;
+
+  public XslMarkupGenerator(TranslatorOptions translatorOptions) {
+    this.translatorOptions = Validate.notNull(translatorOptions, "Undefined translator options");
+  }
+
   protected String[] getAssetTypes() {
-    return new String[] {"business_term", "field", "code", "decoration"};
+    return new String[] {"business-term", "field", "code", "auxiliary"};
   }
 
   private final String translations = Arrays.stream(getAssetTypes())
-      .map(assetType -> "fn:document(concat('" + assetType + "_' , $language, '.xml'))")
+      .map(assetType -> "fn:document(concat('" + assetType + "_' , $LANGUAGE, '.xml'))")
       .collect(Collectors.joining(", "));
 
   private static List<String> markupsListToStringList(List<Markup> markupsList) {
@@ -75,13 +85,20 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
     logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, templates);
 
-    Markup unformattedMarkup = generateMarkup(
+    final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("body", markupsListToStringList(body)),
-        Pair.of("templates", markupsListToStringList(templates)));
+        Pair.of("templates", markupsListToStringList(templates)),
+        Pair.of("decimalSeparator", translatorOptions.getDecimalFormat().getDecimalSeparator()),
+        Pair.of("groupingSeparator", translatorOptions.getDecimalFormat().getGroupingSeparator()));
 
-    return new Markup(XmlHelper.formatXml(unformattedMarkup.script, false));
+    try {
+      final String formattedScript = XmlHelper.formatXml(unformattedMarkup.script, false);
+      return new Markup(formattedScript);
+    } catch (DocumentException | IOException e) {
+      throw new RuntimeException("Failed to format file output", e);
+    }
   }
 
   @Override
@@ -107,14 +124,15 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return generateMarkup(
         FreemarkerTemplate.LABEL_FROM_EXPRESSION,
         Pair.of("expression", expression.script),
-        Pair.of("labelSuffix", ++variableCounter));
+        Pair.of("labelSuffix", String.valueOf(++variableCounter)));
   }
 
   @Override
   public Markup renderFreeText(final String freeText) {
     logger.trace("Rendering free text [{}]", freeText);
 
-    return generateMarkup(FreemarkerTemplate.FREE_TEXT, Pair.of("freeText", freeText));
+    return generateMarkup(FreemarkerTemplate.FREE_TEXT,
+        Pair.of("freeText", freeText.replace(" ", "&#8200;")));
   }
 
   @Override
