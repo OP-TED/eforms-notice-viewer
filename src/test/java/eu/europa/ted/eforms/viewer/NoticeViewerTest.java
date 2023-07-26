@@ -35,7 +35,7 @@ class NoticeViewerTest {
   private static final String[] SOURCE_NOTICE_XML_FILENAMES2 =
       new String[] {"16_cn_24_minimal-test"};
 
-  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.0"};
+  private static final String[] SOURCE_SDK_VERSIONS = new String[] {"1.0", "2.0"};
 
   private static final Path SDK_ROOT_DIR = NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR;
 
