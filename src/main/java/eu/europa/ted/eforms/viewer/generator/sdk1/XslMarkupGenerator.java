@@ -5,7 +5,6 @@ import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -160,11 +159,6 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(final String name, final String number, final Markup content) {
-    return this.composeFragmentDefinition(name, number, content, new LinkedHashSet<String>());
-  }
-
-  @Override
   public Markup composeFragmentDefinition(String name, String number, Markup content, Set<String> parameters) {
     logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
 
@@ -174,11 +168,6 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("name", name),
         Pair.of("number", number),
         Pair.of("parameters", parameters));
-  }
-
-  @Override
-  public Markup renderFragmentInvocation(final String name, final PathExpression context) {
-    return this.renderFragmentInvocation(name, context, new LinkedHashSet<Pair<String, String>>());
   }
 
   @Override
