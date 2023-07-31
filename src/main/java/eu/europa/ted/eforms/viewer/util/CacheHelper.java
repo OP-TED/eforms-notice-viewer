@@ -1,5 +1,6 @@
 package eu.europa.ted.eforms.viewer.util;
 
+import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.function.Supplier;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
-import eu.europa.ted.efx.model.Markup;
+import eu.europa.ted.efx.model.templates.Markup;
 
 /**
  * Utility class with methods for managing the caching of objects.
@@ -122,10 +123,9 @@ public class CacheHelper {
     Validate.notEmpty(strings, "The array of strings cannot be empty");
 
     try {
-      String key = new String(
-          MessageDigest.getInstance("SHA-512")
-              .digest((StringUtils.join(strings, "###").getBytes())));
-
+      byte[] bytes = MessageDigest.getInstance("SHA-512").digest((StringUtils.join(strings, "###").getBytes()));
+      BigInteger number = new BigInteger(1, bytes);
+      String key = StringUtils.leftPad(number.toString(16), 32, '0');
       logger.trace("Computed key for [{}]: {}", strings, key);
 
       return key;

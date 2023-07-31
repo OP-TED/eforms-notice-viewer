@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Contract notice with the minimum amount of information possible.
+     The purpose of this notice is to test the visualisation of notices in TED Viewer (and the development version of TED Viewer, the MDM Viewer).
+     
+     This notice is a mixed representative of notice subtypes 16 to 24. Only Fields that are mandatory for all these notice subtypes are included.
+     For this notice, Mandatory means mandatory when the notice is published, so will include publication dates for example.
+	 Values used are fictitious, and may be redundant or inconsistent.
+     This notice will not pass the CVS validation rules
+-->
+<ContractNotice xmlns="urn:oasis:names:specification:ubl:schema:xsd:ContractNotice-2"
+					xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+					xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+					xmlns:efac="http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1"
+					xmlns:efbc="http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1"
+					xmlns:efext="http://data.europa.eu/p27/eforms-ubl-extensions/1"
+					xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<ext:UBLExtensions>
+		<ext:UBLExtension>
+			<ext:ExtensionContent>
+				<efext:EformsExtension>
+					<!-- -->
+					<!-- notice subtype -->
+					<!-- -->
+					<efac:NoticeSubType>
+						<!-- OPP-070-notice : "Notice Subtype" -->
+						<cbc:SubTypeCode listName="notice-subtype">16</cbc:SubTypeCode>
+					</efac:NoticeSubType>
+					<!-- -->
+					<!-- ORGANISATIONS -->
+					<!-- -->
+					<efac:Organizations>
+						<!-- -->
+						<!-- ORG-0001 : role: Buyer organisation -->
+						<!-- -->
+						<efac:Organization>
+							<efac:Company>
+								<cac:PartyIdentification>
+									<!-- OPT-200-Organization-Company : "Organisation Technical Identifier" -->
+									<cbc:ID schemeName="organization">ORG-0001</cbc:ID>
+								</cac:PartyIdentification>
+								<cac:PartyName>
+									<!-- BT-500-Organization-Company : "Organisation Name" -->
+									<cbc:Name languageID="ENG">Buyer name..</cbc:Name>
+								</cac:PartyName>
+								<cac:PostalAddress>
+									<!-- BT-513-Organization-Company : "Organisation City" -->
+									<cbc:CityName>London</cbc:CityName>
+									<cac:Country>
+										<!-- BT-514-Organization-Company : "Organisation Country Code" -->
+										<cbc:IdentificationCode listName="country">GBR</cbc:IdentificationCode>
+									</cac:Country>
+								</cac:PostalAddress>
+								<cac:Contact>
+									<!-- BT-503-Organization-Company : "Organisation Contact Telephone Number" -->
+									<cbc:Telephone>+44 123456780</cbc:Telephone>
+									<!-- BT-506-Organization-Company : "Organisation Contact Email Address" -->
+									<cbc:ElectronicMail>info@fin-adm.com</cbc:ElectronicMail>
+								</cac:Contact>
+							</efac:Company>
+							<!-- -->
+							<!-- TPO-0001 - role: Organisation providing additional information about the procurement procedure -->
+							<!-- -->
+						</efac:Organization>
+						<!-- -->
+					</efac:Organizations>
+					<efac:Publication>
+						<!-- OPP-010-notice : "Notice Publication Number" -->
+						<efbc:NoticePublicationID schemeName="ojs-notice-id">00000318-2022</efbc:NoticePublicationID>
+						<!-- OPP-011-notice : "OJEU Identifier" -->
+						<efbc:GazetteID schemeName="ojs-id">177/2022</efbc:GazetteID>
+						<!-- OPP-012-notice : "OJEU Publication Date" -->
+						<efbc:PublicationDate>2022-09-14Z</efbc:PublicationDate>
+					</efac:Publication>
+				</efext:EformsExtension>
+			</ext:ExtensionContent>
+		</ext:UBLExtension>
+	</ext:UBLExtensions>
+	<!-- OPT-001-notice : "UBL version ID (UBL)" -->
+	<cbc:UBLVersionID>2.3</cbc:UBLVersionID>
+	<!-- OPT-002-notice : "Customization ID (UBL)" -->
+	<cbc:CustomizationID>eforms-sdk-1.0</cbc:CustomizationID>
+	<!-- BT-701-notice : "Notice Identifier" -->
+	<cbc:ID schemeName="notice-id">14549263-b47b-4e59-96a1-2d0d13e19343</cbc:ID>
+	<!-- BT-04-notice : "Procedure Identifier" -->
+	<cbc:ContractFolderID>aff2863e-b4cc-4e91-baba-b3b85f709117</cbc:ContractFolderID>
+	<!-- BT-05(a)-notice : "Notice Dispatch Date" -->
+	<cbc:IssueDate>2023-03-23+01:00</cbc:IssueDate>
+	<!-- BT-05(b)-notice : "Notice Dispatch Time" -->
+	<cbc:IssueTime>20:59:32+01:00</cbc:IssueTime>
+	<!-- BT-757-notice : "Notice Version" -->
+	<cbc:VersionID>03</cbc:VersionID>
+	<!-- BT-01-notice : "Procedure Legal Basis" -->
+	<cbc:RegulatoryDomain>32014L0024</cbc:RegulatoryDomain>
+	<!-- BT-02-notice : "Notice Type" -->
+	<!-- BT-03-notice : "Form Type" -->
+	<cbc:NoticeTypeCode listName="competition">cn-standard</cbc:NoticeTypeCode>
+	<!-- BT-702(a)-notice : "Notice Official Language" -->
+	<cbc:NoticeLanguageCode>ENG</cbc:NoticeLanguageCode>
+	<!-- -->
+	<!-- 1. BUYER -->
+	<!-- -->
+	<cac:ContractingParty>
+		<cac:Party>
+			<cac:PartyIdentification>
+				<!-- OPT-300-Procedure-Buyer : "Buyer Technical Identifier Reference" -->
+				<cbc:ID schemeName="organization">ORG-0001</cbc:ID>
+			</cac:PartyIdentification>
+		</cac:Party>
+	</cac:ContractingParty>
+	<!-- -->
+	<!-- 2. PROCEDURE -->
+	<!-- PROCEDURE - TENDERING TERMS -->
+	<!-- Minimal: Procedure Tendering Terms: All Fields are optional for some subtypes in 16 to 24 -->
+	<!-- PROCEDURE - TENDERING PROCESS -->
+	<!-- Minimal: Procedure Tendering Process: All Fields are optional for some subtypes in 16 to 24 -->
+	<!-- PROCEDURE - PROCUREMENT PROJECT -->
+	<!-- Minimal: Procedure Procurement Project: BT-21-Procedure, BT-24-Procedure, BT-23-Procedure, BT-262-Procedure and BT-26(m)-Procedure are mandatory -->
+	<cac:ProcurementProject>
+		<!-- BT-21-Procedure : "Title" -->
+		<cbc:Name languageID="ENG">Procurement Title ---</cbc:Name>
+		<!-- BT-24-Procedure : "Description" -->
+		<cbc:Description languageID="ENG">Description ---</cbc:Description>
+		<!-- BT-23-Procedure : "Main Nature" -->
+		<cbc:ProcurementTypeCode listName="contract-nature">services</cbc:ProcurementTypeCode>
+		<cac:MainCommodityClassification>
+			<!-- BT-262-Procedure : "Main Classification Code" -->
+			<!-- BT-26(m)-Procedure : "Classification Type (e.g. CPV)" -->
+			<cbc:ItemClassificationCode listName="cpv">79710000</cbc:ItemClassificationCode>
+		</cac:MainCommodityClassification>
+		<!-- Minimal: Procurement Project: BG-708 Place of Performance is optional for VEAT notices -->
+	</cac:ProcurementProject>
+	<cac:ProcurementProjectLot>
+		<!-- -->
+		<!-- 5. LOTS -->
+		<!-- -->
+        <!-- LOT-0000 -->
+        <!-- -->
+        <!-- BT-137-Lot : "Purpose Lot Identifier" -->
+		<cbc:ID schemeName="Lot">LOT-0000</cbc:ID>
+		<!-- -->
+		<!-- LOT-0001 - TENDERING TERMS -->
+		<!-- -->
+		<!-- Minimal: Lot Tendering Terms: BG-702 Selection Criteria are mandatory for subtypes 7 to 24 -->
+		<cac:TenderingTerms>
+			<ext:UBLExtensions>
+				<ext:UBLExtension>
+					<ext:ExtensionContent>
+						<efext:EformsExtension>
+							<!-- Minimal: Lot Tendering Terms: BG-702 Selection Criteria are mandatory for subtypes 7 to 24 -->
+							<!-- Minimal: BT-747-Lot is mandatory -->
+							<efac:SelectionCriteria>
+								<!-- BT-747-Lot : "Selection Criteria Type" -->
+								<cbc:CriterionTypeCode listName="selection-criterion">ef-stand</cbc:CriterionTypeCode>
+							</efac:SelectionCriteria>
+						</efext:EformsExtension>
+					</ext:ExtensionContent>
+				</ext:UBLExtension>
+			</ext:UBLExtensions>
+			<!-- -->
+			<!-- LOT-0001 - ORGANISATIONS -->
+			<!-- -->
+			<!-- Minimal: Lot Tendering Terms: BG-101 Procurement Documents are mandatory for subtypes 16, 17, 19, 23, 24 -->
+			<!-- -->
+
+		</cac:TenderingTerms>
+		<!-- Minimal: Lot Tendering Process: All Fields are optional -->
+		<!-- Minimal: Lot Procurement Project: BT-22-Lot, BT-21-Lot, BT-24-Lot, BT-23-Lot, BT-262-Lot and BT-26(m)-Lot are mandatory -->
+		<cac:ProcurementProject>
+			<!-- BT-21-Lot : "Title" -->
+			<cbc:Name languageID="ENG">Title ---</cbc:Name>
+			<!-- BT-24-Lot : "Description" -->
+			<cbc:Description languageID="ENG">Description ---</cbc:Description>
+			<!-- BT-23-Lot : "Main Nature" -->
+			<cbc:ProcurementTypeCode listName="contract-nature">services</cbc:ProcurementTypeCode>
+			<cac:MainCommodityClassification>
+				<!-- BT-26(m)-Lot : "Classification Type (e.g. CPV)" -->
+				<!-- BT-262-Lot : "Main Classification Code" -->
+				<cbc:ItemClassificationCode listName="cpv">75121000</cbc:ItemClassificationCode>
+			</cac:MainCommodityClassification>
+			<!-- Minimal: Procurement Project: BG-708 Place of Performance is optional for VEAT notices -->
+		</cac:ProcurementProject>
+	</cac:ProcurementProjectLot>
+</ContractNotice>

@@ -142,6 +142,7 @@ public class NoticeDocument {
 
   /**
    * @return A list of other languages
+   * @throws XPathExpressionException
    */
   public List<String> getOtherLanguages() throws XPathExpressionException {
     return Optional

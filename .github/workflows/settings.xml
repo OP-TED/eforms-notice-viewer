@@ -2,9 +2,6 @@
   <profiles>
     <profile>
       <id>central-repos</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <repositories>
         <repository>
           <id>central</id>
@@ -25,4 +22,7 @@
       </repositories>
     </profile>
   </profiles>
+  <activeProfiles>
+    <activeProfile>central-repos</activeProfile>
+  </activeProfiles>
 </settings>

@@ -114,6 +114,7 @@
     </html>
   </xsl:template>
 
+  <#-- The templates are called by the markup inserted in the body above. -->
   <#list templates as template>
     ${template}
   </#list>

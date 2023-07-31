@@ -34,22 +34,12 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public ScriptGenerator createScriptGenerator(String sdkVersion) {
-    throw new UnsupportedOperationException("Deprecated method, not used: 'createScriptGenerator(sdkVersion)'");
-  }
-
-  @Override
   public ScriptGenerator createScriptGenerator(String sdkVersion, TranslatorOptions options) {
     try {
       return ComponentFactory.getScriptGenerator(sdkVersion, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
-  }
-
-  @Override
-  public MarkupGenerator createMarkupGenerator(String sdkVersion) {
-    throw new UnsupportedOperationException("Deprecated method, not used: 'createMarkupGenerator(sdkVersion)'");
   }
 
   @Override
