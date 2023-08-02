@@ -99,7 +99,7 @@ class NoticeViewerTest {
     final String viewId = "X02";
     final Path xsl =
         XslGenerator.Builder
-            .create(new DependencyFactory(SDK_ROOT_DIR))
+            .create(new DependencyFactoryForUnitTesting(SDK_ROOT_DIR))
             .build()
             .generateFile(sdkVersion, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
                 NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS, true);
@@ -145,7 +145,7 @@ class NoticeViewerTest {
         Files.readString(noticeXmlPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final Path xslPath =
         XslGenerator.Builder
-            .create(new DependencyFactory(SDK_ROOT_DIR))
+            .create(new DependencyFactoryForUnitTesting(SDK_ROOT_DIR))
             .build()
             .generateFile(sdkVersion, NoticeViewer.getEfxPath(sdkVersion, viewId, SDK_ROOT_DIR),
                 NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS, true);

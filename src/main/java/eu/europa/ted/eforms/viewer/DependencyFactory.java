@@ -13,19 +13,36 @@ import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
-  private Path sdkRoot;
+  final private Path sdkRoot;
+  final private boolean sdkSnapshotsAllowed;
 
-  @SuppressWarnings("unused")
-  private DependencyFactory() {}
-
+  /**
+   * Public constructor used by the EfxTranslator does not allow the use of
+   * SNAPSHOT versions of the SDK.
+   * 
+   * @param sdkRoot The root directory where the SDK will be downloaded.
+   */
   public DependencyFactory(Path sdkRoot) {
+    this(sdkRoot, false);
+  }
+
+  /**
+   * Subclasses can use this constructor to allow the use of SNAPSHOT versions of
+   * the SDK.
+   * 
+   * @param sdkRoot          The root directory where the SDK will be downloaded.
+   * @param resolveSnapshots If true, SNAPSHOT versions of the SDK will be
+   *                         downloaded if needed.
+   */
+  protected DependencyFactory(Path sdkRoot, boolean resolveSnapshots) {
     this.sdkRoot = sdkRoot;
+    this.sdkSnapshotsAllowed = resolveSnapshots;
   }
 
   @Override
   public SymbolResolver createSymbolResolver(String sdkVersion) {
     try {
-      SdkDownloader.downloadSdk(sdkVersion, sdkRoot);
+      SdkDownloader.downloadSdk(sdkVersion, sdkRoot, this.sdkSnapshotsAllowed);
 
       return ComponentFactory.getSymbolResolver(sdkVersion, sdkRoot);
     } catch (InstantiationException | IOException e) {
