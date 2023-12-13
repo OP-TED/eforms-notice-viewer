@@ -315,6 +315,9 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${version.surefire.plugin}</version>
+          <configuration>
+            <argLine>-Duser.country=BE</argLine>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>maven-install-plugin</artifactId>
