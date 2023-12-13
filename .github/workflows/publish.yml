@@ -23,6 +23,10 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Test package
+        run: mvn --batch-mode test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish package
         run: mvn --batch-mode deploy -DskipTests
         env:
