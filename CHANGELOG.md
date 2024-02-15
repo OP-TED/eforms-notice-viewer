@@ -1,4 +1,4 @@
-# eForms Notice Viewer 0.10.0 - Release Notes
+# eForms Notice Viewer 0.10.1 - Release Notes
 
 _The eForms Notice Viewer is a sample command line application that demonstrates how you can use the [eForms SDK](https://github.com/OP-TED/eForms-SDK) in a metadata driven application that visualises eForms notices._
 
@@ -6,13 +6,7 @@ _The eForms Notice Viewer is a sample command line application that demonstrates
 
 ## In this release
 
-This version of the Notice Viewer, uses the pre-release version 2.0.0-alpha.2 of the EFX Toolkit.
-
-This release:
-
-- Fixes a bug in label_from_key.ftl that caused erroneous rendering of some labels.
-- Updates variable_expression.ftl to render a comma separated list from sequences of values.
-- Improves unit testing.
+This release updates the dependencies of eForms Notice Viewer to use the latest EFX Toolkit 2.0.0-alpha.3. This fixes the reported [issue #88](https://github.com/OP-TED/eforms-notice-viewer/issues/88), which caused an exception to be thrown by XSLT processors when trying to format sequences of dates or times.   
 
 ---
 
@@ -20,5 +14,5 @@ Documentation for this sample application is available at: https://docs.ted.euro
 
 This version depends on:
 
-- [EFX toolkit for Java](https://github.com/OP-TED/efx-toolkit-java) version 2.0.0-alpha.2.
+- [EFX toolkit for Java](https://github.com/OP-TED/efx-toolkit-java) version 2.0.0-alpha.3.
 - [eForms Core for Java](https://github.com/OP-TED/eforms-core-java) library version 1.3.0.
