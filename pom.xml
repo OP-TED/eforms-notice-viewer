@@ -3,7 +3,7 @@
 
   <groupId>eu.europa.ted.eforms</groupId>
   <artifactId>eforms-notice-viewer</artifactId>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
 
   <name>eForms Notice Viewer</name>
   <description>eForms Notice Viewer sample application.</description>
@@ -54,7 +54,7 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Versions - eForms -->
-    <version.efx-toolkit>2.0.0-alpha.2</version.efx-toolkit>
+    <version.efx-toolkit>2.0.0-alpha.3</version.efx-toolkit>
     <version.eforms-core>1.3.0</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
