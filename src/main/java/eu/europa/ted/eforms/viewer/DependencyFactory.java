@@ -40,7 +40,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public SymbolResolver createSymbolResolver(String sdkVersion) {
+  public SymbolResolver createSymbolResolver(String sdkVersion, String qualifier) {
     try {
       SdkDownloader.downloadSdk(sdkVersion, sdkRoot, this.sdkSnapshotsAllowed);
 
@@ -51,7 +51,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public ScriptGenerator createScriptGenerator(String sdkVersion, TranslatorOptions options) {
+  public ScriptGenerator createScriptGenerator(String sdkVersion, String qualifier, TranslatorOptions options) {
     try {
       return ComponentFactory.getScriptGenerator(sdkVersion, options);
     } catch (InstantiationException e) {
@@ -60,7 +60,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public MarkupGenerator createMarkupGenerator(String sdkVersion, TranslatorOptions options) {
+  public MarkupGenerator createMarkupGenerator(String sdkVersion, String qualifier, TranslatorOptions options) {
     try {
       return ComponentFactory.getMarkupGenerator(sdkVersion, options);
     } catch (InstantiationException e) {
