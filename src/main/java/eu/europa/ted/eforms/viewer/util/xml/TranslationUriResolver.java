@@ -28,6 +28,11 @@ public final class TranslationUriResolver implements URIResolver {
     this.sdkRoot = sdkRoot;
   }
 
+  public TranslationUriResolver(String sdkVersion, String sdkRootStr) {
+    this.sdkVersion = sdkVersion;
+    this.sdkRoot = Path.of(sdkRootStr);
+  }
+
   /**
    * This allows to load the labels.
    */
