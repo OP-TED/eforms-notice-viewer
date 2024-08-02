@@ -40,29 +40,29 @@ public class DependencyFactory implements TranslatorDependencyFactory {
   }
 
   @Override
-  public SymbolResolver createSymbolResolver(String sdkVersion) {
+  public SymbolResolver createSymbolResolver(String sdkVersion, String qualifier) {
     try {
       SdkDownloader.downloadSdk(sdkVersion, sdkRoot, this.sdkSnapshotsAllowed);
 
-      return ComponentFactory.getSymbolResolver(sdkVersion, sdkRoot);
+      return ComponentFactory.getSymbolResolver(sdkVersion, qualifier, sdkRoot);
     } catch (InstantiationException | IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
   @Override
-  public ScriptGenerator createScriptGenerator(String sdkVersion, TranslatorOptions options) {
+  public ScriptGenerator createScriptGenerator(String sdkVersion, String qualifier, TranslatorOptions options) {
     try {
-      return ComponentFactory.getScriptGenerator(sdkVersion, options);
+      return ComponentFactory.getScriptGenerator(sdkVersion, qualifier, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
   @Override
-  public MarkupGenerator createMarkupGenerator(String sdkVersion, TranslatorOptions options) {
+  public MarkupGenerator createMarkupGenerator(String sdkVersion, String qualifier, TranslatorOptions options) {
     try {
-      return ComponentFactory.getMarkupGenerator(sdkVersion, options);
+      return ComponentFactory.getMarkupGenerator(sdkVersion, qualifier, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
