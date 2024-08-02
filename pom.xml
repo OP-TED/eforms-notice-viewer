@@ -3,7 +3,7 @@
 
   <groupId>eu.europa.ted.eforms</groupId>
   <artifactId>eforms-notice-viewer</artifactId>
-  <version>0.11.0-SNAPSHOT</version>
+  <version>0.11.0</version>
 
   <name>eForms Notice Viewer</name>
   <description>eForms Notice Viewer sample application.</description>
@@ -44,7 +44,7 @@
   </distributionManagement>
 
   <properties>
-    <project.build.outputTimestamp>2023-07-31T09:34:21Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2024-08-02T13:11:16Z</project.build.outputTimestamp>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
