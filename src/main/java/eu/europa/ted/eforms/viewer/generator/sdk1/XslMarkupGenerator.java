@@ -3,6 +3,7 @@ package eu.europa.ted.eforms.viewer.generator.sdk1;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,10 +30,25 @@ import eu.europa.ted.efx.model.expressions.path.PathExpression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Markup;
+import eu.europa.ted.efx.model.types.EfxDataType;
 
 @SdkComponent(versions = {"1", "2"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
+
+  /**
+   * Maps {@link EfxDataType} to their corresponding XSL data type.
+   */
+  Map<Class<? extends EfxDataType>, String> xsTypeFromEfxDataType = Map
+      .ofEntries(
+          Map.entry(EfxDataType.String.class, "xs:string"), //
+          Map.entry(EfxDataType.MultilingualString.class, "xs:string"), //
+          Map.entry(EfxDataType.Boolean.class, "xs:boolean"), //
+          Map.entry(EfxDataType.Number.class, "xs:decimal"), //
+          Map.entry(EfxDataType.Date.class, "xs:date"), //
+          Map.entry(EfxDataType.Time.class, "xs:time"), //
+          Map.entry(EfxDataType.Duration.class, "xs:duration") //
+      );
 
   private static int variableCounter = 0;
 
@@ -88,15 +104,22 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   @Override
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
+    return this.composeOutputFile(new ArrayList<Markup>(), body, templates);
+  }
+
+  @Override
+  public Markup composeOutputFile(final List<Markup> globals, final List<Markup> body, final List<Markup> templates) {
     logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, templates);
 
     final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
+        Pair.of("globals", globals),
         Pair.of("body", markupsListToStringList(body)),
         Pair.of("templates", markupsListToStringList(templates)),
         Pair.of("decimalSeparator", translatorOptions.getDecimalFormat().getDecimalSeparator()),
-        Pair.of("groupingSeparator", translatorOptions.getDecimalFormat().getGroupingSeparator()));
+        Pair.of("groupingSeparator", translatorOptions.getDecimalFormat().getGroupingSeparator()),
+        Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
 
     try {
       final String formattedScript = XmlHelper.formatXml(unformattedMarkup.script, false);
@@ -104,6 +127,37 @@ public class XslMarkupGenerator implements MarkupGenerator {
     } catch (DocumentException | IOException e) {
       throw new RuntimeException("Failed to format file output", e);
     }
+  }
+
+  @Override
+  public Markup renderVariableDeclaration(Class<? extends EfxDataType> type, String name, Expression initialiser) {
+    return generateMarkup(
+        FreemarkerTemplate.VARIABLE_DECLARATION,
+        Pair.of("type", type),
+        Pair.of("name", name),
+        Pair.of("initialiser", initialiser));
+  }
+
+  @Override
+  /**
+   * Renders a function declaration in the markup.
+   *
+   * @param type The return type of the function, represented as a class extending {@link EfxDataType}.
+   * @param name The name of the function to be declared.
+   * @param parameters A map of parameter names to their respective types, represented as classes extending {@link EfxDataType}.
+   * @param expression The body of the function, represented as an {@link Expression}.
+   * @return A {@link Markup} object containing the rendered function declaration.
+   */
+  public Markup renderFunctionDeclaration(Class<? extends EfxDataType> type, String name, Map<String, Class<? extends EfxDataType>> parameters, Expression expression) {
+    return generateMarkup(
+        FreemarkerTemplate.FUNCTION_DECLARATION,
+        Pair.of("type", xsTypeFromEfxDataType.get(type)),
+        Pair.of("name", name),
+        Pair.of("parameters", parameters.entrySet().stream()
+            .map(entry -> Map.of("name", entry.getKey(), "type", xsTypeFromEfxDataType.get(entry.getValue())))
+            .collect(Collectors.toList())),
+        Pair.of("expression", expression),
+        Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
   }
 
   @Override

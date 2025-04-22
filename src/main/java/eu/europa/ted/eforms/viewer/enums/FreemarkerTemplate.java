@@ -10,7 +10,9 @@ public enum FreemarkerTemplate {
   LABEL_FROM_EXPRESSION("xsl_markup/label_from_expression.ftl"),
   LABEL_FROM_KEY("xsl_markup/label_from_key.ftl"),
   OUTPUT_FILE("xsl_markup/output_file.ftl"),
-  VARIABLE_EXPRESSION("xsl_markup/variable_expression.ftl");
+  VARIABLE_EXPRESSION("xsl_markup/variable_expression.ftl"),
+  VARIABLE_DECLARATION("xsl_markup/variable_declaration.ftl"),
+  FUNCTION_DECLARATION("xsl_markup/function_declaration.ftl");
 
   private String path;
 

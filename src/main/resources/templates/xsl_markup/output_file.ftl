@@ -1,8 +1,12 @@
 <#--
     Available variables:
     - translations: The available translations
+    - globals: A list of variable and function declarations already rendered in XSLT.
     - body: The main content
-    - templates: The available XSL templates
+    - templates: A list of XSL templates to be added to the XSLT stylesheet.
+    - decimalSeparator: The decimal separator to be used in the output
+    - groupingSeparator: The grouping separator to be used in the output
+    - udfNamespace: The namespace to be used for user-defined functions
 -->
 <xsl:stylesheet version="2.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -14,8 +18,9 @@
   xmlns:efac="http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1"
   xmlns:efbc="http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1"
   xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2"
-  xmlns:efx="http://ted.europa.eu/efx" 
-  exclude-result-prefixes="efx">
+  xmlns:efx="http://ted.europa.eu/efx"
+  xmlns:${udfNamespace}="http://ted.europa.eu/efx/user-defined-functions" 
+  exclude-result-prefixes="efx ${udfNamespace}">
 
   <xsl:output method="html" encoding="UTF-8" indent="yes"/>
 
@@ -31,6 +36,13 @@
 
   <#-- The translations compile-time parameter contains a sequence of calls to fn:doc(), which will effectivelly load all labels. -->
   <xsl:variable name="labels" select="${translations}"/>
+
+  <#-- Insert the user-defined variable declarations -->
+  <#if globals?has_content>
+    <#list globals as markup>
+      ${markup}
+    </#list>
+  </#if>
 
   <#-- Number formatting settings are set by the translator at compile-time. -->
   <xsl:decimal-format decimal-separator="${decimalSeparator}" grouping-separator="${groupingSeparator}" />
