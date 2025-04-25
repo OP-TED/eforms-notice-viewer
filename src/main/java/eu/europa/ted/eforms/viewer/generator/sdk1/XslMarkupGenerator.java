@@ -114,7 +114,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
     final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
-        Pair.of("globals", globals),
+        Pair.of("globals", markupsListToStringList(globals)),
         Pair.of("body", markupsListToStringList(body)),
         Pair.of("templates", markupsListToStringList(templates)),
         Pair.of("decimalSeparator", translatorOptions.getDecimalFormat().getDecimalSeparator()),
@@ -133,9 +133,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderVariableDeclaration(Class<? extends EfxDataType> type, String name, Expression initialiser) {
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_DECLARATION,
-        Pair.of("type", type),
+        Pair.of("type", xsTypeFromEfxDataType.get(type)),
         Pair.of("name", name),
-        Pair.of("initialiser", initialiser));
+        Pair.of("initialiser", initialiser.getScript()));
   }
 
   @Override
@@ -156,7 +156,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("parameters", parameters.entrySet().stream()
             .map(entry -> Map.of("name", entry.getKey(), "type", xsTypeFromEfxDataType.get(entry.getValue())))
             .collect(Collectors.toList())),
-        Pair.of("expression", expression),
+        Pair.of("expression", expression.getScript()),
         Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
   }
 
