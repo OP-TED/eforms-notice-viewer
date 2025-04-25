@@ -7,4 +7,4 @@
     - type: The type of the variable
     - initialiser: The expression to initialise the variable
 -->
-<xsl:variable name="${name}" as="${type}" <#if initialiser?has_content>select="{$initialiser}"</#if> />
+<xsl:variable name="${name}" as="${type}" <#if initialiser?has_content>select="${initialiser}"</#if> />
