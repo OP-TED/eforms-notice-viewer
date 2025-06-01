@@ -23,12 +23,15 @@ import eu.europa.ted.eforms.sdk.component.SdkComponentType;
 import eu.europa.ted.eforms.viewer.enums.FreemarkerTemplate;
 import eu.europa.ted.eforms.viewer.util.FreemarkerHelper;
 import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
+import eu.europa.ted.efx.interfaces.Argument;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
+import eu.europa.ted.efx.interfaces.Parameter;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.expressions.Expression;
 import eu.europa.ted.efx.model.expressions.path.PathExpression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
+import eu.europa.ted.efx.model.templates.Conditional;
 import eu.europa.ted.efx.model.templates.Markup;
 import eu.europa.ted.efx.model.types.EfxDataType;
 
@@ -39,15 +42,15 @@ public class XslMarkupGenerator implements MarkupGenerator {
   /**
    * Maps {@link EfxDataType} to their corresponding XSL data type.
    */
-  Map<Class<? extends EfxDataType>, String> xsTypeFromEfxDataType = Map
+  static final Map<Class<? extends EfxDataType>, Markup> xsTypeFromEfxDataType = Map
       .ofEntries(
-          Map.entry(EfxDataType.String.class, "xs:string"), //
-          Map.entry(EfxDataType.MultilingualString.class, "xs:string"), //
-          Map.entry(EfxDataType.Boolean.class, "xs:boolean"), //
-          Map.entry(EfxDataType.Number.class, "xs:decimal"), //
-          Map.entry(EfxDataType.Date.class, "xs:date"), //
-          Map.entry(EfxDataType.Time.class, "xs:time"), //
-          Map.entry(EfxDataType.Duration.class, "xs:duration") //
+          Map.entry(EfxDataType.String.class, new Markup("xs:string")), //
+          Map.entry(EfxDataType.MultilingualString.class, new Markup("xs:string")), //
+          Map.entry(EfxDataType.Boolean.class, new Markup("xs:boolean")), //
+          Map.entry(EfxDataType.Number.class, new Markup("xs:decimal")), //
+          Map.entry(EfxDataType.Date.class, new Markup("xs:date")), //
+          Map.entry(EfxDataType.Time.class, new Markup("xs:time")), //
+          Map.entry(EfxDataType.Duration.class, new Markup("xs:duration")) //
       );
 
   private static int variableCounter = 0;
@@ -104,7 +107,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
   @Override
   public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
-    return this.composeOutputFile(new ArrayList<Markup>(), body, templates);
+    return this.composeOutputFile(new ArrayList<>(), body, templates);
   }
 
   @Override
@@ -133,7 +136,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderVariableDeclaration(Class<? extends EfxDataType> type, String name, Expression initialiser) {
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_DECLARATION,
-        Pair.of("type", xsTypeFromEfxDataType.get(type)),
+        Pair.of("type", this.getEfxDataTypeEquivalent(type)),
         Pair.of("name", name),
         Pair.of("initialiser", initialiser.getScript()));
   }
@@ -151,10 +154,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderFunctionDeclaration(Class<? extends EfxDataType> type, String name, Map<String, Class<? extends EfxDataType>> parameters, Expression expression) {
     return generateMarkup(
         FreemarkerTemplate.FUNCTION_DECLARATION,
-        Pair.of("type", xsTypeFromEfxDataType.get(type)),
+        Pair.of("type", this.getEfxDataTypeEquivalent(type)),
         Pair.of("name", name),
         Pair.of("parameters", parameters.entrySet().stream()
-            .map(entry -> Map.of("name", entry.getKey(), "type", xsTypeFromEfxDataType.get(entry.getValue())))
+            .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(entry.getValue())))
             .collect(Collectors.toList())),
         Pair.of("expression", expression.getScript()),
         Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
@@ -165,7 +168,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
     logger.trace("Rendering variable expression [{}]", valueReference);
 
     return generateMarkup(
-        FreemarkerTemplate.VARIABLE_EXPRESSION,
+        FreemarkerTemplate.VALUE_OF,
         Pair.of("expression", valueReference.getScript()));
   }
 
@@ -202,7 +205,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   @Override
   public Markup renderFreeText(final String freeText) {
     logger.trace("Rendering free text [{}]", freeText);
-
+    
     return generateMarkup(FreemarkerTemplate.FREE_TEXT,
         Pair.of("freeText", freeText.replace(" ", "&#8200;")));
   }
@@ -213,26 +216,65 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(String name, String number, Markup content, Set<String> parameters) {
+  public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
+      Markup content, Markup children, Set<Parameter> parameters) {
+
     logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
+        Pair.of("conditionals", conditionals.stream()
+            .map(conditional -> Map.of(
+                "condition", conditional.getCondition().getScript(),
+                "content", conditional.getMarkup().script))
+            .collect(Collectors.toList())),
         Pair.of("content", content.script),
+        Pair.of("children", children.script),
         Pair.of("name", name),
         Pair.of("number", number),
         Pair.of("parameters", parameters));
   }
 
   @Override
-  public Markup renderFragmentInvocation(final String name, final PathExpression context, final Set<Pair<String, String>> variables) {
-    logger.trace("Rendering fragment invocation with: name={}, context={}", name, context.getScript());
+  public Markup renderContextLoop(final String name, final PathExpression context, final Markup content,
+      final Set<Argument> arguments) {
+    logger.trace("Rendering context loop with: name={}, context={}", name, context);
+
+    return generateMarkup(
+        FreemarkerTemplate.CONTEXT_LOOP,
+        Pair.of("context", context.getScript()),
+        Pair.of("name", name),
+        Pair.of("variables", arguments),
+        Pair.of("content", content.script));
+  }
+
+  @Override
+  public Markup renderFragmentInvocation(String name, Set<Argument> arguments) {
+    logger.trace("Rendering fragment invocation with: name={}", name);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_INVOCATION,
-        Pair.of("context", context.getScript()),
         Pair.of("name", name),
-        Pair.of("variables", variables.stream().map(variable -> new String[] { variable.getKey(), variable.getValue() }).toArray())
-        );
+        Pair.of("parameters", arguments));
+  }
+
+  @Override
+  public String escapeSpecialCharacters(String text) {
+    if (text == null) {
+      return null;
+    }
+
+    return text
+        // Replace & that are NOT part of existing HTML entities (&#...; or &name;)
+        .replaceAll("&(?![#a-zA-Z0-9]+;)", "&#38;")
+        .replace("<", "&#60;")
+        .replace(">", "&#62;")
+        .replace("\"", "&#34;")
+        .replace("'", "&#39;");
+  }
+
+  @Override
+  public Markup getEfxDataTypeEquivalent(Class<? extends EfxDataType> type) {
+    return xsTypeFromEfxDataType.getOrDefault(type, Markup.empty());
   }
 }
