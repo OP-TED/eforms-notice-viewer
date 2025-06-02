@@ -17,7 +17,7 @@
 	- conditionals: A list of conditionals, each of which is an object with a conditional.condition and a conditional.markup property.
 					If conditional.condition is true then conditional.markup should be displayed. 
     - content: 		The content of this fragment.
-					If the conditionals parameter is not empty, then this is the content to used when no condition is et (under "otherwise").
+					If the conditionals parameter is not empty, then this is the content to be used when no condition is et (under "otherwise").
 					If no conditionals are passed, then this is the content to display for this fragment.
 	- children: 	The children of this fragment  are other fragments that need to be rendered nested under this one.
 -->

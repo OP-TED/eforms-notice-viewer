@@ -136,7 +136,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderVariableDeclaration(Class<? extends EfxDataType> type, String name, Expression initialiser) {
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(type)),
+        Pair.of("type", this.getEfxDataTypeEquivalent(type).script),
         Pair.of("name", name),
         Pair.of("initialiser", initialiser.getScript()));
   }
@@ -236,14 +236,13 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderContextLoop(final String name, final PathExpression context, final Markup content,
+  public Markup renderContextLoop(final PathExpression context, final Markup content,
       final Set<Argument> arguments) {
-    logger.trace("Rendering context loop with: name={}, context={}", name, context);
+    logger.trace("Rendering context loop with: context={}", context);
 
     return generateMarkup(
         FreemarkerTemplate.CONTEXT_LOOP,
         Pair.of("context", context.getScript()),
-        Pair.of("name", name),
         Pair.of("variables", arguments),
         Pair.of("content", content.script));
   }
