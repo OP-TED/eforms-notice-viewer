@@ -92,6 +92,8 @@ public class NoticeDocument {
   }
 
   /**
+   * Gets the notice sub type from the notice XML.
+   * 
    * @return The notice sub type as found in the notice XML
    */
   public String getNoticeSubType() {
@@ -113,6 +115,8 @@ public class NoticeDocument {
   }
 
   /**
+   * Gets the eforms SDK version from the notice XML.
+   * 
    * @return The eforms SDK version as found in the notice XML
    */
   public String getEformsSdkVersion() {
@@ -130,6 +134,8 @@ public class NoticeDocument {
   }
 
   /**
+   * Gets the primary language from the notice XML.
+   * 
    * @return The primary language
    */
   public String getPrimaryLanguage() {
@@ -141,8 +147,10 @@ public class NoticeDocument {
   }
 
   /**
+   * Gets the list of other languages from the notice XML.
+   * 
    * @return A list of other languages
-   * @throws XPathExpressionException
+   * @throws XPathExpressionException If an error occurs evaluating the XPath expression
    */
   public List<String> getOtherLanguages() throws XPathExpressionException {
     return Optional
@@ -163,6 +171,8 @@ public class NoticeDocument {
   }
 
   /**
+   * Gets the notice XML contents.
+   * 
    * @return The notice XML
    */
   public String getXmlContents() {

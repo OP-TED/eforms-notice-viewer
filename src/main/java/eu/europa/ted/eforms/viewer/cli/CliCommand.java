@@ -77,13 +77,16 @@ public class CliCommand implements Callable<Integer> {
   }
 
   /**
-   * @throws IOException If an error occurs during input or output
-   * @throws ParserConfigurationException Error related to XML reader configuration
-   * @throws SAXException XML parse error related
-   * @throws InstantiationException
-   * @throws URISyntaxException
-   * @throws TransformerException
-   * @throws XPathExpressionException
+   * Executes the command line application.
+   * 
+   * @return Status code (0 for success)
+   * @throws IOException If an error occurs during input or output operations
+   * @throws ParserConfigurationException If an error occurs in XML parser configuration
+   * @throws SAXException If an XML parsing error occurs
+   * @throws InstantiationException If an instantiation error occurs
+   * @throws URISyntaxException If a URI syntax error occurs
+   * @throws TransformerException If an XSLT transformation error occurs
+   * @throws XPathExpressionException If an XPath expression error occurs
    */
   @Override
   public Integer call()
