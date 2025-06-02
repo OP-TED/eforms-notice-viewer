@@ -40,7 +40,7 @@ public class NoticeViewerConfig {
    * {@value NoticeViewerConstants#TEMPLATES_ROOT_DIR_PROPERTY}
    *
    * @return A Freemarker configuration object.
-   * @throws IOException
+   * @throws IOException If an error occurs initializing the configuration
    */
   public static Configuration getFreemarkerConfig() throws IOException {
     if (freemarkerConfig == null) {

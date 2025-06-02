@@ -286,11 +286,18 @@ public class NoticeViewer {
     private boolean profileXslt;
     private URIResolver uriResolver;
 
+    /**
+     * Creates a new Builder instance.
+     * 
+     * @return A new Builder instance
+     */
     public static Builder create() {
       return new Builder();
     }
-
+    
     /**
+     * Sets the character set to be used for HTML output and file reading.
+     * 
      * @param charset The character set to be used for the HTML output and for reading the XSL
      *        template and the notice XML
      * @return A {@link Builder} instance
@@ -299,8 +306,10 @@ public class NoticeViewer {
       this.charset = charset;
       return this;
     }
-
+    
     /**
+     * Enables or disables XSLT profiling.
+     * 
      * @param profileXslt If true, Enables XSLT profiling
      * @return A {@link Builder} instance
      */
@@ -309,7 +318,10 @@ public class NoticeViewer {
       return this;
     }
 
+    
     /**
+     * Sets the URI resolver for XSL transformations.
+     * 
      * @param uriResolver The URI resolver to be used during the XSL transformation
      * @return A {@link Builder} instance
      */
@@ -317,8 +329,10 @@ public class NoticeViewer {
       this.uriResolver = uriResolver;
       return this;
     }
-
+    
     /**
+     * Builds and returns a configured NoticeViewer instance.
+     * 
      * @return A configured {@link NoticeViewer} instance
      */
     public NoticeViewer build() {

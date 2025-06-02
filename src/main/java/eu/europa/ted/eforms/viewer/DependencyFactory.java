@@ -2,6 +2,8 @@ package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.MessageFormat;
+
 import org.antlr.v4.runtime.BaseErrorListener;
 import eu.europa.ted.eforms.sdk.ComponentFactory;
 import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
@@ -46,7 +48,8 @@ public class DependencyFactory implements TranslatorDependencyFactory {
 
       return ComponentFactory.getSymbolResolver(sdkVersion, qualifier, sdkRoot);
     } catch (InstantiationException | IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new RuntimeException(MessageFormat.format(
+            "Failed to instantiate Symbol Resolver for SDK version [{0}]", sdkVersion), e);
     }
   }
 
@@ -55,7 +58,8 @@ public class DependencyFactory implements TranslatorDependencyFactory {
     try {
       return ComponentFactory.getScriptGenerator(sdkVersion, qualifier, options);
     } catch (InstantiationException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new RuntimeException(MessageFormat.format(
+            "Failed to instantiate Script Generator for SDK version [{0}]", sdkVersion), e);
     }
   }
 

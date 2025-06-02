@@ -121,7 +121,7 @@ public class HtmlGenerator {
    * @param viewId The view ID corresponding to the XSL template.
    * @param xmlPath The path of the notice XML file
    * @param xslContents The contents of the XSL template
-   * @return
+   * @return The generated HTML content as a string
    * @throws FileNotFoundException when the XML file cannot found
    * @throws TransformerException when the XSL transformation fails
    * @throws IOException when the XML/XSL contents cannot be loaded
@@ -148,7 +148,7 @@ public class HtmlGenerator {
    * @param viewId The view ID corresponding to the XSL template.
    * @param xmlContents The contents of the notice XML
    * @param xslContents The contents of the XSL template
-   * @return
+   * @return The generated HTML content as a string
    * @throws TransformerException when the XSL transformation fails
    * @throws IOException when the XML/XSL contents cannot be loaded
    */
@@ -302,11 +302,19 @@ public class HtmlGenerator {
     private boolean profileXslt;
     private URIResolver uriResolver;
 
+    /**
+     * Creates a new Builder instance.
+     * 
+     * @return A new Builder instance
+     */
     public static Builder create() {
       return new Builder();
     }
 
+    
     /**
+     * Sets the character set to be used for HTML output and file reading.
+     * 
      * @param charset The character set to be used for the HTML output and for reading the XSL
      *        template and the notice XML
      * @return A {@link Builder} instance
@@ -316,7 +324,10 @@ public class HtmlGenerator {
       return this;
     }
 
+    
     /**
+     * Enables or disables XSLT profiling.
+     * 
      * @param profileXslt If true, Enables XSLT profiling
      * @return A {@link Builder} instance
      */
@@ -326,6 +337,8 @@ public class HtmlGenerator {
     }
 
     /**
+     * Sets the URI resolver for XSL transformations.
+     * 
      * @param uriResolver The URI resolver to be used during the XSL transformation
      * @return A {@link Builder} instance
      */
@@ -334,7 +347,10 @@ public class HtmlGenerator {
       return this;
     }
 
+    
     /**
+     * Builds and returns a configured HtmlGenerator instance.
+     * 
      * @return A configured {@link HtmlGenerator} instance
      */
     public HtmlGenerator build() {
