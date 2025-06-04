@@ -154,10 +154,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderFunctionDeclaration(Class<? extends EfxDataType> type, String name, Map<String, Class<? extends EfxDataType>> parameters, Expression expression) {
     return generateMarkup(
         FreemarkerTemplate.FUNCTION_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(type)),
+        Pair.of("type", this.getEfxDataTypeEquivalent(type).script),
         Pair.of("name", name),
         Pair.of("parameters", parameters.entrySet().stream()
-            .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(entry.getValue())))
+            .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(entry.getValue()).script))
             .collect(Collectors.toList())),
         Pair.of("expression", expression.getScript()),
         Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
