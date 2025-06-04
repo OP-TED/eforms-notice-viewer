@@ -1,5 +1,6 @@
 <#-- 
-    function_declaration.ftl 
+    function_declaration.ftl (FreemarkerTemplate.FUNCTION_DECLARATION)
+    Used by MarkupGenerator.renderFunctionDeclaration
     This template generates an XSLT function declaration 
 
     Parameters:
@@ -14,7 +15,8 @@
     <#-- Parameters -->
     <#if parameters?has_content>
         <#list parameters as param>
-        <xsl:param name="${param.name}" as="${param.type}" />
+        <#--  <xsl:param name="${param.name}" as="${param.type}" />  -->
+        <xsl:param name="${param.name}" />
         </#list>
     </#if>
 

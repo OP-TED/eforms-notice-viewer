@@ -13,7 +13,8 @@
 
 <xsl:for-each select="${context}">
     <#list variables as variable>
-    <xsl:variable name="${variable.name}" as="${variable.type}" select = "${variable.value}" />
+    <#--  <xsl:variable name="${variable.name}" as="${variable.type}" select = "${variable.value}" />  -->
+    <xsl:variable name="${variable.name}" select = "${variable.value}" />
     </#list>
     ${content}
 </xsl:for-each>
