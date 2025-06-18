@@ -49,39 +49,39 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Java compiler -->
-    <java.version>11</java.version>
+    <java.version>21</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
 
     <!-- Versions - eForms -->
     <version.efx-toolkit>2.0.0-SNAPSHOT</version.efx-toolkit>
-    <version.eforms-core>1.4.0</version.eforms-core>
+    <version.eforms-core>1.5.0-SNAPSHOT</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
-    <version.antlr4>4.13.1</version.antlr4>
-    <version.commons-lang3>3.12.0</version.commons-lang3>
-    <version.commons-jcs3>3.1</version.commons-jcs3>
-    <version.dom4j>2.1.3</version.dom4j>
-    <version.freemarker>2.3.31</version.freemarker>
-    <version.jsoup>1.14.3</version.jsoup>
-    <version.junit>5.7.2</version.junit>
-    <version.logback>1.2.11</version.logback>
-    <version.picocli>4.6.3</version.picocli>
-    <version.slf4j>1.7.36</version.slf4j>
-    <version.saxon-he>11.3</version.saxon-he>
-    <version.xmlresolver>4.2.0</version.xmlresolver>
+    <version.antlr4>4.13.2</version.antlr4>
+    <version.commons-lang3>3.17.0</version.commons-lang3>
+    <version.commons-jcs3>3.2</version.commons-jcs3>
+    <version.dom4j>2.1.4</version.dom4j>
+    <version.freemarker>2.3.33</version.freemarker>
+    <version.jsoup>1.18.1</version.jsoup>
+    <version.junit>5.11.4</version.junit>
+    <version.logback>1.5.15</version.logback>
+    <version.picocli>4.7.6</version.picocli>
+    <version.slf4j>2.0.16</version.slf4j>
+    <version.saxon-he>12.5</version.saxon-he>
+    <version.xmlresolver>5.2.2</version.xmlresolver>
 
     <!-- Versions - Plugins -->
-    <version.checkstyle.plugin>3.1.2</version.checkstyle.plugin>
-    <version.compiler.plugin>3.10.1</version.compiler.plugin>
-    <version.gpg.plugin>1.5</version.gpg.plugin>
-    <version.install.plugin>2.5.2</version.install.plugin>
-    <version.javadoc.plugin>3.4.0</version.javadoc.plugin>
-    <version.jar.plugin>3.2.2</version.jar.plugin>
-    <version.nexus-staging.plugin>1.6.7</version.nexus-staging.plugin>
-    <version.shade.plugin>3.3.0</version.shade.plugin>
-    <version.source.plugin>3.2.1</version.source.plugin>
-    <version.surefire.plugin>3.2.5</version.surefire.plugin>
+    <version.checkstyle.plugin>3.5.0</version.checkstyle.plugin>
+    <version.compiler.plugin>3.13.0</version.compiler.plugin>
+    <version.gpg.plugin>3.2.7</version.gpg.plugin>
+    <version.install.plugin>3.1.3</version.install.plugin>
+    <version.javadoc.plugin>3.8.0</version.javadoc.plugin>
+    <version.jar.plugin>3.4.2</version.jar.plugin>
+    <version.nexus-staging.plugin>1.7.0</version.nexus-staging.plugin>
+    <version.shade.plugin>3.6.0</version.shade.plugin>
+    <version.source.plugin>3.3.1</version.source.plugin>
+    <version.surefire.plugin>3.5.1</version.surefire.plugin>
   </properties>
 
   <dependencyManagement>
