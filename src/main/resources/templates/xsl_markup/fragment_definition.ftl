@@ -14,8 +14,8 @@
 					Each parameter is an object with a parameter.name and a parameter.type property.
     - number: 		Outline number. 
 					Display if present.
-	- conditionals: A list of conditionals, each of which is an object with a conditional.condition and a conditional.markup property.
-					If conditional.condition is true then conditional.markup should be displayed. 
+	- conditionals: A list of conditionals, each of which is an object with a conditional.condition and a conditional.content property.
+					If conditional.condition is true then conditional.content should be displayed. 
     - content: 		The content of this fragment.
 					If the conditionals parameter is not empty, then this is the content to be used when no condition is et (under "otherwise").
 					If no conditionals are passed, then this is the content to display for this fragment.
@@ -36,7 +36,7 @@
             <xsl:choose>
                 <#list conditionals as item>
                     <xsl:when test="${item.condition}">
-                        ${item.markup}
+                        ${item.content}
                     </xsl:when>
                 </#list>
                 <xsl:otherwise>
