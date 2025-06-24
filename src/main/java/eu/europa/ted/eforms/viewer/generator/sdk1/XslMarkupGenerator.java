@@ -93,6 +93,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
 
       return new Markup(writer.toString());
     } catch (Exception e) {
+      logger.error("Failed to generate markup using template [{}]. Cause: {}", 
+          template.getPath(), e.getMessage(), e);
       throw new RuntimeException(
           MessageFormat.format("Failed to generate markup using template [{0}]",
               template.getPath()),
