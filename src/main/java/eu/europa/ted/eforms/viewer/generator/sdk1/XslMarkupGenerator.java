@@ -278,4 +278,16 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup getEfxDataTypeEquivalent(Class<? extends EfxDataType> type) {
     return xsTypeFromEfxDataType.getOrDefault(type, Markup.empty());
   }
+
+  @Override
+  public Markup renderDictionaryDeclaration(String name, PathExpression match,
+      StringExpression key) {
+    logger.trace("Rendering dictionary declaration with: name={}", name);
+
+    return generateMarkup(
+        FreemarkerTemplate.DICTIONARY_DECLARATION,
+        Pair.of("name", name),
+        Pair.of("match", match.getScript()),
+        Pair.of("key", key.getScript()));
+  }
 }

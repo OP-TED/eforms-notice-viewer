@@ -13,6 +13,7 @@ public enum FreemarkerTemplate {
   OUTPUT_FILE("xsl_markup/output_file.ftl"),
   VALUE_OF("xsl_markup/value_of.ftl"),
   VARIABLE_DECLARATION("xsl_markup/variable_declaration.ftl"),
+  DICTIONARY_DECLARATION("xsl_markup/dictionary_declaration.ftl"),
   FUNCTION_DECLARATION("xsl_markup/function_declaration.ftl");
 
   private String path;
