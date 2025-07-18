@@ -24,7 +24,6 @@ This project depends on both the eForms SDK and the EFX toolkit for Java, and us
 
 To build the application, open a terminal window and navigate to the root folder of this project. Then, run the following command:
 
-
 ```
 mvn clean install
 ```
@@ -39,14 +38,15 @@ mvn clean install -U
 
 This will force Maven to update any snapshots that are used as dependencies in the project.
 
-In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies you will need to add the following repository in the **\<repositories\>** section in your settings.xml file:
+In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies or of the eForms SDK you will need to add the following repository in the **\<repositories\>** section in your settings.xml file:
 
 [^1]: Release versions of the dependencies are provided by default in the maven central repo
-```
+
+```XML
 <repository>
-  <id>oss-snapshots</id>
-  <name>OSS Snapshots repository</name>
-  <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+  <id>central-snapshots</id>
+  <name>Central Snapshots repository</name>
+  <url>https://central.sonatype.com/repository/maven-snapshots</url>
   <releases>
     <enabled>false</enabled>
   </releases>
@@ -56,7 +56,7 @@ In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies you wil
 </repository>
 ```
 
-## Usage    
+## Usage
 
 ### Requirements
 
