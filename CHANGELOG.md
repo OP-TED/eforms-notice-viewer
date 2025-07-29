@@ -6,9 +6,7 @@ _The eForms Notice Viewer is a sample command line application that demonstrates
 
 ## In this release
 
-This release fixes an issue with EFX variable, which prevented a variable to reference another variable declared previously.
-
-This release updates the dependencies of eForms Notice Viewer to use the latest EFX Toolkit 2.0.0-alpha.4, and ANTLR 4.13.1.
+This release updates the dependencies of eForms Notice Viewer to use the latest EFX Toolkit 2.0.0-alpha.5 and eForms Core Library 1.5.0.
 
 ---
 
@@ -16,5 +14,5 @@ Documentation for this sample application is available at: https://docs.ted.euro
 
 This version depends on:
 
-- [EFX toolkit for Java](https://github.com/OP-TED/efx-toolkit-java) version 2.0.0-alpha.4.
-- [eForms Core for Java](https://github.com/OP-TED/eforms-core-java) library version 1.4.0.
+- [EFX toolkit for Java](https://github.com/OP-TED/efx-toolkit-java) version 2.0.0-alpha.5.
+- [eForms Core for Java](https://github.com/OP-TED/eforms-core-java) library version 1.5.0.
