@@ -28,8 +28,8 @@
 			<xsl:param name="${parameter.name}" />
 		</#list>
 	</#if>
-	<section title="${name}">
-		<#if number?has_content>
+	<section title="${name}" <#if number?has_content>id="section${number?replace('.', '_')}"</#if>>
+		<#if number?has_content && children?has_content>
 		  <xsl:text>${number}&#160;</xsl:text>
 		</#if>
         <#if conditionals?? && conditionals?size gt 0>

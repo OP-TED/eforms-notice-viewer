@@ -1,0 +1,226 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Layout for when nav/body are direct children (no tabs) */
+body:not(:has(.tabs)) {
+    display: flex;
+    flex-direction: row;
+}
+
+/* Fallback for browsers that don't support :has() */
+body > .nav {
+    display: flex;
+}
+
+body > .nav + .resizer + .body {
+    display: flex;
+}
+
+.tabs {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-buttons {
+    display: flex;
+    background: #eee;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.tab-buttons .button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.tab-buttons .active {
+    background: #fff;
+    border-bottom: 2px solid #2196f3;
+}
+
+.tab-content {
+    flex: 1;
+    background: #fff;
+    display: none;
+    height: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    position: relative;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.summary-content.tab-content.active {
+    padding: 0;
+}
+
+.summary-inner {
+    flex: 1;
+    overflow: auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.main-content.tab-content.active {
+    flex-direction: row;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+.nav {
+    width: 200px;
+    min-width: 50px;
+    background: #f8f8f8;
+    box-sizing: border-box;
+    height: 100%;
+    transition: width 0.2s;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    max-width: 50vw;
+}
+
+.nav.collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    padding: 0 !important;
+}
+
+.nav .collapse-btn {
+    margin: 12px 8px 12px 8px;
+    background: #ddd;
+    border: none;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav .nav-content {
+    display: block;
+    padding: 16px 8px 8px 8px;
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.nav.collapsed .nav-content {
+    display: none;
+}
+
+.nav-link {
+    display: block;
+    width: 100%;
+    padding: 6px 10px;
+    margin: 2px 0;
+    background: #eee;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1em;
+    transition: background 0.2s;
+}
+
+.nav-link:hover {
+    background: #d6eaff;
+}
+
+.resizer {
+    width: 6px;
+    background: #ccc;
+    cursor: ew-resize;
+    height: 100%;
+    align-self: stretch;
+    transition: background 0.2s;
+}
+
+.nav.collapsed+.resizer {
+    cursor: default;
+    background: #eee;
+}
+
+.body {
+    flex: 1;
+    padding: 16px;
+    box-sizing: border-box;
+    height: 100%;
+    overflow: auto;
+    min-width: 0;
+    scroll-behavior: smooth;
+    /* smooth scrolling for anchor jumps */
+}
+
+.body.no-nav {
+    width: 100%;
+    height: 100vh;
+}
+
+.section-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 32px;
+    margin-bottom: 12px;
+}
+
+.noselect {
+    user-select: none;
+}
+
+section {
+    padding: 6px 6px 6px 36px;
+}
+
+.text {
+    font-size: 12pt;
+    color: black;
+}
+
+.label {
+    font-size: 12pt;
+    color: green;
+}
+
+.dynamic-label {
+    font-size: 12pt;
+    color: blue;
+}
+
+.value {
+    font-size: 12pt;
+    color: red;
+}
