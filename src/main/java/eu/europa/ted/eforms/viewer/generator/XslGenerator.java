@@ -170,6 +170,7 @@ public class XslGenerator {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
 
     logger.debug("Generating XSL for SDK version [{}]", sdkVersion);
+    logger.info("Generating XSL stylesheet from EFX template");
 
     Supplier<String> translator = getTemplateTranslator(sdkVersion, efxTemplate, translatorOptions);
 
