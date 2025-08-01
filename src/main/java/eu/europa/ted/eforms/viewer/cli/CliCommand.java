@@ -34,7 +34,16 @@ import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
-@Command(name = "", mixinStandardHelpOptions = true, description = "eForms Notice Viewer",
+@Command(name = "", mixinStandardHelpOptions = true, 
+    description = {
+        "  ▄▖           ▖ ▖  ▗ ▘      ▖▖▘         ",
+        "█▌▙▖▛▌▛▘▛▛▌▛▘  ▛▖▌▛▌▜▘▌▛▘█▌  ▌▌▌█▌▌▌▌█▌▛▘",
+        "▙▖▌ ▙▌▌ ▌▌▌▄▌  ▌▝▌▙▌▐▖▌▙▖▙▖  ▚▘▌▙▖▚▚▘▙▖▌ ",
+        "                                         ",
+        "Converts eForms XML notices to HTML using SDK templates and translations.",
+        "Automatically downloads required SDK versions from Maven Central.",
+        ""
+    },
     versionProvider = CliCommand.ManifestVersionProvider.class)
 public class CliCommand implements Callable<Integer> {
   private static final Logger logger = LoggerFactory.getLogger(CliCommand.class);
@@ -44,28 +53,32 @@ public class CliCommand implements Callable<Integer> {
 
   private String language;
 
-  @Parameters(index = "1", description = "Path of XML file to view.")
+  @Parameters(index = "1", description = "Path to the eForms notice XML file to convert to HTML.")
   private Path noticeXmlPath;
 
-  @Option(names = {"-i", "--viewId"}, description = "View ID to use.")
+  @Option(names = {"-i", "--viewId"}, description = "Override notice subtype with specific view ID (e.g., 'summary').")
   private String viewId;
 
-  @Option(names = {"-r", "--sdkRoot"}, description = "SDK resources root folder.")
+  @Option(names = {"-r", "--sdkRoot"}, description = "Directory where eForms SDK versions are stored (default: ~/eforms-sdk).")
   private String sdkResourcesRoot;
 
-  @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling.")
+  @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling for performance analysis and debugging.")
   private boolean profileXslt;
 
   @Option(names = {"-f", "--force"},
-      description = "Force re-building of XSL by clearing any cached content.")
+      description = "Force rebuilding of XSL templates by clearing cached content.")
   private boolean forceBuild;
 
-  @Option(names = {"-t", "--templatesRoot"}, description = "Templates root folder.")
+  @Option(names = {"-s", "--snapshots"},
+      description = "Allow downloading SNAPSHOT SDK versions instead of stable releases.")
+  private boolean allowSnapshots;
+
+  @Option(names = {"-t", "--templatesRoot"}, description = "Override directory for Freemarker templates (default: './templates').")
   void setTemplatesRoot(String templatesRoot) {
     System.setProperty(NoticeViewerConstants.TEMPLATES_ROOT_DIR_PROPERTY, templatesRoot);
   }
 
-  @Parameters(index = "0", description = "Two letter language code.")
+  @Parameters(index = "0", description = "Two letter language code (e.g., 'en', 'fr') for notice display language.")
   public void setLanguage(String language) {
     if (StringUtils.isBlank(language) || language.length() != 2) {
       throw new ParameterException(spec.commandLine(),
@@ -97,6 +110,8 @@ public class CliCommand implements Callable<Integer> {
       throw new FileNotFoundException(noticeXmlPath.toString());
     }
 
+    logger.info("Starting notice processing for '{}' language", language);
+    
     final String xmlContents = Files.readString(noticeXmlPath);
 
     // Initialise Freemarker templates so that the templates folder will be populated
@@ -107,17 +122,26 @@ public class CliCommand implements Callable<Integer> {
         .orElse(NoticeViewerConstants.DEFAULT_SDK_ROOT_DIR);
 
     NoticeDocument notice = new NoticeDocument(xmlContents);
-    final Path htmlPath =
-        NoticeViewer.Builder
-            .create()
-            .withProfileXslt(profileXslt)
-            .withUriResolver(new TranslationUriResolver(notice.getEformsSdkVersion(), sdkRoot))
-            .build()
-            .generateHtmlFile(language, viewId, notice, null, sdkRoot,
-                NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat(),
-                forceBuild);
-
-    logger.info("Created HTML file: {}", htmlPath);
+    logger.info("Parsed notice document, detected SDK version {} and subtype {}", 
+        notice.getEformsSdkVersion(), notice.getNoticeSubType());
+    
+    try {
+      final Path htmlPath =
+          NoticeViewer.Builder
+              .create()
+              .withProfileXslt(profileXslt)
+              .withAllowSnapshots(allowSnapshots)
+              .withUriResolver(new TranslationUriResolver(notice.getEformsSdkVersion(), sdkRoot))
+              .build()
+              .generateHtmlFile(language, viewId, notice, null, sdkRoot,
+                  NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat(),
+                  forceBuild);
+      
+      logger.info("Created HTML file: {}", htmlPath);
+    } catch (Exception e) {
+      logger.error("Failed to generate HTML file", e);
+      throw e;
+    }
 
     return 0;
   }
