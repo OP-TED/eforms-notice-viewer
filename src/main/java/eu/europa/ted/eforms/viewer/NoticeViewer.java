@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 import eu.europa.ted.eforms.sdk.SdkConstants;
 import eu.europa.ted.eforms.sdk.SdkVersion;
 import eu.europa.ted.eforms.viewer.generator.HtmlGenerator;
+import eu.europa.ted.eforms.viewer.generator.JsonGenerator;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.efx.EfxTranslatorOptions;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
@@ -33,16 +34,18 @@ public class NoticeViewer {
   private final Charset charset;
   private final boolean profileXslt;
   private final URIResolver uriResolver;
+  private final boolean allowSnapshots;
 
   private NoticeViewer(final Charset charset, final boolean profileXslt,
-      final URIResolver uriResolver) {
+      final URIResolver uriResolver, final boolean allowSnapshots) {
     this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
     this.profileXslt = profileXslt;
     this.uriResolver = uriResolver;
+    this.allowSnapshots = allowSnapshots;
   }
 
   private NoticeViewer(Builder builder) {
-    this(builder.charset, builder.profileXslt, builder.uriResolver);
+    this(builder.charset, builder.profileXslt, builder.uriResolver, builder.allowSnapshots);
   }
 
   /**
@@ -94,12 +97,12 @@ public class NoticeViewer {
 
     final Path efxPath = getEfxPath(sdkVersion, viewId, sdkRoot);
 
-    logger.debug("Starting XSL generation using the EFX template at [{}]", efxPath);
     final String xslContents =
         createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath,
             getTranslatorOptions(notice, language, symbols),
             forceBuild);
 
+    logger.info("Transforming notice XML to HTML");
     return generateHtmlFile(language, viewId, notice, xslContents, outputFile);
   }
 
@@ -205,6 +208,21 @@ public class NoticeViewer {
     return html;
   }
 
+  public String generateJsonString(final String language, final String viewId,
+      final NoticeDocument notice, final String xslContents)
+      throws TransformerException, IOException {
+    Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
+
+    logger.info("Generating JSON for language [{}] and view ID [{}]", language, viewId);
+
+    final String json = createJsonGenerator().generateString(language, viewId,
+        notice.getXmlContents(), xslContents);
+
+    logger.info("Finished generating JSON for language [{}] and view ID [{}]", language, viewId);
+
+    return json;
+  }
+
   /**
    * Resolves the path of the EFX template for a view.
    *
@@ -262,7 +280,7 @@ public class NoticeViewer {
 
   private XslGenerator createXslGenerator(final Path sdkRoot) {
     return XslGenerator.Builder
-        .create(new DependencyFactory(sdkRoot))
+        .create(new DependencyFactory(sdkRoot, allowSnapshots))
         .build();
   }
 
@@ -274,6 +292,15 @@ public class NoticeViewer {
         .withUriResolver(uriResolver)
         .build();
   }
+  private JsonGenerator createJsonGenerator() {
+    return JsonGenerator.Builder
+        .create()
+        .withCharset(charset)
+        .withProfileXslt(profileXslt)
+        .withUriResolver(uriResolver)
+        .build();
+  }
+
 
   /**
    * Builder class for {@link NoticeViewer} instances
@@ -285,6 +312,7 @@ public class NoticeViewer {
     private Charset charset;
     private boolean profileXslt;
     private URIResolver uriResolver;
+    private boolean allowSnapshots;
 
     /**
      * Creates a new Builder instance.
@@ -327,6 +355,17 @@ public class NoticeViewer {
      */
     public Builder withUriResolver(URIResolver uriResolver) {
       this.uriResolver = uriResolver;
+      return this;
+    }
+    
+    /**
+     * Enables or disables the use of SNAPSHOT SDK versions.
+     * 
+     * @param allowSnapshots If true, allows downloading SNAPSHOT versions of the SDK
+     * @return A {@link Builder} instance
+     */
+    public Builder withAllowSnapshots(final boolean allowSnapshots) {
+      this.allowSnapshots = allowSnapshots;
       return this;
     }
     

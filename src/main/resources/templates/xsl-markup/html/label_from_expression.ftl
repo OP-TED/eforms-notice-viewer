@@ -15,7 +15,7 @@
 			<#if quantity?has_content>
 				<xsl:variable name="singular${variableSuffix}" select="."/>
 				<xsl:variable name="plural${variableSuffix}" select="concat(., efx:plural-label-suffix(${quantity}))"/>
-				<#-- This will fallback to the singual form if a pluralised label does not exist. -->
+				<#-- This will fallback to the singular form if a pluralized label does not exist. -->
 				<#-- If the singular form label does not exist either, then the label key will be shown instead. -->
 				<xsl:value-of select="($labels//entry[@key=$plural${variableSuffix}]/text(), $labels//entry[@key=$singular${variableSuffix}]/text(), concat('{', $singular${variableSuffix}, '}'))[1]"/>
 			<#else>

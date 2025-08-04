@@ -8,7 +8,7 @@
     - groupingSeparator: The grouping separator to be used in the output
     - udfNamespace: The namespace to be used for user-defined functions
 -->
-<xsl:stylesheet version="2.0"
+<xsl:stylesheet version="3.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:fn="http://www.w3.org/2005/xpath-functions"
@@ -111,19 +111,56 @@
     <html>
       <head>
         <style>
-          section { padding: 6px 6px 6px 36px; }
-          .text { font-size: 12pt; color: black; }
-          .label { font-size: 12pt; color: green; }
-          .dynamic-label { font-size: 12pt; color: blue; }
-          .value { font-size: 12pt; color: red; }
+          <#include "style.css">
         </style>
       </head>
       <body>
-        <#list body as markup>
-            ${markup}
-        </#list>
+        <#if summary?has_content>
+        <div class="tabs">
+          <div class="tab-buttons">
+            <div class="button summary-tab">Summary</div>
+            <div class="button main-tab active">Main</div>
+          </div>
+          <div class="tab-content summary-content">
+            <div class="summary-inner">
+              <#list summary as markup>
+                  ${markup}
+              </#list>
+            </div>
+          </div>
+          <div class="tab-content main-content active">
+            <xsl:call-template name="main-content"/>
+          </div>
+        </div>
+        <#else>
+        <xsl:call-template name="main-content"/>
+        </#if>
+        <script>
+          <![CDATA[
+          <#include "script.js">
+          ]]>
+        </script>
       </body>
     </html>
+  </xsl:template>
+
+  <xsl:template name="main-content">
+    <#if navigation?has_content>
+    <div class="nav">
+      <div class="nav-collapse-btn collapse-btn button">&#9776;</div>
+      <div class="nav-content">
+      <#list navigation as markup>
+          ${markup}
+      </#list>
+      </div>
+    </div>
+    <div class="resizer"></div>
+    </#if>
+    <div class="body<#if !navigation?has_content> no-nav</#if>">
+    <#list body as markup>
+        ${markup}
+    </#list>
+    </div>
   </xsl:template>
 
   <#-- The templates are called by the markup inserted in the body above. -->

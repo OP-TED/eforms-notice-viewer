@@ -26,6 +26,7 @@ import eu.europa.ted.eforms.viewer.util.xml.XmlHelper;
 import eu.europa.ted.efx.interfaces.Argument;
 import eu.europa.ted.efx.interfaces.MarkupGenerator;
 import eu.europa.ted.efx.interfaces.Parameter;
+import eu.europa.ted.efx.interfaces.TranslatorContext;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.expressions.Expression;
 import eu.europa.ted.efx.model.expressions.path.PathExpression;
@@ -50,12 +51,13 @@ public class XslMarkupGenerator implements MarkupGenerator {
           Map.entry(EfxDataType.Number.class, new Markup("xs:decimal")), //
           Map.entry(EfxDataType.Date.class, new Markup("xs:date")), //
           Map.entry(EfxDataType.Time.class, new Markup("xs:time")), //
-          Map.entry(EfxDataType.Duration.class, new Markup("xs:duration")) //
+          Map.entry(EfxDataType.Duration.class, new Markup("xs:duration")), //
+          Map.entry(EfxDataType.Node.class, new Markup("node()")) //
       );
 
-  private static int variableCounter = 0;
+  protected static int variableCounter = 0;
 
-  private TranslatorOptions translatorOptions;
+  protected TranslatorOptions translatorOptions;
 
   public XslMarkupGenerator(TranslatorOptions translatorOptions) {
     this.translatorOptions = Validate.notNull(translatorOptions, "Undefined translator options");
@@ -65,17 +67,17 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return new String[] {"business-term", "field", "code", "auxiliary"};
   }
 
-  private final String translations = "(" + Arrays.stream(getAssetTypes())
+  protected final String translations = "(" + Arrays.stream(getAssetTypes())
       .map(assetType -> "fn:document(concat('" + assetType + "_' , $LANGUAGE, '.xml'))")
       .collect(Collectors.joining(", ")) + ")";
 
-  private static List<String> markupsListToStringList(List<Markup> markupsList) {
+  protected static List<String> markupsListToStringList(List<Markup> markupsList) {
     return Optional.ofNullable(markupsList).orElse(Collections.emptyList()).stream()
         .map((Markup markup) -> markup.script).collect(Collectors.toList());
   }
 
   @SafeVarargs
-  private static final Markup generateMarkup(final FreemarkerTemplate template,
+  protected static final Markup generateMarkup(final FreemarkerTemplate template,
       Pair<String, Object>... params) {
 
     logger.trace("Generating markup using template [{}] with parameters: {}", template.getPath(),
@@ -108,20 +110,17 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup composeOutputFile(final List<Markup> body, final List<Markup> templates) {
-    return this.composeOutputFile(new ArrayList<>(), body, templates);
-  }
-
-  @Override
-  public Markup composeOutputFile(final List<Markup> globals, final List<Markup> body, final List<Markup> templates) {
-    logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, templates);
+  public Markup composeOutputFile(final List<Markup> globals, final List<Markup> body, final List<Markup> summary, final List<Markup> navigation, final List<Markup> fragments) {
+    logger.trace("Composing output file with:\n\t- body:\n{}\n\t- templates:\n{}", body, fragments);
 
     final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE,
         Pair.of("translations", translations),
         Pair.of("globals", markupsListToStringList(globals)),
         Pair.of("body", markupsListToStringList(body)),
-        Pair.of("templates", markupsListToStringList(templates)),
+        Pair.of("summary", markupsListToStringList(summary)),
+        Pair.of("navigation", markupsListToStringList(navigation)),
+        Pair.of("templates", markupsListToStringList(fragments)),
         Pair.of("decimalSeparator", translatorOptions.getDecimalFormat().getDecimalSeparator()),
         Pair.of("groupingSeparator", translatorOptions.getDecimalFormat().getGroupingSeparator()),
         Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
@@ -166,7 +165,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderVariableExpression(final Expression valueReference) {
+  public Markup renderVariableExpression(final Expression valueReference, TranslatorContext translatorContext) {
     logger.trace("Rendering variable expression [{}]", valueReference);
 
     return generateMarkup(
@@ -175,12 +174,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderLabelFromKey(final StringExpression key) {
-    return this.renderLabelFromKey(key, NumericExpression.empty());
+  public Markup renderLabelFromKey(final StringExpression key, TranslatorContext translatorContext) {
+    return this.renderLabelFromKey(key, NumericExpression.empty(), translatorContext);
   }
 
   @Override
-  public Markup renderLabelFromKey(final StringExpression key, NumericExpression quantity) {
+  public Markup renderLabelFromKey(final StringExpression key, NumericExpression quantity, TranslatorContext translatorContext) {
     logger.trace("Rendering label from key [{}]", key);
 
     return generateMarkup(FreemarkerTemplate.LABEL_FROM_KEY, 
@@ -189,12 +188,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderLabelFromExpression(final Expression expression) {
-    return this.renderLabelFromExpression(expression, NumericExpression.empty());
+  public Markup renderLabelFromExpression(final Expression expression, TranslatorContext translatorContext) {
+    return this.renderLabelFromExpression(expression, NumericExpression.empty(), translatorContext);
   }
 
   @Override
-  public Markup renderLabelFromExpression(final Expression expression, NumericExpression quantity) {
+  public Markup renderLabelFromExpression(final Expression expression, NumericExpression quantity, TranslatorContext translatorContext) {
     logger.trace("Rendering label from expression [{}]", expression);
 
     return generateMarkup(
@@ -205,7 +204,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderFreeText(final String freeText) {
+  public Markup renderFreeText(final String freeText, TranslatorContext translatorContext) {
     logger.trace("Rendering free text [{}]", freeText);
     
     return generateMarkup(FreemarkerTemplate.FREE_TEXT,
@@ -213,13 +212,23 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderLineBreak() {
+  public Markup renderHyperlink(Markup label, StringExpression url, TranslatorContext translatorContext) {
+    logger.trace("Rendering hyperlink with label [{}] and URL [{}]", label, url);
+
+    return generateMarkup(
+        FreemarkerTemplate.HYPERLINK,
+        Pair.of("label", label.script),
+        Pair.of("url", url.getScript()));
+  }
+
+  @Override
+  public Markup renderLineBreak(TranslatorContext translatorContext) {
     return new Markup("<br/>");
   }
 
   @Override
   public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
-      Markup content, Markup children, Set<Parameter> parameters) {
+      Markup content, Markup children, Set<Parameter> parameters, TranslatorContext translatorContext) {
 
     logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
 
@@ -250,7 +259,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderFragmentInvocation(String name, Set<Argument> arguments) {
+  public Markup renderFragmentInvocation(String name, Set<Argument> arguments, TranslatorContext translatorContext) {
     logger.trace("Rendering fragment invocation with: name={}", name);
 
     return generateMarkup(
