@@ -122,7 +122,8 @@ class NoticeViewerTest {
                                 // passing any in cli.
     final Path path = NoticeViewer.Builder
         .create()
-        .withProfileXslt(false)
+        .withXsltProfiler(false)
+        .withEfxProfiler(false)
         .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
         .build()
         .generateHtmlFile(language, viewId, new NoticeDocument(noticeXmlPath), null, SDK_ROOT_DIR,
@@ -153,7 +154,8 @@ class NoticeViewerTest {
     final String xslContent = Files.readString(xslPath, NoticeViewerConstants.DEFAULT_CHARSET);
     final String html = NoticeViewer.Builder
         .create()
-        .withProfileXslt(false)
+        .withXsltProfiler(false)
+        .withEfxProfiler(false)
         .withUriResolver(new TranslationUriResolver(sdkVersion, SDK_ROOT_DIR))
         .build()
         .generateHtmlString(language, viewId, new NoticeDocument(noticeXmlContent), xslContent);

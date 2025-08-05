@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
@@ -24,6 +25,7 @@ import eu.europa.ted.eforms.viewer.NoticeDocument;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
+import eu.europa.ted.eforms.viewer.enums.ProfilerConfig;
 import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -62,8 +64,10 @@ public class CliCommand implements Callable<Integer> {
   @Option(names = {"-r", "--sdkRoot"}, description = "Directory where eForms SDK versions are stored (default: ~/eforms-sdk).")
   private String sdkResourcesRoot;
 
-  @Option(names = {"-p", "--profileXslt"}, description = "Enable XSLT profiling for performance analysis and debugging.")
-  private boolean profileXslt;
+  @Option(names = {"-p", "--profile"}, 
+      description = "Enable profiling for performance analysis. Options: xslt, efx, all (default: all if no value specified).",
+      fallbackValue = "all")
+  private String profilerOptions = "";
 
   @Option(names = {"-f", "--force"},
       description = "Force rebuilding of XSL templates by clearing cached content.")
@@ -87,6 +91,17 @@ public class CliCommand implements Callable<Integer> {
               language));
     }
     this.language = language;
+  }
+
+  /**
+   * Parse the profile options and return the configuration set.
+   */
+  private Set<ProfilerConfig> getProfilerConfig() {
+    try {
+      return ProfilerConfig.parseOptions(profilerOptions);
+    } catch (IllegalArgumentException e) {
+      throw new ParameterException(spec.commandLine(), e.getMessage());
+    }
   }
 
   /**
@@ -126,10 +141,12 @@ public class CliCommand implements Callable<Integer> {
         notice.getEformsSdkVersion(), notice.getNoticeSubType());
     
     try {
+      final Set<ProfilerConfig> profilerConfig = getProfilerConfig();
       final Path htmlPath =
           NoticeViewer.Builder
               .create()
-              .withProfileXslt(profileXslt)
+              .withXsltProfiler(ProfilerConfig.isXsltProfilerEnabled(profilerConfig))
+              .withEfxProfiler(ProfilerConfig.isEfxProfilerEnabled(profilerConfig))
               .withAllowSnapshots(allowSnapshots)
               .withUriResolver(new TranslationUriResolver(notice.getEformsSdkVersion(), sdkRoot))
               .build()
