@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -32,20 +33,22 @@ public class NoticeViewer {
   private static final String MSG_UNDEFINED_NOTICE_DOCUMENT = "Undefined notice document";
 
   private final Charset charset;
-  private final boolean profileXslt;
+  private final boolean enableXslProfiler;
+  private final boolean enableEfxProfiler;
   private final URIResolver uriResolver;
   private final boolean allowSnapshots;
 
-  private NoticeViewer(final Charset charset, final boolean profileXslt,
+  private NoticeViewer(final Charset charset, final boolean enableXslProfiler, final boolean enableEfxProfiler,
       final URIResolver uriResolver, final boolean allowSnapshots) {
     this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
-    this.profileXslt = profileXslt;
+    this.enableXslProfiler = enableXslProfiler;
+    this.enableEfxProfiler = enableEfxProfiler;
     this.uriResolver = uriResolver;
     this.allowSnapshots = allowSnapshots;
   }
 
   private NoticeViewer(Builder builder) {
-    this(builder.charset, builder.profileXslt, builder.uriResolver, builder.allowSnapshots);
+    this(builder.charset, builder.enableXslProfiler, builder.enableEfxProfiler, builder.uriResolver, builder.allowSnapshots);
   }
 
   /**
@@ -97,9 +100,14 @@ public class NoticeViewer {
 
     final Path efxPath = getEfxPath(sdkVersion, viewId, sdkRoot);
 
+    final Path efxProfilerOutputPath = enableEfxProfiler 
+        ? NoticeViewerConstants.OUTPUT_FOLDER_PROFILER.resolve(
+            MessageFormat.format("{0}-{1}-efx_profile.html", viewId, language))
+        : null;
+
     final String xslContents =
         createXslGenerator(sdkRoot).generateString(sdkVersion, efxPath,
-            getTranslatorOptions(notice, language, symbols),
+            getTranslatorOptions(notice, language, symbols, enableEfxProfiler, efxProfilerOutputPath),
             forceBuild);
 
     logger.info("Transforming notice XML to HTML");
@@ -278,6 +286,41 @@ public class NoticeViewer {
         otherLanguages.toArray(String[]::new));
   }
 
+  /**
+   * Creates a {@link TranslatorOptions} instance for a notice with profiling configuration.
+   *
+   * @param notice A {@link NoticeDocument} object containing the notice's XML contents and metadata
+   * @param language The primary language. If not set, the primary language of the notice will be
+   *        used
+   * @param symbols A {@link DecimalFormat} instance defining the symbols to be used
+   * @param enableProfiler If true, enables EFX profiling
+   * @param profilerOutputPath Path where EFX profiling results should be written, or null for no file output
+   * @return A notice-specific {@link TranslatorOptions} instance with profiling configuration
+   * @throws XPathExpressionException when an error occurs while extracting language information
+   *         from the notice document
+   */
+  public static TranslatorOptions getTranslatorOptions(final NoticeDocument notice,
+      final String language, DecimalFormat symbols, boolean enableProfiler, Path profilerOutputPath)
+      throws XPathExpressionException {
+    Validate.notNull(notice, MSG_UNDEFINED_NOTICE_DOCUMENT);
+
+    final String primaryLanguage = Optional.ofNullable(language)
+        .filter(StringUtils::isNotBlank)
+        .orElse(notice.getPrimaryLanguage());
+
+    symbols = ObjectUtils.defaultIfNull(symbols,
+        NoticeViewerConstants.DEFAULT_TRANSLATOR_OPTIONS.getDecimalFormat());
+
+    final List<String> otherLanguages = notice.getOtherLanguages();
+    if (StringUtils.isNotBlank(language)) {
+      otherLanguages.add(0, notice.getPrimaryLanguage());
+    }
+
+    return new EfxTranslatorOptions(enableProfiler, profilerOutputPath, 
+        EfxTranslatorOptions.DEFAULT_UDF_NAMESPACE, symbols, Locale.forLanguageTag(primaryLanguage),
+        otherLanguages.stream().map(Locale::forLanguageTag).toArray(Locale[]::new));
+  }
+
   private XslGenerator createXslGenerator(final Path sdkRoot) {
     return XslGenerator.Builder
         .create(new DependencyFactory(sdkRoot, allowSnapshots))
@@ -288,7 +331,7 @@ public class NoticeViewer {
     return HtmlGenerator.Builder
         .create()
         .withCharset(charset)
-        .withProfileXslt(profileXslt)
+        .withProfileXslt(enableXslProfiler)
         .withUriResolver(uriResolver)
         .build();
   }
@@ -296,7 +339,7 @@ public class NoticeViewer {
     return JsonGenerator.Builder
         .create()
         .withCharset(charset)
-        .withProfileXslt(profileXslt)
+        .withProfileXslt(enableXslProfiler)
         .withUriResolver(uriResolver)
         .build();
   }
@@ -310,7 +353,8 @@ public class NoticeViewer {
 
     // optional parameters
     private Charset charset;
-    private boolean profileXslt;
+    private boolean enableXslProfiler;
+    private boolean enableEfxProfiler;
     private URIResolver uriResolver;
     private boolean allowSnapshots;
 
@@ -338,11 +382,22 @@ public class NoticeViewer {
     /**
      * Enables or disables XSLT profiling.
      * 
-     * @param profileXslt If true, Enables XSLT profiling
+     * @param enableProfiler If true, Enables XSLT profiling
      * @return A {@link Builder} instance
      */
-    public Builder withProfileXslt(final boolean profileXslt) {
-      this.profileXslt = profileXslt;
+    public Builder withXsltProfiler(final boolean enableProfiler) {
+      this.enableXslProfiler = enableProfiler;
+      return this;
+    }
+
+    /**
+     * Enables or disables EFX profiling for performance analysis.
+     * 
+     * @param enableProfiler If true, Enables EFX profiling
+     * @return A {@link Builder} instance
+     */
+    public Builder withEfxProfiler(final boolean enableProfiler) {
+      this.enableEfxProfiler = enableProfiler;
       return this;
     }
 
