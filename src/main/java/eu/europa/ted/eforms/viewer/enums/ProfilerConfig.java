@@ -44,8 +44,8 @@ public enum ProfilerConfig {
   /**
    * Parse a comma-separated string of profiling options.
    * 
-   * @param input Comma-separated string of profiling options (e.g., "xslt,antlr" or "all")
-   * @return Set of ProfileConfig options
+   * @param input Comma-separated string of profiling options (e.g., "xslt,efx" or "all")
+   * @return Set of ProfilerConfig options
    * @throws IllegalArgumentException if any option is invalid
    */
   public static Set<ProfilerConfig> parseOptions(String input) {
@@ -71,7 +71,7 @@ public enum ProfilerConfig {
    * Get ProfileConfig from string value.
    * 
    * @param value String value to convert
-   * @return ProfileConfig matching the value
+   * @return ProfilerConfig matching the value
    * @throws IllegalArgumentException if value is invalid
    */
   public static ProfilerConfig fromValue(String value) {
