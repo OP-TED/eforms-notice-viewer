@@ -19,3 +19,14 @@ jobs:
           distribution: 'adopt'
       - name: Build package
         run: mvn --batch-mode -s .github/workflows/settings.xml -DM2_SETTINGS=.github/workflows/settings.xml clean install # Property "M2_SETTINGS" is used by the SDK downloader in tests.
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          # A unique name for your artifact (required)
+          name: env-snapshot
+          
+          # The path to the file(s) or directory you want to upload (required)
+          path: target/*.jar 
+          
+          # Optional: Set how long GitHub should retain this artifact (e.g., 5 days)
+          retention-days: 5
