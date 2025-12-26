@@ -13,6 +13,7 @@ import eu.europa.ted.efx.interfaces.ScriptGenerator;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
+import eu.europa.ted.efx.interfaces.ValidatorGenerator; // Import
 
 public class DependencyFactory implements TranslatorDependencyFactory {
   final private Path sdkRoot;
@@ -49,7 +50,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
       return ComponentFactory.getSymbolResolver(sdkVersion, qualifier, sdkRoot);
     } catch (InstantiationException | IOException e) {
       throw new RuntimeException(MessageFormat.format(
-            "Failed to instantiate Symbol Resolver for SDK version [{0}]", sdkVersion), e);
+          "Failed to instantiate Symbol Resolver for SDK version [{0}]", sdkVersion), e);
     }
   }
 
@@ -59,7 +60,7 @@ public class DependencyFactory implements TranslatorDependencyFactory {
       return ComponentFactory.getScriptGenerator(sdkVersion, qualifier, options);
     } catch (InstantiationException e) {
       throw new RuntimeException(MessageFormat.format(
-            "Failed to instantiate Script Generator for SDK version [{0}]", sdkVersion), e);
+          "Failed to instantiate Script Generator for SDK version [{0}]", sdkVersion), e);
     }
   }
 
@@ -70,6 +71,12 @@ public class DependencyFactory implements TranslatorDependencyFactory {
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+  }
+
+  @Override
+  public ValidatorGenerator createValidatorGenerator(String sdkVersion, String qualifier,
+      TranslatorOptions options) {
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override
