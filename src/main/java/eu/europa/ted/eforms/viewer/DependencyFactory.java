@@ -13,7 +13,7 @@ import eu.europa.ted.efx.interfaces.ScriptGenerator;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
-import eu.europa.ted.efx.interfaces.ValidatorGenerator; // Import
+import eu.europa.ted.efx.interfaces.ValidatorGenerator;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
   final private Path sdkRoot;
