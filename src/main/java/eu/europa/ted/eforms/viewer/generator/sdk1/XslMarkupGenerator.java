@@ -3,7 +3,6 @@ package eu.europa.ted.eforms.viewer.generator.sdk1;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -29,7 +28,8 @@ import eu.europa.ted.efx.interfaces.Parameter;
 import eu.europa.ted.efx.interfaces.TranslatorContext;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
 import eu.europa.ted.efx.model.expressions.Expression;
-import eu.europa.ted.efx.model.expressions.path.PathExpression;
+import eu.europa.ted.efx.model.expressions.PathExpression;
+import eu.europa.ted.efx.model.expressions.TypedExpression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Conditional;
@@ -41,9 +41,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
   /**
-   * Maps {@link EfxDataType} to their corresponding XSL data type.
+   * Maps primitive {@link EfxDataType} to their corresponding XSL data type.
    */
-  static final Map<Class<? extends EfxDataType>, Markup> xsTypeFromEfxDataType = Map
+  static final Map<Class<? extends EfxDataType.Primitive>, Markup> xsTypeFromEfxDataType = Map
       .ofEntries(
           Map.entry(EfxDataType.String.class, new Markup("xs:string")), //
           Map.entry(EfxDataType.MultilingualString.class, new Markup("xs:string")), //
@@ -134,10 +134,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   @Override
-  public Markup renderVariableDeclaration(Class<? extends EfxDataType> type, String name, Expression initialiser) {
+  public Markup renderVariableDeclaration(String name, TypedExpression initialiser) {
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(type).script),
+        Pair.of("type", this.getEfxDataTypeEquivalent(initialiser.getDataType()).script),
         Pair.of("name", name),
         Pair.of("initialiser", initialiser.getScript()));
   }
@@ -146,16 +146,15 @@ public class XslMarkupGenerator implements MarkupGenerator {
   /**
    * Renders a function declaration in the markup.
    *
-   * @param type The return type of the function, represented as a class extending {@link EfxDataType}.
    * @param name The name of the function to be declared.
    * @param parameters A map of parameter names to their respective types, represented as classes extending {@link EfxDataType}.
-   * @param expression The body of the function, represented as an {@link Expression}.
+   * @param expression The body of the function, represented as a {@link TypedExpression}.
    * @return A {@link Markup} object containing the rendered function declaration.
    */
-  public Markup renderFunctionDeclaration(Class<? extends EfxDataType> type, String name, Map<String, Class<? extends EfxDataType>> parameters, Expression expression) {
+  public Markup renderFunctionDeclaration(String name, Map<String, Class<? extends EfxDataType>> parameters, TypedExpression expression) {
     return generateMarkup(
         FreemarkerTemplate.FUNCTION_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(type).script),
+        Pair.of("type", this.getEfxDataTypeEquivalent(expression.getDataType()).script),
         Pair.of("name", name),
         Pair.of("parameters", parameters.entrySet().stream()
             .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(entry.getValue()).script))
