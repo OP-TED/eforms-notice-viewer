@@ -35,6 +35,7 @@ import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Conditional;
 import eu.europa.ted.efx.model.templates.Markup;
 import eu.europa.ted.efx.model.types.EfxDataType;
+import eu.europa.ted.efx.model.types.EfxTypeLattice;
 
 @SdkComponent(versions = {"1", "2"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
@@ -137,7 +138,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderVariableDeclaration(String name, TypedExpression initialiser) {
     return generateMarkup(
         FreemarkerTemplate.VARIABLE_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(initialiser.getDataType()).script),
+        Pair.of("type", this.getEfxDataTypeEquivalent(EfxTypeLattice.toPrimitive(initialiser.getDataType())).script),
         Pair.of("name", name),
         Pair.of("initialiser", initialiser.getScript()));
   }
@@ -154,10 +155,10 @@ public class XslMarkupGenerator implements MarkupGenerator {
   public Markup renderFunctionDeclaration(String name, Map<String, Class<? extends EfxDataType>> parameters, TypedExpression expression) {
     return generateMarkup(
         FreemarkerTemplate.FUNCTION_DECLARATION,
-        Pair.of("type", this.getEfxDataTypeEquivalent(expression.getDataType()).script),
+        Pair.of("type", this.getEfxDataTypeEquivalent(EfxTypeLattice.toPrimitive(expression.getDataType())).script),
         Pair.of("name", name),
         Pair.of("parameters", parameters.entrySet().stream()
-            .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(entry.getValue()).script))
+            .map(entry -> Map.of("name", entry.getKey(), "type", this.getEfxDataTypeEquivalent(EfxTypeLattice.toPrimitive(entry.getValue())).script))
             .collect(Collectors.toList())),
         Pair.of("expression", expression.getScript()),
         Pair.of("udfNamespace", translatorOptions.getUserDefinedFunctionNamespace()));
