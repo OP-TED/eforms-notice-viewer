@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import eu.europa.ted.eforms.NoticeDocument;
 import eu.europa.ted.eforms.viewer.generator.XslGenerator;
 import eu.europa.ted.eforms.viewer.util.LoggingHelper;
 import eu.europa.ted.eforms.viewer.util.xml.TranslationUriResolver;
