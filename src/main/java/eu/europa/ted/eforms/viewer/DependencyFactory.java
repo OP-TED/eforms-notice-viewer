@@ -2,6 +2,8 @@ package eu.europa.ted.eforms.viewer;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.MessageFormat;
+
 import org.antlr.v4.runtime.BaseErrorListener;
 import eu.europa.ted.eforms.sdk.ComponentFactory;
 import eu.europa.ted.eforms.sdk.resource.SdkDownloader;
@@ -11,6 +13,7 @@ import eu.europa.ted.efx.interfaces.ScriptGenerator;
 import eu.europa.ted.efx.interfaces.SymbolResolver;
 import eu.europa.ted.efx.interfaces.TranslatorDependencyFactory;
 import eu.europa.ted.efx.interfaces.TranslatorOptions;
+import eu.europa.ted.efx.interfaces.ValidatorGenerator;
 
 public class DependencyFactory implements TranslatorDependencyFactory {
   final private Path sdkRoot;
@@ -46,7 +49,8 @@ public class DependencyFactory implements TranslatorDependencyFactory {
 
       return ComponentFactory.getSymbolResolver(sdkVersion, qualifier, sdkRoot);
     } catch (InstantiationException | IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new RuntimeException(MessageFormat.format(
+          "Failed to instantiate Symbol Resolver for SDK version [{0}]", sdkVersion), e);
     }
   }
 
@@ -55,7 +59,8 @@ public class DependencyFactory implements TranslatorDependencyFactory {
     try {
       return ComponentFactory.getScriptGenerator(sdkVersion, qualifier, options);
     } catch (InstantiationException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new RuntimeException(MessageFormat.format(
+          "Failed to instantiate Script Generator for SDK version [{0}]", sdkVersion), e);
     }
   }
 
@@ -66,6 +71,12 @@ public class DependencyFactory implements TranslatorDependencyFactory {
     } catch (InstantiationException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+  }
+
+  @Override
+  public ValidatorGenerator createValidatorGenerator(String sdkVersion, String qualifier,
+      TranslatorOptions options) {
+    throw new UnsupportedOperationException("Not implemented yet");
   }
 
   @Override

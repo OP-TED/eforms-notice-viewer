@@ -21,15 +21,17 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.Validate;
-import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import net.sf.saxon.lib.FeatureKeys;
 import net.sf.saxon.trace.TimingTraceListener;
 
-public class HtmlGenerator {
-  private static final Logger logger = LoggerFactory.getLogger(HtmlGenerator.class);
+public class JsonGenerator {
+  private static final Logger logger = LoggerFactory.getLogger(JsonGenerator.class);
 
   private static final String MSG_INVALID_XML_CONTENTS = "Invalid XML contents";
   private static final String MSG_INVALID_XSL_CONTENTS = "Invalid XSL contents";
@@ -41,14 +43,14 @@ public class HtmlGenerator {
   private final boolean profileXslt;
   private final URIResolver uriResolver;
 
-  public HtmlGenerator(final Charset charset, final URIResolver uriResolver,
+  public JsonGenerator(final Charset charset, final URIResolver uriResolver,
       final boolean profileXslt) {
     this.charset = ObjectUtils.defaultIfNull(charset, NoticeViewerConstants.DEFAULT_CHARSET);
     this.profileXslt = profileXslt;
     this.uriResolver = uriResolver;
   }
 
-  private HtmlGenerator(final Builder builder) {
+  private JsonGenerator(final Builder builder) {
     this(builder.charset, builder.uriResolver, builder.profileXslt);
   }
 
@@ -158,23 +160,23 @@ public class HtmlGenerator {
     Validate.notBlank(xmlContents, MSG_INVALID_XML_CONTENTS);
     Validate.notBlank(xslContents, MSG_INVALID_XSL_CONTENTS);
 
-    logger.debug("Generating HTML as string for language [{}] and view ID [{}]", language, viewId);
+    logger.debug("Generating JSON as string for language [{}] and view ID [{}]", language, viewId);
 
     try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
       final StreamResult output = new StreamResult(outputStream);
 
       applyXslTransformation(language, viewId, xmlContents, xslContents, output);
 
-      final String html = outputStream.toString(charset);
+      final String json = outputStream.toString(charset);
 
-      // Ensure the HTML can be parsed.
-      Jsoup.parse(html);
+      // Ensure the JSON can be parsed.
+      new ObjectMapper().readTree(json);
 
-      logger.info("Finished generating HTML as string for language [{}] and view ID [{}]", language,
+      logger.info("Finished generating JSON as string for language [{}] and view ID [{}]", language,
           viewId);
-      logger.trace("Generated HTML:\n{}", html);
+      logger.trace("Generated JSON:\n{}", json);
 
-      return html;
+      return json;
     }
   }
 
@@ -292,7 +294,7 @@ public class HtmlGenerator {
   }
 
   /**
-   * Builder class for {@link HtmlGenerator} instances
+   * Builder class for {@link JsonGenerator} instances
    */
   public static final class Builder {
     // required parameters
@@ -349,12 +351,12 @@ public class HtmlGenerator {
 
     
     /**
-     * Builds and returns a configured HtmlGenerator instance.
+     * Builds and returns a configured JsonGenerator instance.
      * 
-     * @return A configured {@link HtmlGenerator} instance
+     * @return A configured {@link JsonGenerator} instance
      */
-    public HtmlGenerator build() {
-      return new HtmlGenerator(this);
+    public JsonGenerator build() {
+      return new JsonGenerator(this);
     }
   }
 }

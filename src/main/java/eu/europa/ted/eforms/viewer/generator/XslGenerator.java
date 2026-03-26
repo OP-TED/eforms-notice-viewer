@@ -29,6 +29,8 @@ public class XslGenerator {
   private final TranslatorDependencyFactory dependencyFactory;
 
   /**
+   * Creates a new XslGenerator with the specified dependency factory.
+   * 
    * @param dependencyFactory The dependency factory to provide to
    *        {@link EfxTranslator#translateTemplate} method
    */
@@ -168,6 +170,7 @@ public class XslGenerator {
     Validate.notNull(efxTemplate, MSG_UNDEFINED_EFX_TEMPLATE);
 
     logger.debug("Generating XSL for SDK version [{}]", sdkVersion);
+    logger.info("Generating XSL stylesheet from EFX template");
 
     Supplier<String> translator = getTemplateTranslator(sdkVersion, efxTemplate, translatorOptions);
 
@@ -231,10 +234,13 @@ public class XslGenerator {
     public Builder(final TranslatorDependencyFactory dependencyFactory) {
       this.dependencyFactory = dependencyFactory;
     }
-
+    
     /**
+     * Creates a new Builder instance with the specified dependency factory.
+     * 
      * @param dependencyFactory The dependency factory to provide to
      *        {@link EfxTranslator#translateTemplate} method
+     * @return A new Builder instance
      */
     public static Builder create(TranslatorDependencyFactory dependencyFactory) {
       return new Builder(dependencyFactory);

@@ -22,7 +22,7 @@ public class FreemarkerHelper {
    *
    * @param templatePath The template's path
    * @return A Freemarker template
-   * @throws IOException
+   * @throws IOException If an error occurs reading the template file
    */
   public static Template getTemplate(final String templatePath) throws IOException {
     return NoticeViewerConfig.getFreemarkerConfig().getTemplate(templatePath);
@@ -34,8 +34,8 @@ public class FreemarkerHelper {
    * @param templatePath The template's path
    * @param model The map of variables to load
    * @param out A writer for the output
-   * @throws TemplateException
-   * @throws IOException
+   * @throws TemplateException If an error occurs processing the template
+   * @throws IOException If an error occurs reading the template file or writing output
    */
   public static void processTemplate(final String templatePath, final Map<String, Object> model,
       final Writer out) throws TemplateException, IOException {
