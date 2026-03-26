@@ -77,8 +77,9 @@ The available OPTIONS are:
 - `-f` or `--force`: Forces re-building of XSL by clearing any cached content.
 - `-h` or `--help`: Shows a help message and exits.
 - `-i` or `--viewId`: Identifier of the view template to use. If omitted, the default template for the notice subtype indicated in the XML notice is used.
-- `-p` or `--profileXslt`: Enables XSLT profiling.
+- `-p` or `--profile`: Enables profiling for performance analysis. Options: xslt, efx, all (default: all if no value specified).
 - `-r` or `--sdkRoot`: SDK resources root folder.
+- `-s` or `--snapshots`: Allows downloading SNAPSHOT SDK versions instead of stable releases.
 - `-t` or `--templatesRoot`: Templates root folder.
 - `-V` or `--version`: Prints version information and exits.
 
