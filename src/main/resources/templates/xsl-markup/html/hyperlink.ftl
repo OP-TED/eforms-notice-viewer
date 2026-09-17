@@ -1,1 +1,1 @@
-<a href="${url}">${label}</a>
+<a href="{${url}}">${label}</a>

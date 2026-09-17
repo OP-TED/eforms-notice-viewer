@@ -21,7 +21,7 @@ import org.jsoup.helper.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import eu.europa.ted.eforms.viewer.NoticeDocument;
+import eu.europa.ted.eforms.NoticeDocument;
 import eu.europa.ted.eforms.viewer.NoticeViewer;
 import eu.europa.ted.eforms.viewer.NoticeViewerConstants;
 import eu.europa.ted.eforms.viewer.config.NoticeViewerConfig;
@@ -65,7 +65,7 @@ public class CliCommand implements Callable<Integer> {
   private String sdkResourcesRoot;
 
   @Option(names = {"-p", "--profile"}, 
-      description = "Enable profiling for performance analysis. Options: xslt, efx, all (default: all if no value specified).",
+      description = "Enable profiling. Specify xslt, efx, or all (for example, --profile=all).",
       fallbackValue = "all")
   private String profilerOptions = "";
 
