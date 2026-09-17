@@ -65,8 +65,8 @@ public class CliCommand implements Callable<Integer> {
   private String sdkResourcesRoot;
 
   @Option(names = {"-p", "--profile"}, 
-      description = "Enable profiling for performance analysis. Options: xslt, efx, all (default: all if no value specified).",
-      fallbackValue = "all")
+      description = "Enable profiling. Specify xslt, efx, or all. Values can be comma-separated "
+          + "(for example, --profile=xslt,efx); --profile=all enables both profilers.")
   private String profilerOptions = "";
 
   @Option(names = {"-f", "--force"},
