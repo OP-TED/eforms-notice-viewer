@@ -47,22 +47,8 @@
   <#-- Number formatting settings are set by the translator at compile-time. -->
   <xsl:decimal-format decimal-separator="${decimalSeparator}" grouping-separator="${groupingSeparator}" />
   
-  <#--
-    The plural-label-suffix function takes an quantity (a number) as a parameter, and returns a suffix that is used to retrieve 
-    the correct form (singular or plural) of the label. As the algorithm is language dependent, the function also uses the 
-    $LANGUAGE parameter passed to the XSL transformation.
-  -->
-  <xsl:function name="efx:plural-label-suffix" as="xs:string">
-    <xsl:param name="quantity" as="xs:decimal"/>
-    <xsl:choose>
-      <xsl:when test="$quantity = 1 or $quantity = -1">
-        <xsl:sequence select="''"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:sequence select="'.plural'"/>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:function>
+  <#-- Selects the plural form of a label from a quantity and the display language. -->
+  <#include "../common/plural_label_suffix.ftl">
 
   <xsl:function name="efx:three-letter-language-code" as="xs:string">
     <xsl:param name="two-letter-code" as="xs:string"/>

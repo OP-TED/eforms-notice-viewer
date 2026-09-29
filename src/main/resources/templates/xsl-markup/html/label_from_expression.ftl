@@ -10,14 +10,20 @@
 		In the process we will collect the labels into a variable.
 		After we are done iterating, we will join the labels together in a comma separated list. 
 	-->
+	<#if quantity?has_content>
+		<#-- The quantity is evaluated here, outside the loop below, where the context item is a label key. -->
+		<xsl:variable name="suffix${variableSuffix}" select="efx:plural-label-suffix(xs:decimal(${quantity}))"/>
+	</#if>
 	<xsl:variable name="labels${variableSuffix}" as="xs:string*">
 		<xsl:for-each select="${expression}">
 			<#if quantity?has_content>
 				<xsl:variable name="singular${variableSuffix}" select="."/>
-				<xsl:variable name="plural${variableSuffix}" select="concat(., efx:plural-label-suffix(${quantity}))"/>
-				<#-- This will fallback to the singular form if a pluralized label does not exist. -->
-				<#-- If the singular form label does not exist either, then the label key will be shown instead. -->
-				<xsl:value-of select="($labels//entry[@key=$plural${variableSuffix}]/text(), $labels//entry[@key=$singular${variableSuffix}]/text(), concat('{', $singular${variableSuffix}, '}'))[1]"/>
+				<xsl:variable name="plural${variableSuffix}" select="concat(., $suffix${variableSuffix})"/>
+				<#--
+					Look for the form of the label that matches the quantity, then the general plural, then the singular.
+					If none exists, display the label key.
+				-->
+				<xsl:value-of select="($labels//entry[@key=$plural${variableSuffix}]/text(), $labels//entry[@key=concat($singular${variableSuffix}, '.plural')]/text(), $labels//entry[@key=$singular${variableSuffix}]/text(), concat('{', $singular${variableSuffix}, '}'))[1]"/>
 			<#else>
 				<xsl:variable name="label${variableSuffix}" select="."/>
 				<#-- If the label does not exist, then the label key is displayed instead. -->
