@@ -27,8 +27,8 @@ jobs:
       - name: Set up Java for publishing to Maven Central Repository
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: '21'
+          distribution: 'temurin'
       - name: Publish to the Maven Central Repository
         run: mvn --batch-mode deploy -Dgpg.passphrase='${{ secrets.GPG_PASSPHRASE }}' -Prelease -s .github/workflows/settings.xml
         env:
