@@ -38,13 +38,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Java compiler -->
-    <java.version>11</java.version>
-    <maven.compiler.source>${java.version}</maven.compiler.source>
-    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <java.version>21</java.version>
+    <maven.compiler.release>${java.version}</maven.compiler.release>
 
     <!-- Versions - eForms -->
     <version.efx-toolkit>2.0.0-SNAPSHOT</version.efx-toolkit>
-    <version.eforms-core>1.10.0-SNAPSHOT</version.eforms-core>
+    <version.eforms-core>2.0.0-SNAPSHOT</version.eforms-core>
 
     <!-- Versions - Third-party libraries -->
     <version.antlr4>4.13.1</version.antlr4>
