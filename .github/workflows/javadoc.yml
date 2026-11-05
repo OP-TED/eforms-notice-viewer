@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '21'
           distribution: 'temurin'
       - name: Check javadoc
         run: mvn --batch-mode -s .github/workflows/settings.xml clean test-compile javadoc:javadoc javadoc:test-javadoc

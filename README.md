@@ -16,7 +16,7 @@ In this README, you will find information on how to build and use the eForms Not
 
 To build the eForms Notice Viewer, you will need the following:
 
-* Java 11 or higher
+* Java 21 or higher
 * Apache Maven 3.8 or later (other versions probably work, but they have not been tested)
 
 
@@ -62,7 +62,7 @@ In order to be able to use \'xxx-SNAPSHOT\'[^1] versions of dependencies or of t
 
 Before using this application, please make sure that you have the following requirements installed:
 
-* Java 11 or higher
+* Java 21 or higher
 
 ### Command line
 
