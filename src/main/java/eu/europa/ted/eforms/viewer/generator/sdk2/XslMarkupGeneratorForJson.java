@@ -138,13 +138,6 @@ public class XslMarkupGeneratorForJson extends XslMarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
-      Markup content, Markup children, Set<Parameter> parameters, TranslatorContext translatorContext) {
-    return this.composeFragmentDefinition(name, number, LineStyle.NORMAL, 0, conditionals, content,
-        children, parameters, translatorContext);
-  }
-
-  @Override
   public Markup composeFragmentDefinition(String name, String number, LineStyle style, int level,
       Set<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
       TranslatorContext translatorContext) {

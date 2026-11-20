@@ -228,13 +228,6 @@ public class XslMarkupGenerator implements MarkupGenerator {
     return new Markup("<br/>");
   }
 
-  @Override
-  public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
-      Markup content, Markup children, Set<Parameter> parameters, TranslatorContext translatorContext) {
-    return this.composeFragmentDefinition(name, number, LineStyle.NORMAL, 0, conditionals, content,
-        children, parameters, translatorContext);
-  }
-
   /**
    * Composes a fragment definition. The style and the level of the template line are passed to the
    * template as {@code style} ("heading" or "normal") and {@code level}, which it does not use yet.
