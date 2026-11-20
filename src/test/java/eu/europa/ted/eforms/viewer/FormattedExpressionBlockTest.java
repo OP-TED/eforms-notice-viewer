@@ -131,12 +131,12 @@ class FormattedExpressionBlockTest {
 
   @Test
   void testCalculatedDuration_DisplaysMonths() throws Exception {
-    assertEquals("43 Month", render("${BT-36-Lot[1]}"));
+    assertEquals("43 Month", render("${BT-36-Lot[at 1]}"));
   }
 
   @Test
   void testCalculatedDuration_DisplaysDays() throws Exception {
-    assertEquals("60 Day", render("${BT-131(d)-Lot[1] - BT-05(a)-notice}"));
+    assertEquals("60 Day", render("${BT-131(d)-Lot[at 1] - BT-05(a)-notice}"));
   }
 
   @Test
@@ -196,7 +196,7 @@ class FormattedExpressionBlockTest {
     final Path xsl = XslGenerator.Builder
         .create(new DependencyFactoryForUnitTesting(SDK_ROOT_DIR))
         .build()
-        .generateFile(SDK_VERSION, "expression-block-test", "{" + context + "} " + block + "\n", options, true);
+        .generateFile(SDK_VERSION, "expression-block-test", "WITH " + context + " DISPLAY " + block + ";\n", options, true);
     final String html = NoticeViewer.Builder
         .create()
         .withXsltProfiler(false)
