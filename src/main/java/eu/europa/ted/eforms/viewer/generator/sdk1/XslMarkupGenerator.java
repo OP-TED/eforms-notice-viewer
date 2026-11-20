@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -33,6 +34,7 @@ import eu.europa.ted.efx.model.expressions.TypedExpression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Conditional;
+import eu.europa.ted.efx.model.templates.LineStyle;
 import eu.europa.ted.efx.model.templates.Markup;
 import eu.europa.ted.efx.model.types.EfxDataType;
 import eu.europa.ted.efx.model.types.EfxTypeLattice;
@@ -229,8 +231,21 @@ public class XslMarkupGenerator implements MarkupGenerator {
   @Override
   public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
       Markup content, Markup children, Set<Parameter> parameters, TranslatorContext translatorContext) {
+    return this.composeFragmentDefinition(name, number, LineStyle.NORMAL, 0, conditionals, content,
+        children, parameters, translatorContext);
+  }
 
-    logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
+  /**
+   * Composes a fragment definition. The style and the level of the template line are passed to the
+   * template as {@code style} ("heading" or "normal") and {@code level}, which it does not use yet.
+   */
+  @Override
+  public Markup composeFragmentDefinition(String name, String number, LineStyle style, int level,
+      Set<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
+      TranslatorContext translatorContext) {
+
+    logger.trace("Composing fragment definition with: name={}, number={}, style={}, level={}, content={}",
+        name, number, style, level, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
@@ -243,6 +258,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("children", children.script),
         Pair.of("name", name),
         Pair.of("number", number),
+        Pair.of("style", style.name().toLowerCase(Locale.ROOT)),
+        Pair.of("level", level),
         Pair.of("parameters", parameters));
   }
 
