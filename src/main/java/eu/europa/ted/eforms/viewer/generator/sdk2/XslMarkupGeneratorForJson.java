@@ -3,6 +3,7 @@ package eu.europa.ted.eforms.viewer.generator.sdk2;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,6 +27,7 @@ import eu.europa.ted.efx.model.expressions.Expression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Conditional;
+import eu.europa.ted.efx.model.templates.LineStyle;
 import eu.europa.ted.efx.model.templates.Markup;
 @SdkComponent(versions = {"2"}, componentType = SdkComponentType.MARKUP_GENERATOR, qualifier = "json")
 public class XslMarkupGeneratorForJson extends XslMarkupGenerator {
@@ -136,11 +138,13 @@ public class XslMarkupGeneratorForJson extends XslMarkupGenerator {
   }
 
   @Override
-  public Markup composeFragmentDefinition(String name, String number, Set<Conditional> conditionals,
-      Markup content, Markup children, Set<Parameter> parameters, TranslatorContext translatorContext) {
+  public Markup composeFragmentDefinition(String name, String number, LineStyle style, int level,
+      Set<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
+      TranslatorContext translatorContext) {
 
     if (translatorContext.getCurrentSection() != TemplateSection.NAVIGATION) {
-      return super.composeFragmentDefinition(name, number, conditionals, content, children, parameters, translatorContext);
+      return super.composeFragmentDefinition(name, number, style, level, conditionals, content,
+          children, parameters, translatorContext);
     }
 
     logger.trace("Composing fragment definition with: name={}, number={}, content={}", name, number, content);
@@ -156,6 +160,8 @@ public class XslMarkupGeneratorForJson extends XslMarkupGenerator {
         Pair.of("children", children.script),
         Pair.of("name", name),
         Pair.of("number", number),
+        Pair.of("style", style.name().toLowerCase(Locale.ROOT)),
+        Pair.of("level", level),
         Pair.of("parameters", parameters));
   }
 

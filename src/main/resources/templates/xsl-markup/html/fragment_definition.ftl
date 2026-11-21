@@ -20,6 +20,8 @@
 					If the conditionals parameter is not empty, then this is the content to be used when no condition is et (under "otherwise").
 					If no conditionals are passed, then this is the content to display for this fragment.
 	- children: 	The children of this fragment  are other fragments that need to be rendered nested under this one.
+	- style: 		How the template line is displayed: "heading" or "normal". Not used yet.
+	- level: 		The level of the template line: 1 at the top of its section, one more for each line it is nested in. Not used yet.
 -->
 
 <xsl:template name="${name}">
