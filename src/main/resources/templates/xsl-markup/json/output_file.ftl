@@ -22,7 +22,7 @@
   xmlns:${udfNamespace}="http://ted.europa.eu/efx/user-defined-functions" 
   exclude-result-prefixes="efx ${udfNamespace}">
 
-  <xsl:output method="html" encoding="UTF-8" indent="no"/>
+  <xsl:output method="text" encoding="UTF-8"/>
 
   <#-- The visualisation language is a run-time parameter passed to the the XSL transformation. -->
   <xsl:param name="LANGUAGE" />
@@ -94,50 +94,83 @@
   </xsl:function>
 
 
+  <#include "../common/section_roles.ftl">
+
+  <#--
+    The response holds the main section and the summary as HTML, and the navigation as the entries of
+    a menu. It is built as the XML representation of JSON and converted with xml-to-json, so that
+    every string is escaped and the result is always valid JSON.
+  -->
+  <#-- Each section is held in a document, also when the template has no lines in it. -->
   <xsl:template match="/">
-    <!-- Generate HTML content for body -->
-    <xsl:variable name="body-html">
-      <#list body as markup>
-        ${markup}
-      </#list>
+    <xsl:variable name="body" as="document-node()">
+      <xsl:document>
+        <#list body as markup>
+          ${markup}
+        </#list>
+      </xsl:document>
     </xsl:variable>
-    
-    <!-- Generate HTML content for summary -->
-    <xsl:variable name="summary-html">
-      <#list summary as markup>
-        ${markup}
-      </#list>
+
+    <xsl:variable name="summary-lines" as="document-node()">
+      <xsl:document>
+        <#list summary as markup>
+          ${markup}
+        </#list>
+      </xsl:document>
     </xsl:variable>
-    
-    <!-- Convert HTML nodes to strings and escape for JSON -->
-    <xsl:variable name="body-string" select="serialize($body-html)" as="xs:string"/>
-    <xsl:variable name="summary-string" select="serialize($summary-html)" as="xs:string"/>
-    
-    <!-- Create a map structure for proper JSON escaping -->
-    <xsl:variable name="json-data" as="map(xs:string, xs:string)">
-      <xsl:map>
-        <xsl:map-entry key="'body'" select="$body-string"/>
-        <xsl:map-entry key="'summary'" select="$summary-string"/>
-      </xsl:map>
+    <xsl:variable name="summary">
+      <xsl:apply-templates select="$summary-lines" mode="summary"/>
     </xsl:variable>
-    
-    <!-- Serialize map as JSON to get properly escaped strings -->
-    <xsl:variable name="escaped-json" select="serialize($json-data, map{'method': 'json'})" as="xs:string"/>
-    
-    <!-- Extract escaped values from JSON -->
-    <xsl:variable name="body-escaped" select="substring-after(substring-before($escaped-json, '&quot;,&quot;summary&quot;'), '&quot;body&quot;:&quot;')" as="xs:string"/>
-    <xsl:variable name="summary-escaped" select="substring-after(substring-before($escaped-json, '&quot;}'), '&quot;summary&quot;:&quot;')" as="xs:string"/>
-    
-    <!-- Build the final JSON structure -->
-    <xsl:text>{"body":"</xsl:text>
-    <xsl:value-of select="$body-escaped"/>
-    <xsl:text>","summary":"</xsl:text>
-    <xsl:value-of select="$summary-escaped"/>
-    <xsl:text>","navigation":[</xsl:text>
-    <#list navigation as markup>
-      ${markup}<#if markup?has_next>,</#if>
-    </#list>
-    <xsl:text>]}</xsl:text>
+
+    <xsl:variable name="navigation" as="document-node()">
+      <xsl:document>
+        <#list navigation as markup>
+          ${markup}
+        </#list>
+      </xsl:document>
+    </xsl:variable>
+
+    <#-- The body and the summary are written as HTML, as the HTML page is: an empty element such as
+         <span class="value"></span> stays a pair of tags, which a browser cannot take for an opening
+         tag that holds the lines after it. -->
+    <xsl:variable name="html" select="map{'method': 'html', 'indent': false()}"/>
+    <xsl:variable name="json">
+      <fn:map>
+        <fn:string key="body"><xsl:value-of select="serialize($body, $html)"/></fn:string>
+        <fn:string key="summary"><xsl:value-of select="serialize($summary, $html)"/></fn:string>
+        <fn:array key="navigation"><xsl:apply-templates select="$navigation/section" mode="menu"/></fn:array>
+      </fn:map>
+    </xsl:variable>
+    <xsl:value-of select="xml-to-json($json)"/>
+  </xsl:template>
+
+  <#--
+    A line of the navigation that displays something itself becomes one entry of the menu: what it
+    displays is the label, the link to its heading is the url if it is a heading, and the lines
+    displayed in it are the entries under it. A line that displays nothing itself gives its place to
+    the entries of the lines displayed in it.
+  -->
+  <xsl:template match="section" mode="menu">
+    <xsl:variable name="label" select="normalize-space(string-join(node() except section))"/>
+    <xsl:variable name="children">
+      <xsl:apply-templates select="section" mode="menu"/>
+    </xsl:variable>
+    <xsl:choose>
+      <xsl:when test="$label">
+        <fn:map>
+          <fn:string key="label"><xsl:value-of select="$label"/></fn:string>
+          <xsl:if test="@id">
+            <fn:string key="url"><xsl:value-of select="concat('#', @id)"/></fn:string>
+          </xsl:if>
+          <xsl:if test="$children/*">
+            <fn:array key="children"><xsl:sequence select="$children/*"/></fn:array>
+          </xsl:if>
+        </fn:map>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="$children/*"/>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <#-- The templates are called by the markup inserted in the body above. -->

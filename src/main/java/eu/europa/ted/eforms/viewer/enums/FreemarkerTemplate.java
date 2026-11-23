@@ -17,14 +17,7 @@ public enum FreemarkerTemplate {
   DICTIONARY_DECLARATION("xsl-markup/html/dictionary_declaration.ftl"),
   FUNCTION_DECLARATION("xsl-markup/html/function_declaration.ftl"),
   // JSON templates
-  FRAGMENT_DEFINITION_JSON("xsl-markup/json/fragment_definition.ftl"),
-  FRAGMENT_INVOCATION_JSON("xsl-markup/json/fragment_invocation.ftl"),
-  FREE_TEXT_JSON("xsl-markup/json/free_text.ftl"),
-  LABEL_FROM_EXPRESSION_JSON("xsl-markup/json/label_from_expression.ftl"),
-  LABEL_FROM_KEY_JSON("xsl-markup/json/label_from_key.ftl"),
-  OUTPUT_FILE_JSON("xsl-markup/json/output_file.ftl"),
-  HYPERLINK_JSON("xsl-markup/json/hyperlink.ftl"),
-  VALUE_OF_JSON("xsl-markup/json/value_of.ftl");
+  OUTPUT_FILE_JSON("xsl-markup/json/output_file.ftl");
 
   private String path;
 

@@ -6,7 +6,6 @@ import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -34,12 +33,14 @@ import eu.europa.ted.efx.model.expressions.TypedExpression;
 import eu.europa.ted.efx.model.expressions.scalar.NumericExpression;
 import eu.europa.ted.efx.model.expressions.scalar.StringExpression;
 import eu.europa.ted.efx.model.templates.Conditional;
-import eu.europa.ted.efx.model.templates.LineStyle;
+import eu.europa.ted.efx.model.templates.FragmentKind;
+import eu.europa.ted.efx.model.templates.FragmentOutline;
 import eu.europa.ted.efx.model.templates.Markup;
+import eu.europa.ted.efx.model.templates.OutlineOffset;
 import eu.europa.ted.efx.model.types.EfxDataType;
 import eu.europa.ted.efx.model.types.EfxTypeLattice;
 
-@SdkComponent(versions = {"1", "2"}, componentType = SdkComponentType.MARKUP_GENERATOR)
+@SdkComponent(versions = {"1"}, componentType = SdkComponentType.MARKUP_GENERATOR)
 public class XslMarkupGenerator implements MarkupGenerator {
   private static final Logger logger = LoggerFactory.getLogger(XslMarkupGenerator.class);
 
@@ -229,16 +230,41 @@ public class XslMarkupGenerator implements MarkupGenerator {
   }
 
   /**
-   * Composes a fragment definition. The style and the level of the template line are passed to the
-   * template as {@code style} ("heading" or "normal") and {@code level}, which it does not use yet.
+   * Composes a fragment definition. The kind, the nesting level and the heading level of the
+   * fragment are passed to the template as {@code style} (see {@link #styleOf(FragmentKind)};
+   * "normal" for an EFX-1 line), {@code nestingLevel} and {@code headingLevel} (0 for an EFX-1 line).
+   * An EFX-1 line has no navigation id body: a numbered one is identified by its outline number.
    */
   @Override
-  public Markup composeFragmentDefinition(String name, String number, LineStyle style, int level,
-      Set<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
+  public Markup composeFragmentDefinition(String name, FragmentOutline outline,
+      List<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
       TranslatorContext translatorContext) {
+    final String number = outline.getNumber();
+    return this.composeFragmentDefinition(name, number,
+        number.isEmpty() ? "" : "section" + number.replace('.', '_'), outline.getKind(),
+        outline.getNestingLevel(), outline.getHeadingLevel(), conditionals, content, children,
+        parameters);
+  }
 
-    logger.trace("Composing fragment definition with: name={}, number={}, style={}, level={}, content={}",
-        name, number, style, level, content);
+  /**
+   * Renders a fragment definition. A fragment that is not displayed itself gets no style, so the
+   * template writes no section for it.
+   *
+   * @param id the value of the id attribute of the section, ready to be written out, or "" for no id
+   * @param kind what the fragment is; passed to the template as {@code style} (see
+   *        {@link #styleOf(FragmentKind)})
+   * @param nestingLevel the nesting level of the line where it is displayed, ready to be written
+   *        out; passed to the template as {@code nestingLevel}
+   * @param headingLevel the heading level of the line where it is displayed, ready to be written
+   *        out; passed to the template as {@code headingLevel}
+   */
+  protected Markup composeFragmentDefinition(String name, String number, String id,
+      FragmentKind kind, Object nestingLevel, Object headingLevel, List<Conditional> conditionals,
+      Markup content, Markup children, Set<Parameter> parameters) {
+
+    logger.trace(
+        "Composing fragment definition with: name={}, number={}, id={}, kind={}, nestingLevel={}, headingLevel={}, content={}",
+        name, number, id, kind, nestingLevel, headingLevel, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
@@ -251,9 +277,29 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("children", children.script),
         Pair.of("name", name),
         Pair.of("number", number),
-        Pair.of("style", style.name().toLowerCase(Locale.ROOT)),
-        Pair.of("level", level),
+        Pair.of("id", id),
+        Pair.of("style", styleOf(kind)),
+        Pair.of("nestingLevel", nestingLevel),
+        Pair.of("headingLevel", headingLevel),
         Pair.of("parameters", parameters));
+  }
+
+  /**
+   * @return how a fragment of the given kind is displayed, as the template receives it: "heading"
+   *         or "normal" for a template line that is displayed in a section of its own, and "" for a
+   *         fragment that is not displayed itself (a line that invokes a template, whose templates
+   *         take its place, or a template that holds lines, whose lines take the place of the line
+   *         that invokes it), for which the template writes no section
+   */
+  protected static String styleOf(final FragmentKind kind) {
+    switch (kind) {
+      case HEADING:
+        return "heading";
+      case NORMAL:
+        return "normal";
+      default:
+        return "";
+    }
   }
 
   @Override
@@ -268,8 +314,20 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("content", content.script));
   }
 
+  /**
+   * Renders the call of a fragment. EFX-1 has no navigation ids, and its levels are not used, so
+   * what the call puts above the fragment is not used.
+   */
   @Override
-  public Markup renderFragmentInvocation(String name, Set<Argument> arguments, TranslatorContext translatorContext) {
+  public Markup renderFragmentInvocation(String name, OutlineOffset offset,
+      Set<Argument> arguments, TranslatorContext translatorContext) {
+    return this.renderCall(name, arguments);
+  }
+
+  /**
+   * Renders the call of a fragment with the given arguments.
+   */
+  protected Markup renderCall(String name, Set<Argument> arguments) {
     logger.trace("Rendering fragment invocation with: name={}", name);
 
     return generateMarkup(

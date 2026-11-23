@@ -14,14 +14,17 @@
 					Each parameter is an object with a parameter.name and a parameter.type property.
     - number: 		Outline number. 
 					Display if present.
+	- id: 			The id of the section, ready to be written out, or empty for a section without one.
 	- conditionals: A list of conditionals, each of which is an object with a conditional.condition and a conditional.content property.
 					If conditional.condition is true then conditional.content should be displayed. 
     - content: 		The content of this fragment.
 					If the conditionals parameter is not empty, then this is the content to be used when no condition is et (under "otherwise").
 					If no conditionals are passed, then this is the content to display for this fragment.
 	- children: 	The children of this fragment  are other fragments that need to be rendered nested under this one.
-	- style: 		How the template line is displayed: "heading" or "normal". Not used yet.
-	- level: 		The level of the template line: 1 at the top of its section, one more for each line it is nested in. Not used yet.
+	- style: 		How the template line is displayed: "heading" or "normal".
+					Absent for a fragment that is not displayed itself (a line that invokes a template, or a template that holds lines): no section is written for it.
+	- nestingLevel: 	The nesting level of the line where it is displayed: 1 at the top of its section, one more for each line it is nested in.
+	- headingLevel: 	The heading level of the line where it is displayed: 1 for a heading with no heading above it, one more for each heading it is nested in. 0 for a line that is not a heading.
 -->
 
 <xsl:template name="${name}">
@@ -30,7 +33,7 @@
 			<xsl:param name="${parameter.name}" />
 		</#list>
 	</#if>
-	<section title="${name}" <#if number?has_content>id="section${number?replace('.', '_')}"</#if>>
+	<#if style?has_content><section title="${name}" <#if id?has_content>id="${id}"</#if>></#if>
 		<#if number?has_content && children?has_content>
 		  <xsl:text>${number}&#160;</xsl:text>
 		</#if>
@@ -51,5 +54,5 @@
 		<#if children?has_content>
 			${children}
 		</#if>
-	</section>
+	<#if style?has_content></section></#if>
 </xsl:template>
