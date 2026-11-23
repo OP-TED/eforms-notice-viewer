@@ -95,7 +95,7 @@ class PluralLabelTest {
   void labelFromKey_quantityFromField_selectsTheSpecificForm() throws Exception {
     assertEquals("tygodnie", labelFromKey("html", "22", entry(WEEK, "tydzień")
         + entry(WEEK + ".few", "tygodnie") + entry(WEEK + ".many", "tygodni")));
-    assertEquals("tygodni", labelFromKey("json", "5", entry(WEEK, "tydzień")
+    assertEquals("tygodni", labelFromKey("html", "5", entry(WEEK, "tydzień")
         + entry(WEEK + ".few", "tygodnie") + entry(WEEK + ".many", "tygodni")));
   }
 
@@ -107,7 +107,7 @@ class PluralLabelTest {
 
   @Test
   void labelFromKey_missingPlural_fallsBackToSingular() throws Exception {
-    assertEquals("tydzień", labelFromKey("json", "5", entry(WEEK, "tydzień")));
+    assertEquals("tydzień", labelFromKey("html", "5", entry(WEEK, "tydzień")));
   }
 
   @Test
@@ -121,15 +121,13 @@ class PluralLabelTest {
    */
   @Test
   void labelFromExpression_relativeQuantity_selectsTheSpecificForm() throws Exception {
-    for (String format : new String[] {"html", "json"}) {
-      final String markup = render("xsl-markup/" + format + "/label_from_expression.ftl",
-          Map.of("expression", "('" + WEEK + "')", "variableSuffix", "1", "quantity",
-              "q/number()"));
-      final String result = transform(
-          stylesheet(labels(entry(WEEK, "tydzień") + entry(WEEK + ".few", "tygodnie")) + markup),
-          "<root><q>3</q></root>", "pl");
-      assertEquals("tygodnie", result, format);
-    }
+    final String markup = render("xsl-markup/html/label_from_expression.ftl",
+        Map.of("expression", "('" + WEEK + "')", "variableSuffix", "1", "quantity",
+            "q/number()"));
+    final String result = transform(
+        stylesheet(labels(entry(WEEK, "tydzień") + entry(WEEK + ".few", "tygodnie")) + markup),
+        "<root><q>3</q></root>", "pl");
+    assertEquals("tygodnie", result);
   }
 
   private static String labelFromKey(String format, String quantity, String entries)

@@ -109,9 +109,12 @@
           </div>
           <div class="tab-content summary-content">
             <div class="summary-inner">
+              <xsl:variable name="summary">
               <#list summary as markup>
                   ${markup}
               </#list>
+              </xsl:variable>
+              <xsl:apply-templates select="$summary" mode="summary"/>
             </div>
           </div>
           <div class="tab-content main-content active">
@@ -135,9 +138,12 @@
     <div class="nav">
       <div class="nav-collapse-btn collapse-btn button">&#9776;</div>
       <div class="nav-content">
+      <xsl:variable name="navigation">
       <#list navigation as markup>
           ${markup}
       </#list>
+      </xsl:variable>
+      <xsl:apply-templates select="$navigation" mode="navigation"/>
       </div>
     </div>
     <div class="resizer"></div>
@@ -148,6 +154,10 @@
     </#list>
     </div>
   </xsl:template>
+
+  <#if summary?has_content || navigation?has_content>
+  <#include "../common/section_roles.ftl">
+  </#if>
 
   <#-- The templates are called by the markup inserted in the body above. -->
   <#list templates as template>
