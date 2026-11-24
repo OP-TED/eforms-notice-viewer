@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          java-version: '11'
-          distribution: 'adopt'
+          java-version: '21'
+          distribution: 'temurin'
       - name: Build package
         run: mvn --batch-mode -s .github/workflows/settings.xml -DM2_SETTINGS=.github/workflows/settings.xml clean install # Property "M2_SETTINGS" is used by the SDK downloader in tests.
