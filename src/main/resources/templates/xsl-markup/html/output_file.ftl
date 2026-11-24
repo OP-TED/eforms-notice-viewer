@@ -83,15 +83,8 @@
     <xsl:sequence select="$language-map//language[c2=$two-letter-code]/c3/text()"/>
   </xsl:function>
 
-  <xsl:function name="efx:preferred-language" as="xs:string*">
-    <xsl:param name="ref" as="node()*"/>
-    <xsl:sequence select="(for $language in $PREFERRED_LANGUAGES return $ref[./@languageID=$language], $ref)[1]/@languageID"/>
-  </xsl:function>
-
-  <xsl:function name="efx:preferred-language-text" as="xs:string*">
-    <xsl:param name="ref" as="node()*"/>
-    <xsl:sequence select="(for $language in $PREFERRED_LANGUAGES return $ref[./@languageID=$language], $ref)[1]/normalize-space(text())"/>
-  </xsl:function>
+  <#-- Selects the language and the text of each value of a multilingual field. -->
+  <#include "../common/preferred_language.ftl">
 
   <xsl:template match="/">
     <html>
