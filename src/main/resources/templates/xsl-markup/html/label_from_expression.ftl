@@ -3,8 +3,10 @@
     - expression: Expression that generates the label key.
     - variableSuffix: Suffix provided for uniqueness of variable names.
 	- quantity: A numeric quantity used to decide if the label needs to be pluralized.
+	The label keys are also written in the attribute data-label-key, separated by spaces, which the page shows in
+	debug mode.
 -->
-<span class="dynamic-label">
+<span class="dynamic-label" data-label-key="{${expression}}">
 	<#-- 
 		The expression may return a sequence, so we will iterate over each label returned by the expression. 
 		In the process we will collect the labels into a variable.

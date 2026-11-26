@@ -51,6 +51,21 @@ body > .nav + .resizer + .body {
     font-weight: bold;
 }
 
+.tab-buttons .debug-toggle {
+    flex: 0 0 auto;
+    padding: 12px 16px;
+    border: none;
+    background: #eee;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #444;
+}
+
+.tab-buttons .debug-toggle[aria-pressed="true"] {
+    background: #ddd;
+    color: black;
+}
+
 .tab-buttons .active {
     background: #fff;
     border-bottom: 2px solid #2196f3;
@@ -205,72 +220,84 @@ section {
     padding: 6px 6px 6px 36px;
 }
 
-.text {
-    font-size: 12pt;
+/* Fonts and colours of the TED website: Arial, dark grey text (#444) on 20px lines, links in blue without
+   underline. The main section is in 15px, the summary in 14px and the navigation in 16px; a text, a label or a
+   value takes the size and the colour of the line it is in. */
+.body,
+.summary-inner,
+.nav .nav-content {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #444;
+}
+
+.text,
+.label,
+.dynamic-label,
+.value {
+    font-size: inherit;
+    color: inherit;
+}
+
+.body a,
+.summary-inner a,
+.nav-content a {
+    color: #3d6ecf;
+    text-decoration: none;
+}
+
+.body a:hover,
+.summary-inner a:hover,
+.nav-content a:hover {
+    color: #1454b7;
+}
+
+/* Debug colours, switched on by the "Debug colours" button (class "debug-colours" on the body): each piece of
+   text shows where it comes from. Free text is black, a label green, the label of a code blue, a value red. */
+.debug-colours .text {
     color: black;
 }
 
-.label {
-    font-size: 12pt;
+.debug-colours .label {
     color: green;
 }
 
-.dynamic-label {
-    font-size: 12pt;
+.debug-colours .dynamic-label {
     color: blue;
 }
 
-.value {
-    font-size: 12pt;
+.debug-colours .value {
     color: red;
 }
+
 /* Each section has the class "heading" or "normal", and the classes "nesting-N" and "heading-N" with its
-   nesting level and its heading level (0 for a normal line). A heading is bold, and the higher its heading
-   level, the smaller it is, down to 12.5pt from level 4. The text of a section is written directly in it, before its nested sections,
-   so each section sets its own size and weight, and a nested section never inherits those of its parent. */
+   nesting level and its heading level (0 for a normal line). As on the TED website, a heading is bold, at the
+   size of the text, with more space above it the higher it is. The text of a section is written directly in
+   it, before its nested sections, so each section sets its own weight, and a nested section never inherits the
+   weight of its parent. */
+.body section {
+    font-size: 15px;
+    line-height: 20px;
+    /* 9px between two lines, as on the TED website: 20px lines, 29px apart */
+    padding-top: 4px;
+    padding-bottom: 5px;
+}
+
 section.heading {
     font-weight: bold;
-    font-size: 12.5pt;
     margin-top: 12px;
 }
 
 section.normal {
     font-weight: normal;
-    font-size: 12pt;
-}
-
-section.heading > .text,
-section.heading > .label,
-section.heading > .value,
-section.heading > .dynamic-label,
-section.heading > a > .text,
-section.heading > a > .label,
-section.heading > a > .value,
-section.heading > a > .dynamic-label {
-    font-size: inherit;
 }
 
 section.heading-1 {
-    font-size: 18pt;
     margin-top: 24px;
-}
-
-section.heading-2 {
-    font-size: 15.5pt;
-    margin-top: 18px;
-}
-
-section.heading-3 {
-    font-size: 14pt;
 }
 
 /* Summary: a compact layout, as on the TED website. Lines follow each other without spacing, headings are bold
    at the size of the text, the lines under a heading are indented once, and a heading with lines under it starts
    a new block after a blank line. */
-.summary-inner {
-    font-family: Arial, Helvetica, sans-serif;
-}
-
 .summary-inner section {
     padding: 0;
     margin: 0;
@@ -282,23 +309,12 @@ section.heading-3 {
     padding-left: 20px;
 }
 
-.summary-inner .text,
-.summary-inner .label,
-.summary-inner .value,
-.summary-inner .dynamic-label {
-    font-size: inherit;
-}
-
 .summary-inner section.heading:has(> section) {
     margin-top: 20px;
 }
 
 /* Navigation: a list of entries, as on the TED website. Each entry is one line with a separator under it; the
    entries under an entry are indented once and hidden until its arrow opens them. */
-.nav .nav-content {
-    font-family: Arial, Helvetica, sans-serif;
-}
-
 .nav-content section {
     padding: 0;
     margin: 0;
@@ -310,13 +326,6 @@ section.heading-3 {
 
 .nav-content section section {
     padding-left: 20px;
-}
-
-.nav-content .text,
-.nav-content .label,
-.nav-content .value,
-.nav-content .dynamic-label {
-    font-size: inherit;
 }
 
 /* A heading of the navigation section is a link to its heading in the main section: it is shown as a row.

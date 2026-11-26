@@ -40,6 +40,77 @@ function init() {
         section.insertBefore(toggle, section.firstChild);
     });
 
+    // In debug mode, each section and each label also gets a tooltip that says where it comes from: for a section,
+    // its XSL template, its style and its levels; for a label, the same for its line, then its key. The tooltips
+    // are prepared here and only set while the debug colours are on, so that the page shows no tooltip of its own
+    // otherwise.
+    const debugTooltips = new Map();
+    document.querySelectorAll('section[title]').forEach(function (section) {
+        const lines = ['XSL template: ' + section.getAttribute('title')];
+        const style = ['heading', 'normal'].find(function (name) { return section.classList.contains(name); });
+        if (style) lines.push('Style: ' + style);
+        section.classList.forEach(function (name) {
+            const nesting = /^nesting-(\d+)$/.exec(name);
+            if (nesting) lines.push('Nesting level: ' + nesting[1]);
+            const heading = /^heading-(\d+)$/.exec(name);
+            if (heading && heading[1] !== '0') lines.push('Heading level: ' + heading[1]);
+        });
+        debugTooltips.set(section, lines.join('\n'));
+        section.removeAttribute('title');
+    });
+    // A browser shows only the tooltip of the innermost element under the mouse, so the tooltip of a label also
+    // repeats that of its line, before the label key.
+    document.querySelectorAll('[data-label-key]').forEach(function (label) {
+        const keys = label.getAttribute('data-label-key').split(/\s+/).filter(Boolean);
+        if (keys.length === 0) return;
+        const line = label.closest('section');
+        const lines = line && debugTooltips.has(line) ? [debugTooltips.get(line)] : [];
+        keys.forEach(function (key) { lines.push('Label key: ' + key); });
+        debugTooltips.set(label, lines.join('\n'));
+    });
+    const showDebugTooltips = function (on) {
+        debugTooltips.forEach(function (tooltip, element) {
+            if (on) {
+                element.setAttribute('title', tooltip);
+            } else {
+                element.removeAttribute('title');
+            }
+        });
+    };
+
+    // The "Debug colours" button shows where each piece of text comes from: its colours (see style.css) and the
+    // tooltips above. It is switched on by the button, or by "debug" in the query of the address, as in
+    // "notice.html?debug"; the browser remembers the choice made with the button.
+    const tabButtons = document.querySelector('.tab-buttons');
+    if (tabButtons) {
+        const debugToggle = document.createElement('button');
+        debugToggle.className = 'debug-toggle';
+        debugToggle.type = 'button';
+        debugToggle.textContent = 'Debug colours';
+        const showDebugColours = function (on) {
+            document.body.classList.toggle('debug-colours', on);
+            debugToggle.setAttribute('aria-pressed', String(on));
+            showDebugTooltips(on);
+        };
+        let remembered = null;
+        try {
+            remembered = window.localStorage.getItem('debugColours');
+        } catch (e) {
+            // No storage, as in a private window: the choice is not remembered
+        }
+        showDebugColours(new URLSearchParams(window.location.search).has('debug') || remembered === 'on');
+        debugToggle.addEventListener('click', function () {
+            const on = !document.body.classList.contains('debug-colours');
+            showDebugColours(on);
+            try {
+                window.localStorage.setItem('debugColours', on ? 'on' : 'off');
+            } catch (e) {
+                // No storage: the choice holds until the page is closed
+            }
+        });
+        tabButtons.appendChild(debugToggle);
+    }
+
     // Navigation collapse button event listener
     const collapseBtn = document.querySelector('.nav-collapse-btn');
     if (collapseBtn) {
