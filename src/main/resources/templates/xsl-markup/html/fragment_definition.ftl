@@ -33,7 +33,7 @@
 			<xsl:param name="${parameter.name}" />
 		</#list>
 	</#if>
-	<#if style?has_content><section title="${name}" <#if id?has_content>id="${id}"</#if>></#if>
+	<#if style?has_content><section title="${name}" class="${style} nesting-{${nestingLevel}} heading-{${headingLevel}}" <#if id?has_content>id="${id}"</#if>></#if>
 		<#if number?has_content && children?has_content>
 		  <xsl:text>${number}&#160;</xsl:text>
 		</#if>

@@ -15,6 +15,31 @@ function init() {
         });
     }
 
+    // A navigation entry with entries under it gets an arrow that opens and closes them. The arrow is named after
+    // its entry: the text of the section itself, without the entries under it. An entry that displays no text
+    // stays open and gets no arrow, because there would be nothing to show where the closed entries are.
+    document.querySelectorAll('.nav-content section').forEach(function (section) {
+        if (!section.querySelector(':scope > section')) return;
+        const name = Array.from(section.childNodes)
+            .filter(function (node) { return node.nodeName !== 'SECTION'; })
+            .map(function (node) { return node.textContent; })
+            .join('').replace(/\s+/g, ' ').trim();
+        if (!name) return;
+        section.classList.add('collapsible');
+        const toggle = document.createElement('button');
+        toggle.className = 'nav-toggle';
+        toggle.type = 'button';
+        toggle.textContent = '\u25B8';
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', name);
+        toggle.addEventListener('click', function () {
+            const open = section.classList.toggle('open');
+            toggle.textContent = open ? '\u25BE' : '\u25B8';
+            toggle.setAttribute('aria-expanded', String(open));
+        });
+        section.insertBefore(toggle, section.firstChild);
+    });
+
     // Navigation collapse button event listener
     const collapseBtn = document.querySelector('.nav-collapse-btn');
     if (collapseBtn) {

@@ -224,3 +224,134 @@ section {
     font-size: 12pt;
     color: red;
 }
+/* Each section has the class "heading" or "normal", and the classes "nesting-N" and "heading-N" with its
+   nesting level and its heading level (0 for a normal line). A heading is bold, and the higher its heading
+   level, the smaller it is, down to 12.5pt from level 4. The text of a section is written directly in it, before its nested sections,
+   so each section sets its own size and weight, and a nested section never inherits those of its parent. */
+section.heading {
+    font-weight: bold;
+    font-size: 12.5pt;
+    margin-top: 12px;
+}
+
+section.normal {
+    font-weight: normal;
+    font-size: 12pt;
+}
+
+section.heading > .text,
+section.heading > .label,
+section.heading > .value,
+section.heading > .dynamic-label,
+section.heading > a > .text,
+section.heading > a > .label,
+section.heading > a > .value,
+section.heading > a > .dynamic-label {
+    font-size: inherit;
+}
+
+section.heading-1 {
+    font-size: 18pt;
+    margin-top: 24px;
+}
+
+section.heading-2 {
+    font-size: 15.5pt;
+    margin-top: 18px;
+}
+
+section.heading-3 {
+    font-size: 14pt;
+}
+
+/* Summary: a compact layout, as on the TED website. Lines follow each other without spacing, headings are bold
+   at the size of the text, the lines under a heading are indented once, and a heading with lines under it starts
+   a new block after a blank line. */
+.summary-inner {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.summary-inner section {
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.summary-inner section section {
+    padding-left: 20px;
+}
+
+.summary-inner .text,
+.summary-inner .label,
+.summary-inner .value,
+.summary-inner .dynamic-label {
+    font-size: inherit;
+}
+
+.summary-inner section.heading:has(> section) {
+    margin-top: 20px;
+}
+
+/* Navigation: a list of entries, as on the TED website. Each entry is one line with a separator under it; the
+   entries under an entry are indented once and hidden until its arrow opens them. */
+.nav .nav-content {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.nav-content section {
+    padding: 0;
+    margin: 0;
+    font-size: 16px;
+    font-weight: normal;
+    line-height: 20px;
+    position: relative;
+}
+
+.nav-content section section {
+    padding-left: 20px;
+}
+
+.nav-content .text,
+.nav-content .label,
+.nav-content .value,
+.nav-content .dynamic-label {
+    font-size: inherit;
+}
+
+/* A heading of the navigation section is a link to its heading in the main section: it is shown as a row.
+   A heading cannot hold a hyperlink of its own, so its link is always this one. A hyperlink in a normal line
+   stays inline. */
+.nav-content section.heading > a {
+    display: block;
+    padding: 15px 28px 15px 20px;
+    border-bottom: 1px solid #ddd;
+    text-decoration: none;
+}
+
+/* The arrow sits on the first line of its entry: at the top of a normal line, and below the padding of the
+   row when the entry is a heading. */
+.nav-content .nav-toggle {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: #2b65d9;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.nav-content section.heading > .nav-toggle:has(+ a) {
+    top: 15px;
+}
+
+.nav-content section.collapsible > section {
+    display: none;
+}
+
+.nav-content section.collapsible.open > section {
+    display: block;
+}
