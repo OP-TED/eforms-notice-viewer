@@ -91,9 +91,28 @@ public class XslMarkupGenerator extends eu.europa.ted.eforms.viewer.generator.sd
     final String id = navIdBody.isEmpty()
         ? ""
         : "{concat($" + NAV_ID_PREFIX + ", '" + navIdBody + "', '-', generate-id())}";
-    return this.composeFragmentDefinition(name, outline.getNumber(), id, outline.getKind(),
+    return this.composeFragmentDefinition(name, outline.getNumber(), id,
+        sectionClassWhereDisplayed(outline), outline.getKind(),
         nestingLevelWhereDisplayed(outline), headingLevelWhereDisplayed(outline), conditionals,
         content, children, received);
+  }
+
+  /**
+   * @return the class that names the section of a line where it is displayed, ready to be written
+   *         out: for a line with a navigation id body, "section-" and its navigation id with "-"
+   *         instead of {@link OutlineAddress#SEPARATOR}, as "section-5-1" for 5.1 or
+   *         "section-notice-info" for the tag notice-info; for a numbered line without one, such
+   *         as a numbered line of the summary, "section-" and its outline number with "-" instead
+   *         of "."; "" for a line with neither
+   */
+  private static String sectionClassWhereDisplayed(final FragmentOutline outline) {
+    final String navIdBody = outline.getNavIdBody();
+    if (!navIdBody.isEmpty()) {
+      return "section-{translate(concat($" + NAV_ID_PREFIX + ", '" + navIdBody + "'), '"
+          + OutlineAddress.SEPARATOR + "', '-')}";
+    }
+    final String number = outline.getNumber();
+    return number.isEmpty() ? "" : "section-" + number.replace('.', '-');
   }
 
   /**

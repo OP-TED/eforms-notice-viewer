@@ -108,7 +108,7 @@
             <div class="button main-tab active">Main</div>
           </div>
           <div class="tab-content summary-content">
-            <div class="summary-inner">
+            <div class="summary-inner summary">
               <xsl:variable name="summary">
               <#list summary as markup>
                   ${markup}
@@ -137,7 +137,7 @@
     <#if navigation?has_content>
     <div class="nav">
       <div class="nav-collapse-btn collapse-btn button">&#9776;</div>
-      <div class="nav-content">
+      <div class="nav-content navigation">
       <xsl:variable name="navigation">
       <#list navigation as markup>
           ${markup}
@@ -148,7 +148,7 @@
     </div>
     <div class="resizer"></div>
     </#if>
-    <div class="body<#if !navigation?has_content> no-nav</#if>">
+    <div class="body main<#if !navigation?has_content> no-nav</#if>">
     <#list body as markup>
         ${markup}
     </#list>

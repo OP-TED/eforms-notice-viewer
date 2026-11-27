@@ -1,3 +1,15 @@
+/* The notice viewer in the TED design system. The values are the design system's tokens, written out, because
+   the page loads no other stylesheet: text gray-100 #333333, muted text gray-75 #666666, rules gray-20 #d8d8d8,
+   links eu-blue-100 #0e47cb, the selected tab forest-110 #2c862d, Arial throughout.
+
+   The page has three areas, each with a class of its own: "summary", "navigation" and "main". A line of the notice
+   is a section with the class "heading" or "normal", the classes "nesting-N" and "heading-N" with its nesting
+   level and its heading level (0 for a normal line), and, when it has an outline number or a tag, a class that
+   names it, such as "section-5-1" for 5.1. Its own text, before the lines nested in it, is in a span of class
+   "line-text", and its outline number in a span of class "number". The styles below rely only on these classes and
+   on the classes of the text in a line ("text", "label", "dynamic-label", "value"), never on the order of the
+   lines. */
+
 html, body {
     height: 100%;
     margin: 0;
@@ -5,7 +17,9 @@ html, body {
 }
 
 body {
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
+    color: #333333;
+    background: #ffffff;
     height: 100vh;
     overflow: hidden;
 }
@@ -32,9 +46,15 @@ body > .nav + .resizer + .body {
     flex-direction: column;
 }
 
+/* Tab bar: the design system's Tabs. 16px labels in #333333, the selected one bold with a 3px forest-110 line
+   under it, a 1px gray-20 line under the bar. */
 .tab-buttons {
     display: flex;
-    background: #eee;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 0 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #d8d8d8;
     position: sticky;
     top: 0;
     z-index: 10;
@@ -42,33 +62,63 @@ body > .nav + .resizer + .body {
 }
 
 .tab-buttons .button {
-    flex: 1;
-    padding: 12px;
+    padding: 12px 16px;
+    margin-bottom: -1px;
     border: none;
-    background: #eee;
+    border-bottom: 3px solid transparent;
+    background: none;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
-}
-
-.tab-buttons .debug-toggle {
-    flex: 0 0 auto;
-    padding: 12px 16px;
-    border: none;
-    background: #eee;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: #444;
-}
-
-.tab-buttons .debug-toggle[aria-pressed="true"] {
-    background: #ddd;
-    color: black;
+    font-weight: 400;
+    color: #333333;
 }
 
 .tab-buttons .active {
-    background: #fff;
-    border-bottom: 2px solid #2196f3;
+    font-weight: 700;
+    border-bottom-color: #2c862d;
+}
+
+/* Debug button: the design system's ghost button (no border or fill, 3px corners); switched on, its
+   secondary-filled look (eu-blue-5 fill, eu-blue-100 text). */
+.tab-buttons .debug-toggle {
+    margin-left: auto;
+    padding: 6px 12px;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: none;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 0.875rem;
+    color: #0e47cb;
+}
+
+.tab-buttons .debug-toggle:hover {
+    background: #e7edfa;
+}
+
+.tab-buttons .debug-toggle[aria-pressed="true"] {
+    background: #f3f6fc;
+    border-color: #0e47cb;
+}
+
+/* The key of the debug colours, shown under the tab bar while they are on. */
+.debug-key {
+    display: none;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    align-items: center;
+    margin: 12px 24px 0;
+    padding: 12px 16px;
+    background: #f5f5f5;
+    border: 1px solid #d8d8d8;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #666666;
+    flex-shrink: 0;
+}
+
+.debug-colours .debug-key {
+    display: flex;
 }
 
 .tab-content {
@@ -95,7 +145,7 @@ body > .nav + .resizer + .body {
 .summary-inner {
     flex: 1;
     overflow: auto;
-    padding: 16px;
+    padding: 32px 40px 64px;
     box-sizing: border-box;
 }
 
@@ -106,10 +156,12 @@ body > .nav + .resizer + .body {
     overflow: hidden;
 }
 
+/* The navigation panel is the design system's EuiSidebarMenu: 260px wide, on the application shell's #f5f5f5, with the
+   1px #d8d8d8 line of the resizer on its right. */
 .nav {
-    width: 200px;
+    width: 260px;
     min-width: 50px;
-    background: #f8f8f8;
+    background: #f5f5f5;
     box-sizing: border-box;
     height: 100%;
     transition: width 0.2s;
@@ -128,25 +180,46 @@ body > .nav + .resizer + .body {
     padding: 0 !important;
 }
 
+/* The button that folds the navigation away: the design system's Button, variant "ghost", size "sm", icon-only, with
+   Phosphor's "sidebar-simple" icon (script.js draws it). Its icon lines up with the rule of the navigation. */
 .nav .collapse-btn {
-    margin: 12px 8px 12px 8px;
-    background: #ddd;
-    border: none;
+    margin: 16px 0 12px 16px;
+    padding: 6px;
+    border: 2px solid transparent;
+    border-radius: 3px;
+    background: none;
+    color: #0e47cb;
     cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: bold;
-    width: 24px;
-    height: 24px;
-    display: flex;
+    font-size: 0.875rem;
+    line-height: 1.15;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav .collapse-btn:hover {
+    background: #e7edfa;
+}
+
+.nav .collapse-btn:focus-visible {
+    outline: 2px solid #757575;
+    outline-offset: 2px;
+}
+
+.nav .collapse-btn svg {
+    width: 1em;
+    height: 1em;
+}
+
+.nav.collapsed .collapse-btn {
+    margin-left: 5px;
 }
 
 .nav .nav-content {
     display: block;
-    padding: 16px 8px 8px 8px;
+    margin: 0;
+    padding: 8px 0;
     width: 100%;
     box-sizing: border-box;
     height: 100%;
@@ -176,22 +249,26 @@ body > .nav + .resizer + .body {
 }
 
 .resizer {
-    width: 6px;
-    background: #ccc;
+    width: 1px;
+    background: #d8d8d8;
     cursor: ew-resize;
     height: 100%;
     align-self: stretch;
     transition: background 0.2s;
 }
 
+.resizer:hover {
+    background: #858585;
+}
+
 .nav.collapsed+.resizer {
     cursor: default;
-    background: #eee;
+    background: #d8d8d8;
 }
 
 .body {
     flex: 1;
-    padding: 16px;
+    padding: 0 40px 64px;
     box-sizing: border-box;
     height: 100%;
     overflow: auto;
@@ -217,19 +294,12 @@ body > .nav + .resizer + .body {
 }
 
 section {
-    padding: 6px 6px 6px 36px;
+    padding: 0;
+    margin: 0;
 }
 
-/* Fonts and colours of the TED website: Arial, dark grey text (#444) on 20px lines, links in blue without
-   underline. The main section is in 15px, the summary in 14px and the navigation in 16px; a text, a label or a
-   value takes the size and the colour of the line it is in. */
-.body,
-.summary-inner,
-.nav .nav-content {
-    font-family: Arial, Helvetica, sans-serif;
-    color: #444;
-}
-
+/* Text: a text, a label or a value takes the colour and the size of its line. Links: eu-blue-100, underlined,
+   the underline gone on hover. */
 .text,
 .label,
 .dynamic-label,
@@ -238,129 +308,234 @@ section {
     color: inherit;
 }
 
-.body a,
-.summary-inner a,
-.nav-content a {
-    color: #3d6ecf;
+a {
+    color: #0e47cb;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+a:hover {
     text-decoration: none;
 }
 
-.body a:hover,
-.summary-inner a:hover,
-.nav-content a:hover {
-    color: #1454b7;
+/* Main: body text 16px on 1.62 lines, at most 65rem wide; the label of a normal line in gray-75. Headings bold
+   on the design system's ladder: 28px at heading level 1, 24px at 2, 20px below. A heading sets its own size and
+   a normal line resets it, so that no line inherits the size of the heading it is nested in. */
+.main > section {
+    max-width: 65rem;
 }
 
-/* Debug colours, switched on by the "Debug colours" button (class "debug-colours" on the body): each piece of
-   text shows where it comes from. Free text is black, a label green, the label of a code blue, a value red. */
-.debug-colours .text {
-    color: black;
+.main section {
+    font-size: 1rem;
+    line-height: 1.62;
 }
 
-.debug-colours .label {
-    color: green;
+.main section.normal {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.62;
+    padding: 2px 0;
 }
 
-.debug-colours .dynamic-label {
-    color: blue;
+.main section.normal > .line-text > .label {
+    color: #666666;
 }
 
-.debug-colours .value {
-    color: red;
+.main section.heading {
+    font-weight: 700;
+    line-height: 1.15;
+    padding-top: 32px;
+    padding-bottom: 8px;
 }
 
-/* Each section has the class "heading" or "normal", and the classes "nesting-N" and "heading-N" with its
-   nesting level and its heading level (0 for a normal line). As on the TED website, a heading is bold, at the
-   size of the text, with more space above it the higher it is. The text of a section is written directly in
-   it, before its nested sections, so each section sets its own weight, and a nested section never inherits the
-   weight of its parent. */
-.body section {
-    font-size: 15px;
-    line-height: 20px;
-    /* 9px between two lines, as on the TED website: 20px lines, 29px apart */
-    padding-top: 4px;
-    padding-bottom: 5px;
+.main section.heading-1 {
+    font-size: 1.75rem;
+    padding-top: 48px;
 }
 
-section.heading {
-    font-weight: bold;
-    margin-top: 12px;
+.main section.heading-2 {
+    font-size: 1.5rem;
 }
 
-section.normal {
-    font-weight: normal;
+.main section.heading:not(.heading-1):not(.heading-2) {
+    font-size: 1.25rem;
 }
 
-section.heading-1 {
-    margin-top: 24px;
+/* The outline number of a line in main: gray-75, not bold, as the design system writes the number of a heading. The
+   summary numbers some of its lines only to mark them (see below) and does not show the numbers. In the navigation
+   the number stays part of the entry's link. */
+.main .number {
+    color: #666666;
+    font-weight: 400;
 }
 
-/* Summary: a compact layout, as on the TED website. Lines follow each other without spacing, headings are bold
-   at the size of the text, the lines under a heading are indented once, and a heading with lines under it starts
-   a new block after a blank line. */
-.summary-inner section {
-    padding: 0;
-    margin: 0;
-    font-size: 14px;
-    line-height: 20px;
-}
-
-.summary-inner section section {
-    padding-left: 20px;
-}
-
-.summary-inner section.heading:has(> section) {
-    margin-top: 20px;
-}
-
-/* Navigation: a list of entries, as on the TED website. Each entry is one line with a separator under it; the
-   entries under an entry are indented once and hidden until its arrow opens them. */
-.nav-content section {
-    padding: 0;
-    margin: 0;
-    font-size: 16px;
-    font-weight: normal;
-    line-height: 20px;
-    position: relative;
-}
-
-.nav-content section section {
-    padding-left: 20px;
-}
-
-/* A heading of the navigation section is a link to its heading in the main section: it is shown as a row.
-   A heading cannot hold a hyperlink of its own, so its link is always this one. A hyperlink in a normal line
-   stays inline. */
-.nav-content section.heading > a {
-    display: block;
-    padding: 15px 28px 15px 20px;
-    border-bottom: 1px solid #ddd;
-    text-decoration: none;
-}
-
-/* The arrow sits on the first line of its entry: at the top of a normal line, and below the padding of the
-   row when the entry is a heading. */
-.nav-content .nav-toggle {
-    position: absolute;
-    top: 0;
-    right: 8px;
-    border: none;
-    background: none;
-    padding: 0;
-    cursor: pointer;
-    color: #2b65d9;
-    font-size: 16px;
-    line-height: 20px;
-}
-
-.nav-content section.heading > .nav-toggle:has(+ a) {
-    top: 15px;
-}
-
-.nav-content section.collapsible > section {
+.summary .number {
     display: none;
 }
 
-.nav-content section.collapsible.open > section {
+/* A heading at level 1 has a gray-20 rule under its own text (its "line-text"), before the lines nested in it. */
+.main section.heading-1 > .line-text {
     display: block;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #d8d8d8;
+    margin-bottom: 8px;
+}
+
+/* Summary: the same text, at most 65rem wide; a heading is an 18px component heading, with space above it. */
+.summary > section {
+    max-width: 65rem;
+}
+
+.summary section {
+    font-size: 1rem;
+    line-height: 1.62;
+}
+
+.summary section.normal {
+    font-weight: 400;
+    padding: 2px 0;
+}
+
+.summary section.normal > .line-text > .label {
+    color: #666666;
+}
+
+.summary section.heading {
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.3;
+    padding-top: 24px;
+    padding-bottom: 4px;
+}
+
+/* The lots of the summary (section 5, each lot 5.1) are the design system's Card (OP's .gs-card), side by side: white,
+   a 1px #d8d8d8 border, 8px corners, a single black shadow that grows on hover, 16px inside. The lot's own line is
+   the card's title: 18px bold on 1.3 lines, #333333, 6px above the description. The lines of the lot are the
+   description: 16px on 1.62 lines, with no space of their own between them. */
+.summary section.section-5 {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: 24px;
+}
+
+.summary section.section-5 > .line-text {
+    grid-column: 1 / -1;
+}
+
+.summary section.section-5-1 {
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #d8d8d8;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.1s ease-in-out;
+    overflow: hidden;
+}
+
+.summary section.section-5-1:hover {
+    box-shadow: 0 1px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.summary section.section-5-1 > .line-text {
+    display: block;
+    margin-bottom: 6px;
+    line-height: 1.3;
+    color: #333333;
+}
+
+.summary section.section-5-1 section.normal {
+    padding: 0;
+}
+
+/* Navigation: the design system's EuiSidebarMenu, the menu MDM shows for the same entries. script.js puts each entry in a
+   row ("nav-entry"): its link, then, when the entry has entries under it, a 14px chevron that shows or hides them
+   (pointing down while they are hidden, up while they are shown); they are hidden until it is pressed. A top-level
+   entry is 16px text in #333333, 8px above and below, 16px from the left after a 3px line that stays transparent; an
+   entry under it is 14px text in #515560, 4px above and below, 40px from the left. The entry of the part of the
+   notice being read (class "current") has an #e7edfa background and semi-bold #082b7a text, and, at the top level,
+   its 3px line in #0e47cb. The design system's menu has no deeper levels; they are shown as eUI's own menu shows them
+   in MDM, as rows like the second level, one step further in (eUI's 16px step from its second to its third level),
+   and no further for the levels below. The text is in the eUI font family. */
+.navigation section {
+    font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+}
+
+.navigation .nav-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navigation .nav-entry > a {
+    flex: 1;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.navigation section.nesting-1 > .nav-entry {
+    padding: 8px 16px;
+    border-left: 3px solid transparent;
+    font-size: 1rem;
+    color: #333333;
+}
+
+.navigation section:not(.nesting-1) > .nav-entry {
+    padding: 4px 16px 4px 40px;
+    font-size: 0.875rem;
+    color: #515560;
+}
+
+.navigation section:not(.nesting-1):not(.nesting-2) > .nav-entry {
+    padding-left: 56px;
+}
+
+.navigation .nav-toggle {
+    flex: none;
+    display: inline-flex;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: inherit;
+}
+
+.navigation .nav-toggle svg {
+    width: 14px;
+    height: 14px;
+}
+
+.navigation section.collapsible:not(.open) > section {
+    display: none;
+}
+
+.navigation section.current > .nav-entry {
+    background: #e7edfa;
+    font-weight: 600;
+    color: #082b7a;
+}
+
+.navigation section.nesting-1.current > .nav-entry {
+    border-left-color: #0e47cb;
+}
+
+/* Debug colours, switched on by the "Debug colours" button (class "debug-colours" on the body): each piece of
+   text shows where it comes from, in the design system's colours. Free text gray-100, a label forest-110, the
+   label of a code eu-blue-100, a value error-100. */
+.debug-colours .text {
+    color: #333333;
+}
+
+.debug-colours .label,
+.debug-colours section.normal > .line-text > .label {
+    color: #2c862d;
+}
+
+.debug-colours .dynamic-label {
+    color: #0e47cb;
+}
+
+.debug-colours .value {
+    color: #bb0202;
 }

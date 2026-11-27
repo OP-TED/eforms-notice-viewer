@@ -233,7 +233,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
    * Composes a fragment definition. The kind, the nesting level and the heading level of the
    * fragment are passed to the template as {@code style} (see {@link #styleOf(FragmentKind)};
    * "normal" for an EFX-1 line), {@code nestingLevel} and {@code headingLevel} (0 for an EFX-1 line).
-   * An EFX-1 line has no navigation id body: a numbered one is identified by its outline number.
+   * An EFX-1 line has no navigation id body: a numbered one is identified by its outline number,
+   * which also gives its section class, as "section-5-1" for 5.1.
    */
   @Override
   public Markup composeFragmentDefinition(String name, FragmentOutline outline,
@@ -241,7 +242,8 @@ public class XslMarkupGenerator implements MarkupGenerator {
       TranslatorContext translatorContext) {
     final String number = outline.getNumber();
     return this.composeFragmentDefinition(name, number,
-        number.isEmpty() ? "" : "section" + number.replace('.', '_'), outline.getKind(),
+        number.isEmpty() ? "" : "section" + number.replace('.', '_'),
+        number.isEmpty() ? "" : "section-" + number.replace('.', '-'), outline.getKind(),
         outline.getNestingLevel(), outline.getHeadingLevel(), conditionals, content, children,
         parameters);
   }
@@ -251,6 +253,9 @@ public class XslMarkupGenerator implements MarkupGenerator {
    * template writes no section for it.
    *
    * @param id the value of the id attribute of the section, ready to be written out, or "" for no id
+   * @param sectionClass the class that names the section by its outline number or tag, as
+   *        "section-5-1", ready to be written out; or "" for none. A style sheet can style a whole
+   *        section of the notice by it, wherever its lines are displayed.
    * @param kind what the fragment is; passed to the template as {@code style} (see
    *        {@link #styleOf(FragmentKind)})
    * @param nestingLevel the nesting level of the line where it is displayed, ready to be written
@@ -259,12 +264,12 @@ public class XslMarkupGenerator implements MarkupGenerator {
    *        out; passed to the template as {@code headingLevel}
    */
   protected Markup composeFragmentDefinition(String name, String number, String id,
-      FragmentKind kind, Object nestingLevel, Object headingLevel, List<Conditional> conditionals,
+      String sectionClass, FragmentKind kind, Object nestingLevel, Object headingLevel, List<Conditional> conditionals,
       Markup content, Markup children, Set<Parameter> parameters) {
 
     logger.trace(
-        "Composing fragment definition with: name={}, number={}, id={}, kind={}, nestingLevel={}, headingLevel={}, content={}",
-        name, number, id, kind, nestingLevel, headingLevel, content);
+        "Composing fragment definition with: name={}, number={}, id={}, sectionClass={}, kind={}, nestingLevel={}, headingLevel={}, content={}",
+        name, number, id, sectionClass, kind, nestingLevel, headingLevel, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
@@ -278,6 +283,7 @@ public class XslMarkupGenerator implements MarkupGenerator {
         Pair.of("name", name),
         Pair.of("number", number),
         Pair.of("id", id),
+        Pair.of("sectionClass", sectionClass),
         Pair.of("style", styleOf(kind)),
         Pair.of("nestingLevel", nestingLevel),
         Pair.of("headingLevel", headingLevel),

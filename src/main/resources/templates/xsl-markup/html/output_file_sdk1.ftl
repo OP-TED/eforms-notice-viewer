@@ -121,7 +121,7 @@
             <div class="button main-tab active">Main</div>
           </div>
           <div class="tab-content summary-content">
-            <div class="summary-inner">
+            <div class="summary-inner summary">
               <#list summary as markup>
                   ${markup}
               </#list>
@@ -130,14 +130,14 @@
           <div class="tab-content main-content active">
             <div class="nav">
               <div class="nav-collapse-btn collapse-btn button">&#9776;</div>
-              <div class="nav-content">
+              <div class="nav-content navigation">
               <#list navigation as markup>
                   ${markup}
               </#list>
               </div>
             </div>
             <div class="resizer"></div>
-            <div class="body">
+            <div class="body main">
             <#list body as markup>
                 ${markup}
             </#list>
