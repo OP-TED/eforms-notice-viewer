@@ -17,8 +17,12 @@
 	                apart from the text of the line (or hidden).
 	- navIdBody:    The navigation id of the line in its own section or template, as 5_1 or notice-info, or empty for a
 	                line without one.
-	- conditionals: A list of conditionals, each of which is an object with a conditional.condition and a
-	                conditional.content property. If conditional.condition is true, then conditional.content is displayed.
+	- conditionals: A list of conditionals, each of which is an object with a conditional.condition, a
+	                conditional.caption and a conditional.content property. If conditional.condition is true, then
+	                conditional.caption and conditional.content are displayed.
+	- caption:      The caption of the content: what the template of the line displays before the colon that separates
+	                it from the content, or empty when the template has no caption (always for a heading, and in EFX-1).
+	                The colon itself is not passed: the viewer writes its own separator.
 	- content:      The content of this fragment.
 	                If the conditionals parameter is not empty, this is the content displayed when no condition is met
 	                (under "otherwise"). Otherwise, this is the content to display for this fragment.
@@ -43,10 +47,12 @@
 	- its section class is "section-" and its navigation id with "-" instead of "_", as section-5-1 for 5.1, or, for a
 	  line without a navigation id body, "section-" and its outline number with "-" instead of "."; a style sheet can
 	  style a whole section of the notice by it, wherever its lines are displayed;
-	- its nesting level and its heading level are the offsets plus its own (a line that is not a heading stays at 0).
+	- its nesting level is the offset plus its own, in the class nesting-N;
+	- a heading's heading level is the offset plus its own, in the class heading-N; a line that is not a heading has no
+	  heading level, so it gets no such class.
 -->
 
-<#-- What the line displays: its number, when lines are nested in it, then its content. -->
+<#-- What the line displays: its number, when lines are nested in it, then its caption and its content. -->
 <#macro lineText>
 	<#if number?has_content && children?has_content>
 		<span class="number">${number}&#160;</span>
@@ -55,13 +61,29 @@
 		<xsl:choose>
 			<#list conditionals as item>
 				<xsl:when test="${item.condition}">
-					${item.content}
+					<@captionedContent caption=item.caption content=item.content/>
 				</xsl:when>
 			</#list>
 			<xsl:otherwise>
-				${content}
+				<@captionedContent caption=caption content=content/>
 			</xsl:otherwise>
 		</xsl:choose>
+	<#else>
+		<@captionedContent caption=caption content=content/>
+	</#if>
+</#macro>
+
+<#-- A content with its caption, when it has one: the caption, the viewer's own separator and the content, each in a
+     span of its own, together in a span of class "captioned", so that a style sheet can show them side by side or
+     one below the other. Like the number, the separator ends with a no-break space. A content without a caption is
+     written as it is. -->
+<#macro captionedContent caption content>
+	<#if caption?has_content>
+		<span class="captioned">
+			<span class="caption">${caption}</span>
+			<span class="separator">:&#160;</span>
+			<span class="content">${content}</span>
+		</span>
 	<#else>
 		${content}
 	</#if>
@@ -78,9 +100,9 @@
 	<xsl:param name="__headingLevelOffset" />
 	<#if style?has_content>
 		<#if headingLevel gt 0>
-			<#assign heading = "{$__headingLevelOffset + ${headingLevel?c}}">
+			<#assign headingClass = " heading-{$__headingLevelOffset + ${headingLevel?c}}">
 		<#else>
-			<#assign heading = "0">
+			<#assign headingClass = "">
 		</#if>
 		<#if navIdBody?has_content>
 			<#assign sectionClass = " section-{translate(concat($__navIdPrefix, '${navIdBody}'), '_', '-')}">
@@ -90,7 +112,7 @@
 			<#assign sectionClass = "">
 		</#if>
 		<section title="${name}"
-			class="${style} nesting-{$__nestingLevelOffset + ${nestingLevel?c}} heading-${heading}${sectionClass}"
+			class="${style} nesting-{$__nestingLevelOffset + ${nestingLevel?c}}${headingClass}${sectionClass}"
 			<#if navIdBody?has_content>id="{concat($__navIdPrefix, '${navIdBody}', '-', generate-id())}"</#if>>
 			<span class="line-text">
 				<@lineText/>

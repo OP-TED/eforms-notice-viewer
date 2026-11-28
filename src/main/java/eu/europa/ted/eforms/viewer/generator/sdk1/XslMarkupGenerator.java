@@ -238,22 +238,28 @@ public class XslMarkupGenerator implements MarkupGenerator {
    * (see {@link #renderFragmentInvocation(String, OutlineOffset, Set, TranslatorContext)}), the
    * template writes the id, the section class and the levels of the line where it is displayed.
    * An EFX-1 line has no navigation id body, so it gets no id.
+   *
+   * <p>The template also receives the caption of the line, and of each of its alternatives, apart
+   * from the content: what the template of the line displays before the colon that separates
+   * them. It is empty when the template has no caption, and always in EFX-1.
    */
   @Override
   public Markup composeFragmentDefinition(String name, FragmentOutline outline,
-      List<Conditional> conditionals, Markup content, Markup children, Set<Parameter> parameters,
-      TranslatorContext translatorContext) {
+      List<Conditional> conditionals, Markup caption, Markup content, Markup children,
+      Set<Parameter> parameters, TranslatorContext translatorContext) {
 
-    logger.trace("Composing fragment definition with: name={}, outline={}, content={}", name,
-        outline, content);
+    logger.trace("Composing fragment definition with: name={}, outline={}, caption={}, content={}",
+        name, outline, caption, content);
 
     return generateMarkup(
         FreemarkerTemplate.FRAGMENT_DEFINITION,
         Pair.of("conditionals", conditionals.stream()
             .map(conditional -> Map.of(
                 "condition", conditional.getCondition().getScript(),
+                "caption", conditional.getCaption().script,
                 "content", conditional.getMarkup().script))
             .collect(Collectors.toList())),
+        Pair.of("caption", caption.script),
         Pair.of("content", content.script),
         Pair.of("children", children.script),
         Pair.of("name", name),

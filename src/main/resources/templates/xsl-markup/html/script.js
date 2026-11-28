@@ -173,7 +173,7 @@ function init() {
             const nesting = /^nesting-(\d+)$/.exec(name);
             if (nesting) lines.push('Nesting level: ' + nesting[1]);
             const heading = /^heading-(\d+)$/.exec(name);
-            if (heading && heading[1] !== '0') lines.push('Heading level: ' + heading[1]);
+            if (heading) lines.push('Heading level: ' + heading[1]);
         });
         debugTooltips.set(section, lines.join('\n'));
         section.removeAttribute('title');
