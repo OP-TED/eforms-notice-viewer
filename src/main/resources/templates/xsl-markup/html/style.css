@@ -3,8 +3,8 @@
    links eu-blue-100 #0e47cb, the selected tab forest-110 #2c862d, Arial throughout.
 
    The page has three areas, each with a class of its own: "summary", "navigation" and "main". A line of the notice
-   is a section with the class "heading" or "normal", the classes "nesting-N" and "heading-N" with its nesting
-   level and its heading level (0 for a normal line), and, when it has an outline number or a tag, a class that
+   is a section with the class "heading" or "normal", the class "nesting-N" with its nesting level, a heading also
+   the class "heading-N" with its heading level, and, when it has an outline number or a tag, a class that
    names it, such as "section-5-1" for 5.1. Its own text, before the lines nested in it, is in a span of class
    "line-text", and its outline number in a span of class "number". The styles below rely only on these classes and
    on the classes of the text in a line ("text", "label", "dynamic-label", "value"), never on the order of the
@@ -318,9 +318,10 @@ a:hover {
     text-decoration: none;
 }
 
-/* Main: body text 16px on 1.62 lines, at most 65rem wide; the label of a normal line in gray-75. Headings bold
-   on the design system's ladder: 28px at heading level 1, 24px at 2, 20px below. A heading sets its own size and
-   a normal line resets it, so that no line inherits the size of the heading it is nested in. */
+/* Main: one text size, 16px on 1.62 lines, at most 65rem wide. The text of a normal line is gray-75, whether it is a
+   caption or a line without a caption; only the content next to a caption is gray-100 (see below). Headings bold on
+   the design system's ladder: 28px at heading level 1, 24px at 2, 20px below. A heading sets its own size and a
+   normal line resets it, so that no line inherits the size of the heading it is nested in. */
 .main > section {
     max-width: 65rem;
 }
@@ -330,15 +331,86 @@ a:hover {
     line-height: 1.62;
 }
 
+/* Two lines are 8px apart (4px above and below each), the row gap of the design system's description list
+   (spacing-xs). */
 .main section.normal {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.62;
-    padding: 2px 0;
+    padding: 4px 0;
 }
 
-.main section.normal > .line-text > .label {
+.main section.normal > .line-text {
     color: #666666;
+}
+
+/* The lines are laid out on two columns, as the design system's description list: the captions, 10rem to 17rem wide,
+   and the content, 1.5rem further. A heading, and a normal line that is not under a heading or another line, defines
+   the two columns; every normal line under it, at any depth, uses the same columns (subgrid), so that all the content
+   lines up on one edge. A line nested in a normal line is indented by 1.5rem (spacing-l): the indent takes room from
+   the caption column only. A line without a caption spans both columns. On a narrow screen there is one column, and
+   the content goes below its caption. */
+.main section.heading,
+.main section.normal {
+    display: grid;
+    column-gap: 1.5rem;
+}
+
+@media (min-width: 769px) {
+    .main section.heading,
+    .main section.normal {
+        grid-template-columns: minmax(10rem, 17rem) minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main section.heading,
+    .main section.normal {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.main section section.normal {
+    grid-template-columns: subgrid;
+}
+
+.main section.heading > .line-text,
+.main section.heading > section {
+    grid-column: 1 / -1;
+}
+
+.main section.normal > .line-text,
+.main section.normal > section {
+    grid-column: 1 / -1;
+}
+
+.main section.normal > section {
+    padding-left: 1.5rem;
+}
+
+/* A line with a caption (span "captioned", see fragment_definition.ftl) puts its caption in the first column and its
+   content, in gray-100, in the second. The columns separate them, so the separator is not shown. */
+.main section.normal > .line-text:has(> .captioned) {
+    display: grid;
+    grid-template-columns: subgrid;
+}
+
+.main .captioned {
+    display: contents;
+}
+
+.main .captioned > .content {
+    color: #333333;
+}
+
+.main .captioned > .separator {
+    display: none;
+}
+
+/* A normal line without a caption (no span "captioned" in what it displays) has 12px more space above it than other
+   lines, so that it does not read as the continuation of the value above it. */
+.main section.normal:not(:has(> .line-text .captioned)) {
+    padding-top: 1rem;
 }
 
 .main section.heading {
@@ -393,11 +465,46 @@ a:hover {
 
 .summary section.normal {
     font-weight: 400;
-    padding: 2px 0;
+    padding: 4px 0;
 }
 
-.summary section.normal > .line-text > .label {
+.summary section.normal > .line-text {
     color: #666666;
+}
+
+/* In the summary, a caption has a column of 10rem to 14rem (see main above). Inside a lot's card, a caption stays in
+   the line of its content, with the separator, as the card's description. */
+.summary .captioned {
+    display: grid;
+    column-gap: 1.5rem;
+}
+
+@media (min-width: 769px) {
+    .summary .captioned {
+        grid-template-columns: minmax(10rem, 14rem) minmax(0, 1fr);
+    }
+}
+
+.summary .captioned > .content {
+    color: #333333;
+}
+
+.summary .captioned > .separator {
+    display: none;
+}
+
+.summary section.section-5-1 .captioned {
+    display: inline;
+}
+
+.summary section.section-5-1 .captioned > .separator {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .summary .captioned {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .summary section.heading {
