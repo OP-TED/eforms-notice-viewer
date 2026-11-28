@@ -308,6 +308,12 @@ section {
     color: inherit;
 }
 
+/* A value can hold a word longer than its line, such as a web address. It breaks inside that word, and only there,
+   so that a narrow page does not scroll sideways. */
+.value {
+    overflow-wrap: anywhere;
+}
+
 a {
     color: #0e47cb;
     text-decoration: underline;
