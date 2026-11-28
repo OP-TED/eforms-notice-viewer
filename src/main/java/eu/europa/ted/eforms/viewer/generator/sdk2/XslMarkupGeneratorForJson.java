@@ -32,7 +32,7 @@ public class XslMarkupGeneratorForJson extends XslMarkupGenerator {
     final Markup unformattedMarkup = generateMarkup(
         FreemarkerTemplate.OUTPUT_FILE_JSON,
         Pair.of("translations", translations),
-        Pair.of("globals", markupsListToStringList(withOutlineStart(globals))),
+        Pair.of("globals", markupsListToStringList(globals)),
         Pair.of("body", markupsListToStringList(main)),
         Pair.of("summary", markupsListToStringList(summary)),
         Pair.of("navigation", markupsListToStringList(navigation)),

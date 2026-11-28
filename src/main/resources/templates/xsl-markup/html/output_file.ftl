@@ -37,6 +37,11 @@
   <#-- The translations compile-time parameter contains a sequence of calls to fn:doc(), which will effectivelly load all labels. -->
   <xsl:variable name="labels" select="${translations}"/>
 
+  <#-- What the calls at the top of a section pass on: no navigation id prefix and offsets 0 (see fragment_definition.ftl). -->
+  <xsl:variable name="__navIdPrefix" select="''"/>
+  <xsl:variable name="__nestingLevelOffset" select="0"/>
+  <xsl:variable name="__headingLevelOffset" select="0"/>
+
   <#-- Insert the user-defined variable declarations -->
   <#if globals?has_content>
     <#list globals as markup>
@@ -108,7 +113,7 @@
             <div class="button main-tab active">Main</div>
           </div>
           <div class="tab-content summary-content">
-            <div class="summary-inner">
+            <div class="summary-inner summary">
               <xsl:variable name="summary">
               <#list summary as markup>
                   ${markup}
@@ -137,7 +142,7 @@
     <#if navigation?has_content>
     <div class="nav">
       <div class="nav-collapse-btn collapse-btn button">&#9776;</div>
-      <div class="nav-content">
+      <div class="nav-content navigation">
       <xsl:variable name="navigation">
       <#list navigation as markup>
           ${markup}
@@ -148,7 +153,7 @@
     </div>
     <div class="resizer"></div>
     </#if>
-    <div class="body<#if !navigation?has_content> no-nav</#if>">
+    <div class="body main<#if !navigation?has_content> no-nav</#if>">
     <#list body as markup>
         ${markup}
     </#list>

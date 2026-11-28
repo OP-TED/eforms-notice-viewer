@@ -10,9 +10,16 @@
     It does so by using the xsl:call-template element.
 
     Parameters:
-    - name:         Fragment identifier.
-    - parameters:   List of parameters to pass to the fragment.
-                    Each parameter is an object with parameter.name and parameter.value properties.
+    - name:               Fragment identifier.
+    - parameters:         List of parameters to pass to the fragment.
+                          Each parameter is an object with parameter.name and parameter.value properties.
+    - navIdPrefix:        The navigation id prefix that this call puts above the fragment, followed by the separator "_",
+                          as 5_1_, or empty.
+    - nestingLevelOffset: The nesting level offset that this call puts above the fragment.
+    - headingLevelOffset: The heading level offset that this call puts above the fragment.
+
+    The call passes on what the calls on the way put above the caller (see fragment_definition.ftl), with what it puts
+    itself added.
 -->
 
 
@@ -20,4 +27,7 @@
     <#list parameters as parameter>
         <xsl:with-param name="${parameter.name}" select = "${parameter.value}" />
     </#list>
+    <xsl:with-param name="__navIdPrefix" select="concat($__navIdPrefix, '${navIdPrefix}')" />
+    <xsl:with-param name="__nestingLevelOffset" select="$__nestingLevelOffset + ${nestingLevelOffset?c}" />
+    <xsl:with-param name="__headingLevelOffset" select="$__headingLevelOffset + ${headingLevelOffset?c}" />
 </xsl:call-template>
